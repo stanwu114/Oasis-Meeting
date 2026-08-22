@@ -2,7 +2,6 @@ import { useState } from 'react'
 import { useAppStore } from '../stores/appStore'
 import { useUiStore } from '../stores/uiStore'
 import { useRecorderStore } from '../stores/recorderStore'
-import { BrandMark } from './BrandMark'
 import { Icon } from './Icon'
 import { PageTree } from './PageTree'
 

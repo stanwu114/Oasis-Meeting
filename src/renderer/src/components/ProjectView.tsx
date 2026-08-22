@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react'
 import { useAppStore } from '../stores/appStore'
-import { useUiStore } from '../stores/uiStore'
 import { Icon } from './Icon'
 import type { PageSummary } from '../../../shared/ipc'
 
