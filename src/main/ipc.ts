@@ -170,11 +170,11 @@ export function registerIpc(): void {
   })
   handle(IPC.systemCityLocation, async () => {
     try {
-      const res = await fetch('https://ipapi.co/json/', { signal: AbortSignal.timeout(5000) })
+      const res = await fetch('http://ip-api.com/json/?lang=zh-CN', { signal: AbortSignal.timeout(5000) })
       if (!res.ok) return null
-      const data = (await res.json()) as { city?: string; region?: string; country_name?: string }
+      const data = (await res.json()) as { city?: string; regionName?: string; country?: string }
       if (!data.city && !data.region) return null
-      return { city: data.city ?? '', region: data.region ?? '', country: data.country_name ?? '' }
+      return { city: data.city ?? '', region: data.regionName ?? '', country: data.country ?? '' }
     } catch {
       return null
     }
