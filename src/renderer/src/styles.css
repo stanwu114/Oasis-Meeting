@@ -1337,7 +1337,7 @@ kbd {
 }
 
 .recordings-title {
-  font-size: 30px;
+  font-size: 28px;
   font-weight: 700;
   margin: 0;
   letter-spacing: -0.5px;
@@ -1643,7 +1643,7 @@ kbd {
 }
 
 .trash-title {
-  font-size: 30px;
+  font-size: 28px;
   font-weight: 700;
   margin: 0 0 6px;
   letter-spacing: -0.5px;
@@ -1959,7 +1959,7 @@ kbd {
 .brand-word {
   font-family: 'BrandDisplay', Inter, -apple-system, sans-serif;
   font-weight: 900;
-  font-size: 30px;
+  font-size: 28px;
   letter-spacing: -0.025em;
   line-height: 1;
   color: var(--fg);
@@ -1975,7 +1975,7 @@ kbd {
 .brand-sub {
   font-family: 'BrandDisplay', Inter, -apple-system, sans-serif;
   font-weight: 900;
-  font-size: 30px;
+  font-size: 28px;
   color: var(--fg);
   margin-left: 7px;
   letter-spacing: -0.025em;
