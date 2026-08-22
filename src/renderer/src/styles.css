@@ -603,19 +603,17 @@ kbd {
   height: 52px;
   border-radius: 50%;
   background: var(--accent);
-  color: #fff;
-  font-size: 20px;
+  color: var(--on-accent);
   display: flex;
   align-items: center;
   justify-content: center;
   box-shadow: var(--shadow-lg);
   z-index: 60;
-  transition: transform 0.15s, filter 0.15s;
+  transition: filter 0.15s;
 }
 
 .record-fab:hover {
-  transform: scale(1.07);
-  filter: brightness(1.06);
+  filter: brightness(1.1);
 }
 
 .page-title {
@@ -917,18 +915,17 @@ kbd {
   height: 32px;
   border-radius: 50%;
   background: var(--accent);
-  color: #fff;
+  color: var(--on-accent);
   font-size: 11px;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  transition: transform 0.12s, filter 0.12s;
+  transition: filter 0.12s;
 }
 
 .audio-play-btn:hover {
-  filter: brightness(1.08);
-  transform: scale(1.04);
+  filter: brightness(1.1);
 }
 
 .audio-wave {
@@ -1067,7 +1064,7 @@ kbd {
 }
 
 .btn:active:not(:disabled) {
-  transform: scale(0.97);
+  filter: brightness(0.92);
 }
 
 .btn.primary {
