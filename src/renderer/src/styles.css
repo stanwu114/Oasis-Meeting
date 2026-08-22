@@ -2,22 +2,26 @@
 :root {
   --bg: #ffffff;
   --bg-sidebar: #f7f7f5;
-  --bg-hover: rgba(55, 53, 47, 0.06);
-  --bg-active: rgba(55, 53, 47, 0.1);
+  --bg-subtle: #fbfbfa;
+  --bg-hover: rgba(55, 53, 47, 0.055);
+  --bg-active: rgba(55, 53, 47, 0.09);
   --fg: #37352f;
   --fg-muted: #787774;
   --fg-faint: #9b9a97;
-  --border: #e9e9e7;
-  --accent: #2383e2;
-  --accent-soft: rgba(35, 131, 226, 0.14);
+  --border: #ececeb;
+  --border-strong: #dfdfdc;
+  --accent: #2f80ed;
+  --accent-soft: rgba(47, 128, 237, 0.12);
   --danger: #eb5757;
-  --danger-soft: rgba(235, 87, 87, 0.12);
+  --danger-soft: rgba(235, 87, 87, 0.1);
   --ok: #0f9960;
-  --wave: #d3d3d1;
-  --wave-progress: #2383e2;
+  --ok-soft: rgba(15, 153, 96, 0.1);
+  --wave: #d4d4d2;
+  --wave-progress: #2f80ed;
   --card: #ffffff;
-  --shadow: 0 10px 40px rgba(15, 15, 15, 0.16), 0 2px 8px rgba(15, 15, 15, 0.08);
-  --radius: 8px;
+  --shadow-sm: 0 1px 2px rgba(15, 15, 15, 0.04), 0 2px 6px rgba(15, 15, 15, 0.04);
+  --shadow-lg: 0 12px 44px rgba(15, 15, 15, 0.14), 0 3px 10px rgba(15, 15, 15, 0.06);
+  --radius: 10px;
   font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei',
     'Helvetica Neue', sans-serif;
 }
@@ -25,18 +29,25 @@
 html.dark {
   --bg: #191919;
   --bg-sidebar: #202020;
-  --bg-hover: rgba(255, 255, 255, 0.055);
-  --bg-active: rgba(255, 255, 255, 0.09);
+  --bg-subtle: #1e1e1e;
+  --bg-hover: rgba(255, 255, 255, 0.05);
+  --bg-active: rgba(255, 255, 255, 0.085);
   --fg: #e9e9e7;
   --fg-muted: #9b9b98;
   --fg-faint: #6f6f6c;
-  --border: #2f2f2f;
+  --border: #2e2e2e;
+  --border-strong: #3a3a3a;
   --accent: #529cca;
-  --accent-soft: rgba(82, 156, 202, 0.18);
+  --accent-soft: rgba(82, 156, 202, 0.16);
+  --danger: #eb5757;
+  --danger-soft: rgba(235, 87, 87, 0.14);
+  --ok: #3fae7c;
+  --ok-soft: rgba(63, 174, 124, 0.13);
   --wave: #3a3a3a;
   --wave-progress: #529cca;
-  --card: #252525;
-  --shadow: 0 10px 40px rgba(0, 0, 0, 0.5), 0 2px 8px rgba(0, 0, 0, 0.35);
+  --card: #242424;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.25), 0 2px 6px rgba(0, 0, 0, 0.2);
+  --shadow-lg: 0 12px 44px rgba(0, 0, 0, 0.5), 0 3px 10px rgba(0, 0, 0, 0.35);
 }
 
 * {
@@ -56,6 +67,7 @@ body {
   background: var(--bg);
   overflow: hidden;
   -webkit-font-smoothing: antialiased;
+  letter-spacing: 0.1px;
 }
 
 button {
@@ -90,14 +102,14 @@ kbd {
 
 /* ============ 侧栏 ============ */
 .sidebar {
-  width: 264px;
+  width: 262px;
   flex-shrink: 0;
   background: var(--bg-sidebar);
   border-right: 1px solid var(--border);
   display: flex;
   flex-direction: column;
-  padding: 52px 8px 10px;
-  gap: 2px;
+  padding: 52px 10px 10px;
+  gap: 4px;
   user-select: none;
   position: relative;
 }
@@ -114,36 +126,40 @@ kbd {
 
 .sidebar-brand {
   font-weight: 600;
-  font-size: 13.5px;
+  font-size: 13px;
   display: flex;
-  gap: 6px;
+  gap: 7px;
   align-items: center;
-  color: var(--fg-muted);
-  padding: 2px 10px 0;
-  margin-bottom: 10px;
+  color: var(--fg);
+  padding: 4px 10px 6px;
+}
+
+.brand-mark {
+  font-size: 14px;
 }
 
 .sidebar-actions {
   display: flex;
   flex-direction: column;
-  gap: 2px;
-  margin-bottom: 10px;
+  gap: 3px;
+  margin-bottom: 12px;
 }
 
 .sidebar-btn {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 5px 10px;
-  border-radius: 6px;
+  gap: 9px;
+  padding: 6px 10px;
+  border-radius: 7px;
   color: var(--fg-muted);
   font-size: 13.5px;
   text-align: left;
-  transition: background 0.1s;
+  transition: background 0.12s, color 0.12s;
 }
 
 .sidebar-btn:hover {
   background: var(--bg-hover);
+  color: var(--fg);
 }
 
 .sidebar-btn.active {
@@ -170,41 +186,44 @@ kbd {
   display: flex;
   flex-direction: column;
   gap: 1px;
-  margin-bottom: 12px;
+  margin-bottom: 10px;
 }
 
 .sidebar-pages {
   flex: 1;
   overflow-y: auto;
-  margin: 0 -8px;
-  padding: 0 8px;
+  margin: 0 -10px;
+  padding: 0 10px;
 }
 
 .sidebar-pages-head {
-  font-size: 12px;
+  font-size: 11.5px;
   font-weight: 600;
+  letter-spacing: 0.5px;
   color: var(--fg-faint);
-  padding: 4px 10px 6px;
-  display: flex;
-  align-items: center;
-  gap: 6px;
+  padding: 8px 10px 6px;
 }
 
 .sidebar-pages-count {
   font-weight: 400;
+  opacity: 0.8;
 }
 
 .sidebar-bottom {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 2px;
   padding-top: 8px;
   border-top: 1px solid var(--border);
 }
 
+.sidebar-bottom .sidebar-btn {
+  font-size: 13px;
+}
+
 .theme-toggle {
   padding: 5px 10px;
-  border-radius: 6px;
+  border-radius: 7px;
   font-size: 12.5px;
   color: var(--fg-muted);
   text-align: left;
@@ -216,7 +235,7 @@ kbd {
 
 .model-hint {
   padding: 6px 10px;
-  border-radius: 6px;
+  border-radius: 7px;
   background: var(--accent-soft);
   color: var(--accent);
   font-size: 12px;
@@ -234,8 +253,8 @@ kbd {
   display: flex;
   align-items: center;
   gap: 2px;
-  height: 27px;
-  border-radius: 5px;
+  height: 28px;
+  border-radius: 6px;
   font-size: 13.5px;
   color: var(--fg-muted);
   cursor: default;
@@ -321,13 +340,13 @@ kbd {
 .row-menu {
   position: absolute;
   right: 4px;
-  top: 26px;
+  top: 27px;
   z-index: 30;
   background: var(--card);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  box-shadow: var(--shadow);
-  padding: 4px;
+  box-shadow: var(--shadow-lg);
+  padding: 5px;
   display: flex;
   flex-direction: column;
   min-width: 150px;
@@ -335,7 +354,7 @@ kbd {
 
 .row-menu button {
   padding: 6px 10px;
-  border-radius: 5px;
+  border-radius: 6px;
   font-size: 13px;
   text-align: left;
   color: var(--fg);
@@ -351,9 +370,9 @@ kbd {
 
 /* ============ 编辑器 ============ */
 .editor-page {
-  max-width: 760px;
+  max-width: 768px;
   margin: 0 auto;
-  padding: 56px 48px 30vh;
+  padding: 64px 52px 30vh;
 }
 
 .page-title {
@@ -365,119 +384,106 @@ kbd {
   color: var(--fg);
   font-size: 40px;
   font-weight: 700;
-  line-height: 1.2;
+  line-height: 1.25;
   font-family: inherit;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
   overflow: hidden;
+  letter-spacing: -0.5px;
 }
 
 .page-title::placeholder {
   color: var(--fg-faint);
 }
 
-/* ============ 录音块 ============ */
-.recording-block {
-  margin: 10px 0;
+/* ============ 会议记录块(录音) ============ */
+.meeting-block {
+  margin: 14px 0;
   border: 1px solid var(--border);
-  border-radius: 10px;
-  background: var(--bg-sidebar);
-  padding: 12px 14px;
+  border-radius: 12px;
+  background: var(--bg-subtle);
+  padding: 16px 18px;
+  box-shadow: var(--shadow-sm);
 }
 
-.recording-block-main {
+.meeting-head {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
+  margin-bottom: 12px;
 }
 
-.recording-block-icon {
-  font-size: 18px;
+.meeting-icon {
+  font-size: 15px;
 }
 
-.recording-block-duration {
+.meeting-title {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.meeting-date {
   color: var(--fg-faint);
-  font-size: 12px;
-  font-variant-numeric: tabular-nums;
-  flex-shrink: 0;
+  font-size: 12.5px;
 }
 
-.audio-player {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  min-width: 0;
-}
-
-.audio-play-btn {
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  background: var(--accent);
-  color: #fff;
-  font-size: 11px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-.audio-play-btn:hover {
-  filter: brightness(1.08);
-}
-
-.audio-wave {
-  flex: 1;
-  min-width: 0;
-}
-
-.audio-time {
-  font-size: 11.5px;
+.meeting-duration {
   color: var(--fg-faint);
+  font-size: 12.5px;
   font-variant-numeric: tabular-nums;
-  flex-shrink: 0;
+  margin-left: auto;
 }
 
-.recording-block-meta {
+.meeting-player {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  padding: 10px 14px;
+}
+
+.meeting-status-row {
   display: flex;
   align-items: center;
-  gap: 10px;
-  margin-top: 8px;
+  gap: 12px;
+  margin: 12px 2px 4px;
   flex-wrap: wrap;
 }
 
-.recording-status {
+.meeting-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   font-size: 12px;
-  padding: 2px 8px;
-  border-radius: 10px;
+  font-weight: 500;
+  padding: 2px 9px;
+  border-radius: 9px;
   background: var(--bg-active);
   color: var(--fg-muted);
 }
 
-.recording-status.status-transcribing,
-.recording-status.status-downloading-model,
-.recording-status.status-pending {
+.meeting-status.status-transcribing,
+.meeting-status.status-downloading-model,
+.meeting-status.status-pending {
   color: var(--accent);
   background: var(--accent-soft);
 }
 
-.recording-status.status-done {
+.meeting-status.status-done {
   color: var(--ok);
-  background: rgba(15, 153, 96, 0.12);
+  background: var(--ok-soft);
 }
 
-.recording-status.status-error {
+.meeting-status.status-error {
   color: var(--danger);
   background: var(--danger-soft);
 }
 
-.recording-error-text {
+.meeting-error {
   font-size: 12px;
   color: var(--danger);
 }
 
 .link-btn {
-  font-size: 12px;
+  font-size: 12.5px;
   color: var(--fg-muted);
   text-decoration: underline;
   text-underline-offset: 2px;
@@ -492,101 +498,242 @@ kbd {
   cursor: default;
 }
 
-.recording-transcript {
+.meeting-transcript {
   margin-top: 10px;
-  padding: 10px 12px;
-  border-top: 1px dashed var(--border);
-  white-space: pre-wrap;
-  font-size: 13.5px;
-  line-height: 1.7;
-  color: var(--fg);
+  border-top: 1px solid var(--border);
+  padding-top: 12px;
 }
 
-/* ============ 录音浮层 ============ */
-.recorder-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.25);
+.meeting-line {
   display: flex;
-  align-items: flex-end;
+  gap: 10px;
+  margin: 0 0 10px;
+  font-size: 13.5px;
+  line-height: 1.75;
+  align-items: baseline;
+}
+
+.meeting-stamp {
+  flex-shrink: 0;
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  color: var(--fg-faint);
+  background: var(--bg-active);
+  border-radius: 5px;
+  padding: 1px 6px;
+  transform: translateY(-1px);
+}
+
+.meeting-transcript-empty {
+  color: var(--fg-faint);
+  font-size: 13px;
+  padding: 8px 2px;
+}
+
+/* 转写中的骨架屏 */
+.meeting-transcript-loading {
+  border-top: 1px solid var(--border);
+  margin-top: 10px;
+  padding-top: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.shimmer-line {
+  height: 13px;
+  border-radius: 6px;
+  background: linear-gradient(90deg, var(--bg-active) 25%, var(--bg-hover) 50%, var(--bg-active) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+.spin {
+  display: inline-block;
+  width: 11px;
+  height: 11px;
+  border: 2px solid currentColor;
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: rotate 0.8s linear infinite;
+}
+
+@keyframes rotate {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ============ 播放器 ============ */
+.audio-player {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.audio-play-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #fff;
+  font-size: 11px;
+  display: flex;
+  align-items: center;
   justify-content: center;
-  padding-bottom: 48px;
+  flex-shrink: 0;
+  transition: transform 0.12s, filter 0.12s;
+}
+
+.audio-play-btn:hover {
+  filter: brightness(1.08);
+  transform: scale(1.04);
+}
+
+.audio-wave {
+  flex: 1;
+  min-width: 0;
+}
+
+.audio-time {
+  font-size: 11.5px;
+  color: var(--fg-faint);
+  font-variant-numeric: tabular-nums;
+  flex-shrink: 0;
+}
+
+/* ============ 录音 HUD(顶部悬浮胶囊) ============ */
+.hud-center {
+  position: fixed;
+  top: 52px;
+  left: 50%;
+  transform: translateX(-50%);
   z-index: 100;
 }
 
-.recorder-card {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  box-shadow: var(--shadow);
-  padding: 18px 22px;
-  width: 520px;
-  max-width: calc(100vw - 60px);
-}
-
-.recorder-head {
+.hud-pill {
   display: flex;
   align-items: center;
-  gap: 10px;
-  margin-bottom: 10px;
+  gap: 12px;
+  background: var(--card);
+  border: 1px solid var(--border-strong);
+  border-radius: 999px;
+  box-shadow: var(--shadow-lg);
+  padding: 10px 12px 10px 18px;
+  backdrop-filter: blur(20px);
 }
 
-.recorder-dot {
-  width: 10px;
-  height: 10px;
+.hud-pill.error {
+  padding: 10px 12px 10px 18px;
+  max-width: 620px;
+}
+
+.hud-dot {
+  width: 9px;
+  height: 9px;
   border-radius: 50%;
   background: var(--danger);
   animation: pulse 1.2s ease-in-out infinite;
+  flex-shrink: 0;
 }
 
 @keyframes pulse {
   0%,
   100% {
     opacity: 1;
+    transform: scale(1);
   }
   50% {
-    opacity: 0.35;
+    opacity: 0.4;
+    transform: scale(0.85);
   }
 }
 
-.recorder-time {
-  font-size: 22px;
+.hud-timer {
+  font-size: 17px;
   font-weight: 600;
   font-variant-numeric: tabular-nums;
+  letter-spacing: 0.5px;
 }
 
-.recorder-canvas {
-  width: 100%;
-  height: 56px;
+.hud-canvas {
+  width: 170px;
+  height: 30px;
   display: block;
-  margin-bottom: 14px;
 }
 
-.recorder-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
+.hud-divider {
+  width: 1px;
+  height: 20px;
+  background: var(--border-strong);
+  flex-shrink: 0;
 }
 
-.recorder-status-text {
-  text-align: center;
+.hud-hint {
+  font-size: 13.5px;
   color: var(--fg-muted);
-  padding: 12px 0;
+  padding-right: 6px;
 }
 
-.recorder-status-text.error {
+.hud-error-text {
+  font-size: 12.5px;
   color: var(--danger);
-  padding-bottom: 0;
-  white-space: pre-wrap;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 340px;
+}
+
+.hud-btn {
+  padding: 6px 13px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--fg);
+  background: var(--bg-active);
+  transition: filter 0.12s, background 0.12s;
+}
+
+.hud-btn:hover {
+  background: var(--bg-hover);
+}
+
+.hud-btn.primary {
+  background: var(--accent);
+  color: #fff;
+}
+
+.hud-btn.stop {
+  background: var(--danger);
+  color: #fff;
+}
+
+.hud-btn.stop:hover {
+  filter: brightness(1.06);
+}
+
+.hud-spin {
+  color: var(--fg-muted);
 }
 
 /* ============ 按钮 ============ */
 .btn {
-  padding: 7px 14px;
-  border-radius: 7px;
+  padding: 7px 15px;
+  border-radius: 8px;
   font-size: 13.5px;
   font-weight: 500;
-  transition: filter 0.1s, background 0.1s;
+  transition: filter 0.12s, background 0.12s;
 }
 
 .btn.primary {
@@ -595,7 +742,7 @@ kbd {
 }
 
 .btn.primary:hover {
-  filter: brightness(1.08);
+  filter: brightness(1.07);
 }
 
 .btn.ghost {
@@ -631,7 +778,7 @@ kbd {
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.3);
+  background: rgba(0, 0, 0, 0.32);
   display: flex;
   align-items: flex-start;
   justify-content: center;
@@ -642,9 +789,9 @@ kbd {
 .modal-card {
   background: var(--card);
   border: 1px solid var(--border);
-  border-radius: 12px;
-  box-shadow: var(--shadow);
-  width: 560px;
+  border-radius: 14px;
+  box-shadow: var(--shadow-lg);
+  width: 580px;
   max-width: calc(100vw - 60px);
   max-height: 72vh;
   overflow-y: auto;
@@ -659,14 +806,14 @@ kbd {
 .modal-title {
   font-size: 17px;
   margin: 0;
-  padding: 18px 22px 4px;
+  padding: 18px 24px 4px;
 }
 
 .search-input {
   border: none;
   outline: none;
   border-bottom: 1px solid var(--border);
-  padding: 16px 20px;
+  padding: 17px 22px;
   font-size: 15px;
   background: transparent;
   color: var(--fg);
@@ -674,13 +821,13 @@ kbd {
 
 .search-results {
   overflow-y: auto;
-  padding: 6px;
+  padding: 8px;
 }
 
 .search-empty {
   color: var(--fg-faint);
   text-align: center;
-  padding: 24px 0;
+  padding: 26px 0;
   font-size: 13px;
 }
 
@@ -689,7 +836,7 @@ kbd {
   gap: 10px;
   width: 100%;
   padding: 10px 12px;
-  border-radius: 8px;
+  border-radius: 9px;
   text-align: left;
   align-items: flex-start;
 }
@@ -726,15 +873,16 @@ kbd {
 
 /* ============ 设置 ============ */
 .settings-section {
-  padding: 12px 22px;
+  padding: 12px 24px;
 }
 
 .settings-section h3 {
-  font-size: 12px;
+  font-size: 11.5px;
   text-transform: uppercase;
-  letter-spacing: 0.4px;
+  letter-spacing: 0.6px;
   color: var(--fg-faint);
-  margin: 6px 0 10px;
+  margin: 8px 0 10px;
+  font-weight: 600;
 }
 
 .settings-row {
@@ -742,7 +890,7 @@ kbd {
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  padding: 6px 0;
+  padding: 7px 0;
   font-size: 13.5px;
 }
 
@@ -764,14 +912,14 @@ kbd {
   color: var(--fg);
   background: var(--bg);
   border: 1px solid var(--border);
-  border-radius: 6px;
+  border-radius: 7px;
   padding: 4px 8px;
 }
 
 .seg {
   display: flex;
   border: 1px solid var(--border);
-  border-radius: 7px;
+  border-radius: 8px;
   overflow: hidden;
 }
 
@@ -791,9 +939,9 @@ kbd {
   display: flex;
   flex-direction: column;
   gap: 4px;
-  padding: 10px 12px;
+  padding: 12px 14px;
   border: 1px solid var(--border);
-  border-radius: 10px;
+  border-radius: 11px;
   margin-top: 6px;
 }
 
@@ -820,7 +968,7 @@ kbd {
 .settings-about {
   color: var(--fg-muted);
   font-size: 13px;
-  line-height: 1.7;
+  line-height: 1.75;
   margin: 0;
 }
 
@@ -828,19 +976,158 @@ kbd {
   display: flex;
   justify-content: flex-end;
   gap: 10px;
-  padding: 8px 22px 18px;
+  padding: 8px 24px 18px;
+}
+
+/* ============ 录音列表页 ============ */
+.recordings-view {
+  max-width: 780px;
+  margin: 0 auto;
+  padding: 64px 52px 20vh;
+}
+
+.recordings-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.recordings-title {
+  font-size: 30px;
+  font-weight: 700;
+  margin: 0;
+  letter-spacing: -0.5px;
+}
+
+.recordings-sub {
+  color: var(--fg-muted);
+  font-size: 13.5px;
+  margin: 0 0 28px;
+}
+
+.recordings-empty {
+  text-align: center;
+  color: var(--fg-faint);
+  padding: 60px 0;
+}
+
+.recordings-empty-icon {
+  font-size: 38px;
+  margin-bottom: 10px;
+}
+
+.recordings-empty p {
+  margin: 0;
+  font-size: 13.5px;
+}
+
+.recordings-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.recording-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  padding: 13px 16px;
+  border: 1px solid var(--border);
+  border-radius: 11px;
+  background: var(--bg-subtle);
+  text-align: left;
+  transition: border-color 0.12s, box-shadow 0.12s;
+}
+
+.recording-row:hover {
+  border-color: var(--border-strong);
+  box-shadow: var(--shadow-sm);
+}
+
+.recording-row-icon {
+  font-size: 17px;
+  flex-shrink: 0;
+}
+
+.recording-row-body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.recording-row-title {
+  font-size: 13.5px;
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--fg);
+}
+
+.recording-row-meta {
+  font-size: 12px;
+  color: var(--fg-faint);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.recording-row-side {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.recording-row-status {
+  font-size: 11.5px;
+  padding: 2px 8px;
+  border-radius: 9px;
+  background: var(--bg-active);
+  color: var(--fg-muted);
+}
+
+.recording-row-status.s-done {
+  color: var(--ok);
+  background: var(--ok-soft);
+}
+
+.recording-row-status.s-transcribing,
+.recording-row-status.s-pending,
+.recording-row-status.s-downloading-model {
+  color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.recording-row-status.s-error {
+  color: var(--danger);
+  background: var(--danger-soft);
+}
+
+.recording-row-duration {
+  font-size: 12px;
+  color: var(--fg-faint);
+  font-variant-numeric: tabular-nums;
+  min-width: 40px;
+  text-align: right;
 }
 
 /* ============ 回收站 ============ */
 .trash-view {
-  max-width: 760px;
+  max-width: 780px;
   margin: 0 auto;
-  padding: 56px 48px 20vh;
+  padding: 64px 52px 20vh;
 }
 
 .trash-title {
   font-size: 30px;
+  font-weight: 700;
   margin: 0 0 6px;
+  letter-spacing: -0.5px;
 }
 
 .trash-sub {
@@ -853,8 +1140,8 @@ kbd {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 10px 12px;
-  border-radius: 8px;
+  padding: 11px 14px;
+  border-radius: 10px;
   border: 1px solid var(--border);
   margin-bottom: 8px;
 }
@@ -901,17 +1188,19 @@ kbd {
 }
 
 .empty-logo {
-  font-size: 44px;
+  font-size: 46px;
 }
 
 .empty-state h1 {
   font-size: 24px;
   margin: 0;
+  letter-spacing: -0.3px;
 }
 
 .empty-state p {
   color: var(--fg-muted);
   margin: 0 0 14px;
+  font-size: 13.5px;
 }
 
 .empty-actions {
@@ -921,15 +1210,15 @@ kbd {
 
 .toast {
   position: fixed;
-  bottom: 28px;
+  bottom: 30px;
   left: 50%;
   transform: translateX(-50%);
   background: var(--fg);
   color: var(--bg);
   padding: 9px 18px;
-  border-radius: 8px;
+  border-radius: 9px;
   font-size: 13.5px;
-  box-shadow: var(--shadow);
+  box-shadow: var(--shadow-lg);
   z-index: 300;
   max-width: 70vw;
 }

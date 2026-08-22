@@ -4,7 +4,15 @@ import { app } from 'electron'
 import { join } from 'node:path'
 import { randomUUID } from 'node:crypto'
 import { extractDocText, makeSnippet } from '../shared/extract'
-import type { BlockDoc, PageDetail, PageSummary, RecordingInfo, SearchResult, TranscribeStatus } from '../shared/ipc'
+import type {
+  BlockDoc,
+  PageDetail,
+  PageSummary,
+  RecordingInfo,
+  RecordingListEntry,
+  SearchResult,
+  TranscribeStatus
+} from '../shared/ipc'
 
 let db: DB
 
@@ -311,6 +319,36 @@ export function getRecording(id: string): RecordingInfo | null {
 export function listRecordingsByPage(pageId: string): RecordingInfo[] {
   const rows = db.prepare(`SELECT * FROM recordings WHERE page_id = ? ORDER BY created_at`).all(pageId) as RecRow[]
   return rows.map(toRecording)
+}
+
+export function listAllRecordings(): RecordingListEntry[] {
+  const rows = db
+    .prepare(
+      `SELECT r.id, r.page_id, p.title AS page_title, r.duration_ms, r.status, r.error, r.transcript, r.created_at
+       FROM recordings r JOIN pages p ON p.id = r.page_id
+       WHERE p.deleted_at IS NULL
+       ORDER BY r.created_at DESC LIMIT 200`
+    )
+    .all() as {
+    id: string
+    page_id: string
+    page_title: string
+    duration_ms: number
+    status: string
+    error: string | null
+    transcript: string | null
+    created_at: string
+  }[]
+  return rows.map((r) => ({
+    id: r.id,
+    pageId: r.page_id,
+    pageTitle: r.page_title,
+    durationMs: r.duration_ms,
+    status: r.status as TranscribeStatus,
+    error: r.error,
+    transcriptPreview: (r.transcript ?? '').replace(/\[\d{1,2}:\d{2}(?::\d{2})?\]\s*/g, '').replace(/\n+/g, ' ').slice(0, 120),
+    createdAt: r.created_at
+  }))
 }
 
 export function setRecordingBlock(id: string, blockId: string | null): void {

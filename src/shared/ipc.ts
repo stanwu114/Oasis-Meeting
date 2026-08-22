@@ -16,6 +16,7 @@ export const IPC = {
   recordingsSave: 'recordings:save',
   recordingsGet: 'recordings:get',
   recordingsListByPage: 'recordings:list-by-page',
+  recordingsListAll: 'recordings:list-all',
   recordingsUpdateBlock: 'recordings:update-block',
   recordingsTranscribe: 'recordings:transcribe',
 
@@ -68,6 +69,18 @@ export interface RecordingInfo {
   engine: string
   status: TranscribeStatus
   error: string | null
+  createdAt: string
+}
+
+/** 录音列表条目(跨页面,用于「录音」视图) */
+export interface RecordingListEntry {
+  id: string
+  pageId: string
+  pageTitle: string
+  durationMs: number
+  status: TranscribeStatus
+  error: string | null
+  transcriptPreview: string
   createdAt: string
 }
 
@@ -133,6 +146,7 @@ export interface OasisApi {
     save(input: SaveRecordingInput): Promise<RecordingInfo>
     get(id: string): Promise<RecordingInfo | null>
     listByPage(pageId: string): Promise<RecordingInfo[]>
+    listAll(): Promise<RecordingListEntry[]>
     updateBlock(id: string, blockId: string | null): Promise<void>
     transcribe(id: string, pcm: Int16Array, sampleRate: number, language: string): Promise<void>
   }

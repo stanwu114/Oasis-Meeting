@@ -155,7 +155,7 @@ function cleanText(t: string): string {
 export function recognizePcm(pcm: Int16Array, sampleRate: number, language: string): string {
   const recognizer = getRecognizer(language)
   const segments = energyVadSegments(pcm, sampleRate)
-  const texts: string[] = []
+  const lines: string[] = []
   const samples = new Float32Array(pcm.length)
   for (let i = 0; i < pcm.length; i++) samples[i] = pcm[i] / 32768
 
@@ -165,9 +165,19 @@ export function recognizePcm(pcm: Int16Array, sampleRate: number, language: stri
     recognizer.decode(stream)
     const result = recognizer.getResult(stream) as { text?: string }
     const text = cleanText(result?.text ?? '')
-    if (text) texts.push(text)
+    if (text) lines.push(`[${formatStamp(Math.round((seg.start / sampleRate) * 1000))}] ${text}`)
   }
-  return texts.join('\n\n')
+  return lines.join('\n\n')
+}
+
+/** 段落时间戳:mm:ss,超过一小时为 h:mm:ss */
+export function formatStamp(ms: number): string {
+  const total = Math.floor(ms / 1000)
+  const h = Math.floor(total / 3600)
+  const m = Math.floor((total % 3600) / 60)
+  const s = total % 60
+  const two = (n: number) => String(n).padStart(2, '0')
+  return h > 0 ? `${h}:${two(m)}:${two(s)}` : `${two(m)}:${two(s)}`
 }
 
 /* ---------- 串行任务队列 ---------- */

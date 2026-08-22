@@ -45,7 +45,7 @@ export function Sidebar() {
           disabled={recording}
           onClick={() => void useRecorderStore.getState().start()}
         >
-          🎙 {recording ? '录音中…' : '录音转写'}
+          🎙 {recording ? '录音中…' : '开始录音'}
         </button>
         <button
           type="button"
@@ -53,7 +53,7 @@ export function Sidebar() {
           disabled={recording}
           onClick={() => void importAudioAndTranscribe()}
         >
-          ⬆ 导入音频转写
+          ⬆ 导入音频
         </button>
       </div>
 
@@ -69,18 +69,15 @@ export function Sidebar() {
         >
           📝 笔记
         </button>
-        <button type="button" className={btn(false)} onClick={() => useUiStore.getState().setSearchOpen(true)}>
-          🔍 搜索 <kbd>⌘K</kbd>
-        </button>
         <button
           type="button"
-          className={btn(view === 'trash')}
-          onClick={() => useUiStore.getState().setView('trash')}
+          className={btn(view === 'recordings')}
+          onClick={() => useUiStore.getState().setView('recordings')}
         >
-          🗑 回收站
+          🎧 录音
         </button>
-        <button type="button" className={btn(false)} onClick={() => useUiStore.getState().setSettingsOpen(true)}>
-          ⚙️ 设置
+        <button type="button" className={btn(false)} onClick={() => useUiStore.getState().setSearchOpen(true)}>
+          🔍 搜索 <kbd>⌘K</kbd>
         </button>
       </div>
 
@@ -93,6 +90,16 @@ export function Sidebar() {
       </div>
 
       <div className="sidebar-bottom">
+        <button
+          type="button"
+          className={btn(view === 'trash')}
+          onClick={() => useUiStore.getState().setView('trash')}
+        >
+          🗑 回收站
+        </button>
+        <button type="button" className={btn(false)} onClick={() => useUiStore.getState().setSettingsOpen(true)}>
+          ⚙️ 设置
+        </button>
         {modelStatus && !modelStatus.downloaded ? (
           <button
             type="button"

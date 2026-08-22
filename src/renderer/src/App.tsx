@@ -4,6 +4,7 @@ import { RecorderOverlay } from './components/RecorderOverlay'
 import { SearchModal } from './components/SearchModal'
 import { SettingsModal } from './components/SettingsModal'
 import { TrashView } from './components/TrashView'
+import { RecordingsView } from './components/RecordingsView'
 import OasisEditor from './editor/OasisEditor'
 import { useAppStore } from './stores/appStore'
 import { useUiStore } from './stores/uiStore'
@@ -62,6 +63,8 @@ export default function App() {
       <main className="main">
         {view === 'trash' ? (
           <TrashView />
+        ) : view === 'recordings' ? (
+          <RecordingsView />
         ) : loaded && currentId ? (
           <OasisEditor key={currentId} pageId={currentId} />
         ) : (
