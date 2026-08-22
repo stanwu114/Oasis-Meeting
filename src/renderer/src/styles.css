@@ -343,10 +343,20 @@ kbd {
 }
 
 .sidebar-btn.primary {
-  color: var(--accent);
+  background: var(--accent);
+  color: var(--on-accent);
   font-weight: 600;
   font-size: 14.5px;
-  padding: 8px 10px;
+  padding: 9px 14px;
+  border-radius: 9px;
+  justify-content: center;
+  margin-bottom: 4px;
+  transition: filter 0.15s;
+}
+
+.sidebar-btn.primary:hover {
+  background: var(--accent);
+  filter: brightness(1.08);
 }
 
 .sidebar-btn.record {
