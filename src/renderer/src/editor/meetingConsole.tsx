@@ -143,6 +143,7 @@ function MeetingConsoleView({ block }: { block: { id: string; props: Record<stri
   const [notes, setNotes] = useState(block.props.notes || '')
   const [errorMsg, setErrorMsg] = useState('')
   const [searchQuery, setSearchQuery] = useState('')
+  const [activeStamp, setActiveStamp] = useState('')
   const recorderRef = useRef<MicRecorder | null>(null)
   const wsPlayRef = useRef<WaveSurfer | null>(null)
   const timerRef = useRef<number | null>(null)
@@ -180,6 +181,7 @@ function MeetingConsoleView({ block }: { block: { id: string; props: Record<stri
 
   /* 点击时间戳跳转播放 */
   const seekToStamp = (stamp: string): void => {
+    setActiveStamp(stamp)
     const ws = wsPlayRef.current
     if (!ws) return
     const parts = stamp.split(':').map(Number)

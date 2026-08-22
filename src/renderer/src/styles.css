@@ -2768,6 +2768,11 @@ svg {
   color: var(--accent);
 }
 
+.console-stamp.clickable.active {
+  background: var(--accent);
+  color: var(--on-accent);
+}
+
 /* 转写稿搜索栏 */
 .console-search {
   display: flex;
