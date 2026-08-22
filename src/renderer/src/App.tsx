@@ -5,6 +5,7 @@ import { SearchModal } from './components/SearchModal'
 import { SettingsModal } from './components/SettingsModal'
 import { TrashView } from './components/TrashView'
 import { RecordingsView } from './components/RecordingsView'
+import { AiPanel } from './components/AiPanel'
 import OasisEditor from './editor/OasisEditor'
 import { useAppStore } from './stores/appStore'
 import { useUiStore } from './stores/uiStore'
@@ -65,6 +66,8 @@ export default function App() {
           <TrashView />
         ) : view === 'recordings' ? (
           <RecordingsView />
+        ) : view === 'ai' ? (
+          <AiPanel />
         ) : loaded && currentId ? (
           <OasisEditor key={currentId} pageId={currentId} />
         ) : (

@@ -4,7 +4,8 @@ import { initDb, closeDb } from './db'
 import { initMedia, registerMediaProtocol, registerMediaScheme } from './media'
 import { registerIpc } from './ipc'
 import { onModelStatus } from './modelManager'
-import { broadcastModelStatus } from './events'
+import { broadcastModelStatus, broadcastAiState } from './events'
+import { onDshState, stopDsh } from './dshRunner'
 
 // 单实例
 const gotLock = app.requestSingleInstanceLock()
@@ -36,7 +37,8 @@ function createWindow(): void {
       preload: join(__dirname, '../preload/index.js'),
       contextIsolation: true,
       nodeIntegration: false,
-      spellcheck: false
+      spellcheck: false,
+      webviewTag: true
     }
   })
 
@@ -106,6 +108,7 @@ app.whenReady().then(() => {
   registerMediaProtocol()
   registerIpc()
   onModelStatus(broadcastModelStatus)
+  onDshState(broadcastAiState)
   setupMenu()
   createWindow()
 
@@ -119,5 +122,6 @@ app.on('window-all-closed', () => {
 })
 
 app.on('before-quit', () => {
+  stopDsh()
   closeDb()
 })

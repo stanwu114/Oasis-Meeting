@@ -28,9 +28,15 @@ export const IPC = {
 
   systemAskMic: 'system:ask-mic',
   systemImportAudio: 'system:import-audio',
+  systemOpenExternal: 'system:open-external',
+
+  aiStart: 'ai:start',
+  aiStop: 'ai:stop',
+  aiStatus: 'ai:status',
 
   evtRecordingsChanged: 'evt:recordings-changed',
-  evtModelProgress: 'evt:model-progress'
+  evtModelProgress: 'evt:model-progress',
+  evtAiState: 'evt:ai-state'
 } as const
 
 export interface PageSummary {
@@ -74,8 +80,7 @@ export interface RecordingInfo {
 }
 
 /** 录音列表条目(跨页面,用于「录音」视图) */
-export interface RecordingListEntry {
-  id: string
+export interface RecordingListEntry {  id: string
   pageId: string
   pageTitle: string
   durationMs: number
@@ -163,12 +168,26 @@ export interface OasisApi {
   system: {
     askMicPermission(): Promise<MicPermissionResult>
     importAudioFile(): Promise<ImportedAudio | null>
+    openExternal(url: string): Promise<void>
+  }
+  ai: {
+    start(): Promise<AiPanelState>
+    stop(): Promise<void>
+    status(): Promise<AiPanelState>
   }
   on: {
     recordingsChanged(cb: (r: RecordingInfo) => void): () => void
     modelProgress(cb: (m: ModelStatus) => void): () => void
+    aiStateChanged(cb: (s: AiPanelState) => void): () => void
     appAction(cb: (action: string) => void): () => void
   }
+}
+
+/** AI 面板(内嵌 dsh web)状态 */
+export interface AiPanelState {
+  status: 'unavailable' | 'stopped' | 'starting' | 'ready' | 'error'
+  url: string | null
+  error: string | null
 }
 
 /** 录音转写支持的语言 */

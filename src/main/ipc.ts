@@ -1,10 +1,11 @@
-import { app, ipcMain, systemPreferences, dialog } from 'electron'
+import { app, ipcMain, systemPreferences, dialog, shell } from 'electron'
 import { IPC } from '../shared/ipc'
 import type { BlockDoc, ImportedAudio, SaveRecordingInput } from '../shared/ipc'
 import * as db from './db'
 import * as media from './media'
 import { getModelStatus, ensureModelDownloaded } from './modelManager'
 import { enqueueTranscription } from './transcriber'
+import { startDsh, stopDsh, getDshState } from './dshRunner'
 
 /** 包装 handler:统一异常日志与向渲染进程抛错 */
 function handle<T extends unknown[]>(channel: string, fn: (...args: T) => unknown): void {
@@ -65,6 +66,13 @@ export function registerIpc(): void {
   handle(IPC.modelsStatus, () => getModelStatus())
   handle(IPC.modelsEnsure, () => ensureModelDownloaded())
 
+  /* ---------- AI 面板(dsh) ---------- */
+  handle(IPC.aiStart, () => startDsh())
+  handle(IPC.aiStop, () => {
+    stopDsh()
+  })
+  handle(IPC.aiStatus, () => getDshState())
+
   /* ---------- 搜索 ---------- */
   handle(IPC.searchQuery, (q: string) => db.searchPages(q.trim()))
 
@@ -79,6 +87,9 @@ export function registerIpc(): void {
       console.error('[mic-permission]', e)
       return { granted: false, appName }
     }
+  })
+  handle(IPC.systemOpenExternal, async (url: string) => {
+    if (/^https?:\/\//.test(url)) await shell.openExternal(url)
   })
   handle(IPC.systemImportAudio, async (): Promise<ImportedAudio | null> => {
     const { canceled, filePaths } = await dialog.showOpenDialog({

@@ -35,11 +35,18 @@ const api: OasisApi = {
   },
   system: {
     askMicPermission: () => ipcRenderer.invoke(IPC.systemAskMic),
-    importAudioFile: () => ipcRenderer.invoke(IPC.systemImportAudio)
+    importAudioFile: () => ipcRenderer.invoke(IPC.systemImportAudio),
+    openExternal: (url) => ipcRenderer.invoke(IPC.systemOpenExternal, url)
+  },
+  ai: {
+    start: () => ipcRenderer.invoke(IPC.aiStart),
+    stop: () => ipcRenderer.invoke(IPC.aiStop),
+    status: () => ipcRenderer.invoke(IPC.aiStatus)
   },
   on: {
     recordingsChanged: (cb) => subscribe(IPC.evtRecordingsChanged, cb),
     modelProgress: (cb) => subscribe(IPC.evtModelProgress, cb),
+    aiStateChanged: (cb) => subscribe(IPC.evtAiState, cb),
     appAction: (cb) => subscribe('app:action', cb)
   }
 }
