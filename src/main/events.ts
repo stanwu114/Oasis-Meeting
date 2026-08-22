@@ -1,5 +1,12 @@
 import { BrowserWindow } from 'electron'
-import { IPC, type AiPanelState, type ModelStatus, type RecordingInfo } from '../shared/ipc'
+import {
+  IPC,
+  type AiChatDelta,
+  type AiChatDone,
+  type AiPanelState,
+  type ModelStatus,
+  type RecordingInfo
+} from '../shared/ipc'
 
 export function broadcastRecording(rec: RecordingInfo): void {
   for (const win of BrowserWindow.getAllWindows()) {
@@ -16,5 +23,23 @@ export function broadcastModelStatus(status: ModelStatus): void {
 export function broadcastAiState(state: AiPanelState): void {
   for (const win of BrowserWindow.getAllWindows()) {
     win.webContents.send(IPC.evtAiState, state)
+  }
+}
+
+export function broadcastAiChatDelta(delta: AiChatDelta): void {
+  for (const win of BrowserWindow.getAllWindows()) {
+    win.webContents.send(IPC.evtAiChatDelta, delta)
+  }
+}
+
+export function broadcastAiChatDone(done: AiChatDone): void {
+  for (const win of BrowserWindow.getAllWindows()) {
+    win.webContents.send(IPC.evtAiChatDone, done)
+  }
+}
+
+export function broadcastAiChatError(error: { conversationId: string; error: string }): void {
+  for (const win of BrowserWindow.getAllWindows()) {
+    win.webContents.send(IPC.evtAiChatError, error)
   }
 }

@@ -7,6 +7,8 @@ import { TrashView } from './components/TrashView'
 import { RecordingsView } from './components/RecordingsView'
 import { AiPanel } from './components/AiPanel'
 import { AiSelectionBar } from './components/AiSelectionBar'
+import { ChatPanel } from './components/ChatPanel'
+import { useChatStore } from './stores/chatStore'
 import OasisEditor from './editor/OasisEditor'
 import { useAppStore } from './stores/appStore'
 import { useUiStore } from './stores/uiStore'
@@ -15,6 +17,7 @@ import { useRecorderStore } from './stores/recorderStore'
 
 export default function App() {
   const view = useUiStore((s) => s.view)
+  const chatOpen = useUiStore((s) => s.chatOpen)
   const currentId = useAppStore((s) => s.currentId)
   const loaded = useAppStore((s) => s.loaded)
   const toast = useUiStore((s) => s.toast)
@@ -34,10 +37,22 @@ export default function App() {
     const offAction = window.oasis.on.appAction((action) => {
       if (action === 'new-page') void useAppStore.getState().createPage(null)
     })
+    const offDelta = window.oasis.on.aiChatDelta((d) => {
+      useChatStore.getState().onDelta(d.conversationId, d.delta)
+    })
+    const offDone = window.oasis.on.aiChatDone((d) => {
+      useChatStore.getState().onDone(d.conversationId, d.content)
+    })
+    const offErr = window.oasis.on.aiChatError((e) => {
+      useChatStore.getState().onError(e.conversationId, e.error)
+    })
     return () => {
       offRec()
       offModel()
       offAction()
+      offDelta()
+      offDone()
+      offErr()
     }
   }, [])
 
@@ -48,6 +63,10 @@ export default function App() {
       if (mod && e.key.toLowerCase() === 'k') {
         e.preventDefault()
         useUiStore.getState().setSearchOpen(true)
+      }
+      if (mod && e.key.toLowerCase() === 'l') {
+        e.preventDefault()
+        useUiStore.getState().setChatOpen(!useUiStore.getState().chatOpen)
       }
       if (mod && e.shiftKey && e.key.toLowerCase() === 'r') {
         e.preventDefault()
@@ -75,6 +94,11 @@ export default function App() {
           <EmptyState />
         )}
       </main>
+      {chatOpen ? (
+        <aside className="chat-drawer">
+          <ChatPanel />
+        </aside>
+      ) : null}
 
       <RecorderOverlay />
       <AiSelectionBar />

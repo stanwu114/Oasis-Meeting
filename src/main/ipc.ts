@@ -8,6 +8,7 @@ import { enqueueTranscription } from './transcriber'
 import { startDsh, stopDsh, getDshState } from './dshRunner'
 import { enqueueSummary } from './summarizer'
 import { chat, runEditorAction } from './llm'
+import { sendChat, stopChat } from './chatService'
 import { extractDocText } from '../shared/extract'
 
 /** 包装 handler:统一异常日志与向渲染进程抛错 */
@@ -71,6 +72,17 @@ export function registerIpc(): void {
   /* ---------- 模型 ---------- */
   handle(IPC.modelsStatus, () => getModelStatus())
   handle(IPC.modelsEnsure, () => ensureModelDownloaded())
+
+  /* ---------- AI 对话 ---------- */
+  handle(IPC.aiChatSend, (input: import('../shared/ipc').SendChatInput) => sendChat(input))
+  handle(IPC.aiChatStop, () => {
+    stopChat()
+  })
+  handle(IPC.aiChatConversations, () => db.listAiConversations())
+  handle(IPC.aiChatMessages, (conversationId: string) => db.listAiMessages(conversationId))
+  handle(IPC.aiChatDelete, (conversationId: string) => {
+    db.deleteAiConversation(conversationId)
+  })
 
   /* ---------- AI 面板(dsh) ---------- */
   handle(IPC.aiStart, () => startDsh())

@@ -78,6 +78,25 @@ function migrate(): void {
     `)
     db.pragma('user_version = 2')
   }
+  if (version < 3) {
+    db.exec(`
+      CREATE TABLE ai_conversations (
+        id TEXT PRIMARY KEY,
+        title TEXT NOT NULL DEFAULT '新对话',
+        created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ','now')),
+        updated_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ','now'))
+      );
+      CREATE TABLE ai_messages (
+        id TEXT PRIMARY KEY,
+        conversation_id TEXT NOT NULL REFERENCES ai_conversations(id) ON DELETE CASCADE,
+        role TEXT NOT NULL,
+        content TEXT NOT NULL,
+        created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ','now'))
+      );
+      CREATE INDEX idx_ai_messages_conv ON ai_messages(conversation_id, created_at);
+    `)
+    db.pragma('user_version = 3')
+  }
 }
 
 /* ---------- 行映射 ---------- */
@@ -385,6 +404,76 @@ export function setSummaryStatus(id: string, status: 'pending' | 'summarizing' |
 
 export function setSummaryText(id: string, summary: string): void {
   db.prepare(`UPDATE recordings SET summary = ?, summary_status = 'done', summary_error = NULL WHERE id = ?`).run(summary, id)
+}
+
+/* ---------- AI 对话 ---------- */
+
+export interface AiConversationRow {
+  id: string
+  title: string
+  createdAt: string
+  updatedAt: string
+}
+
+export interface AiMessageRow {
+  id: string
+  conversationId: string
+  role: 'user' | 'assistant'
+  content: string
+  createdAt: string
+}
+
+export function createAiConversation(): AiConversationRow {
+  const id = randomUUID()
+  db.prepare(`INSERT INTO ai_conversations (id) VALUES (?)`).run(id)
+  return getAiConversation(id)!
+}
+
+export function getAiConversation(id: string): AiConversationRow | null {
+  const row = db.prepare(`SELECT * FROM ai_conversations WHERE id = ?`).get(id) as
+    | { id: string; title: string; created_at: string; updated_at: string }
+    | undefined
+  return row ? { id: row.id, title: row.title, createdAt: row.created_at, updatedAt: row.updated_at } : null
+}
+
+export function listAiConversations(): AiConversationRow[] {
+  const rows = db
+    .prepare(`SELECT * FROM ai_conversations ORDER BY updated_at DESC LIMIT 100`)
+    .all() as { id: string; title: string; created_at: string; updated_at: string }[]
+  return rows.map((r) => ({ id: r.id, title: r.title, createdAt: r.created_at, updatedAt: r.updated_at }))
+}
+
+export function appendAiMessage(conversationId: string, role: 'user' | 'assistant', content: string): AiMessageRow {
+  const id = randomUUID()
+  db.prepare(`INSERT INTO ai_messages (id, conversation_id, role, content) VALUES (?, ?, ?, ?)`).run(
+    id,
+    conversationId,
+    role,
+    content
+  )
+  db.prepare(`UPDATE ai_conversations SET updated_at = strftime('%Y-%m-%dT%H:%M:%fZ','now') WHERE id = ?`).run(conversationId)
+  return { id, conversationId, role, content, createdAt: new Date().toISOString() }
+}
+
+export function listAiMessages(conversationId: string): AiMessageRow[] {
+  const rows = db
+    .prepare(`SELECT * FROM ai_messages WHERE conversation_id = ? ORDER BY created_at, rowid`)
+    .all(conversationId) as { id: string; conversation_id: string; role: string; content: string; created_at: string }[]
+  return rows.map((r) => ({
+    id: r.id,
+    conversationId: r.conversation_id,
+    role: r.role as 'user' | 'assistant',
+    content: r.content,
+    createdAt: r.created_at
+  }))
+}
+
+export function setAiConversationTitle(id: string, title: string): void {
+  db.prepare(`UPDATE ai_conversations SET title = ? WHERE id = ?`).run(title, id)
+}
+
+export function deleteAiConversation(id: string): void {
+  db.prepare(`DELETE FROM ai_conversations WHERE id = ?`).run(id)
 }
 
 export function getSetting(key: string): string | undefined {

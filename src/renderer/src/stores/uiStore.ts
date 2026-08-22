@@ -8,6 +8,7 @@ interface UiState {
   view: View
   searchOpen: boolean
   settingsOpen: boolean
+  chatOpen: boolean
   theme: Theme
   language: string
   modelStatus: ModelStatus | null
@@ -17,6 +18,7 @@ interface UiState {
   setView(v: View): void
   setSearchOpen(open: boolean): void
   setSettingsOpen(open: boolean): void
+  setChatOpen(open: boolean): void
   toggleTheme(): void
   setLanguage(lang: string): void
   setModelStatus(m: ModelStatus): void
@@ -41,6 +43,7 @@ export const useUiStore = create<UiState>((set, get) => ({
   view: 'editor',
   searchOpen: false,
   settingsOpen: false,
+  chatOpen: false,
   theme: initialTheme(),
   language: localStorage.getItem('oasis.language') ?? 'auto',
   modelStatus: null,
@@ -50,6 +53,7 @@ export const useUiStore = create<UiState>((set, get) => ({
   setView: (v) => set({ view: v }),
   setSearchOpen: (open) => set({ searchOpen: open }),
   setSettingsOpen: (open) => set({ settingsOpen: open }),
+  setChatOpen: (open) => set({ chatOpen: open }),
 
   toggleTheme: () => {
     const next: Theme = get().theme === 'dark' ? 'light' : 'dark'

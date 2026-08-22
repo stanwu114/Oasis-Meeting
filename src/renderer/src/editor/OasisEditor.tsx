@@ -117,15 +117,25 @@ export default function OasisEditor({ pageId }: { pageId: string }) {
 
   return (
     <div className="editor-page">
-      <button
-        type="button"
-        className="page-ai-btn"
-        disabled={summarizing || docEmpty}
-        title="对本页内容生成 AI 摘要,插入到页首"
-        onClick={() => void summarizePage()}
-      >
-        {summarizing ? <span className="spin" /> : '⚡'} AI 总结本页
-      </button>
+      <div className="page-actions">
+        <button
+          type="button"
+          className="page-ai-btn"
+          title="和 AI 对话,自动携带本页内容 (⌘L)"
+          onClick={() => useUiStore.getState().setChatOpen(!useUiStore.getState().chatOpen)}
+        >
+          💬 AI 对话
+        </button>
+        <button
+          type="button"
+          className="page-ai-btn"
+          disabled={summarizing || docEmpty}
+          title="对本页内容生成 AI 摘要,插入到页首"
+          onClick={() => void summarizePage()}
+        >
+          {summarizing ? <span className="spin" /> : '⚡'} 总结本页
+        </button>
+      </div>
       <textarea
         className="page-title"
         value={title}

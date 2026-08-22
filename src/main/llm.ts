@@ -15,7 +15,7 @@ export function hasDeepseekKey(): boolean {
   return readKey() !== null
 }
 
-function readKey(): string | null {
+export function readKey(): string | null {
   if (cachedKey !== undefined) return cachedKey
   try {
     const text = readFileSync(join(process.env.HOME ?? '', '.dsh', '.credentials.yaml'), 'utf8')
