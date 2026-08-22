@@ -33,6 +33,10 @@ export function Sidebar() {
   return (
     <aside className="sidebar">
       <div className="sidebar-top" />
+      <div className="sidebar-brand">
+        <span className="brand-word">Oasis</span>
+        <span className="brand-sub">Meeting</span>
+      </div>
 
       <div className="sidebar-actions">
         <button
