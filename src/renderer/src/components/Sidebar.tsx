@@ -127,30 +127,6 @@ export function Sidebar() {
             </button>
           </div>
 
-          <div className="sidebar-sections">
-            <button
-              type="button"
-              className={btn(view === 'editor')}
-              onClick={() => {
-                useUiStore.getState().setView('editor')
-                const id = useAppStore.getState().currentId
-                if (id) void useAppStore.getState().openPage(id)
-              }}
-            >
-              📝 Meeting
-            </button>
-            <button
-              type="button"
-              className={btn(view === 'recordings')}
-              onClick={() => useUiStore.getState().setView('recordings')}
-            >
-              🎧 录音
-            </button>
-            <button type="button" className={btn(false)} onClick={() => useUiStore.getState().setSearchOpen(true)}>
-              🔍 搜索 <kbd>⌘K</kbd>
-            </button>
-          </div>
-
           <div className="sidebar-pages">
             <div className="sidebar-pages-head">
               页面
