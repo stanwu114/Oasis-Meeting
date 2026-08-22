@@ -1,4 +1,4 @@
-import { ipcMain, systemPreferences, dialog } from 'electron'
+import { app, ipcMain, systemPreferences, dialog } from 'electron'
 import { IPC } from '../shared/ipc'
 import type { BlockDoc, ImportedAudio, SaveRecordingInput } from '../shared/ipc'
 import * as db from './db'
@@ -62,12 +62,14 @@ export function registerIpc(): void {
 
   /* ---------- 系统 ---------- */
   handle(IPC.systemAskMic, async () => {
-    if (process.platform !== 'darwin') return true
+    const appName = app.isPackaged ? 'Notion Oasis' : 'Electron'
+    if (process.platform !== 'darwin') return { granted: true, appName }
     try {
-      return await systemPreferences.askForMediaAccess('microphone')
+      const granted = await systemPreferences.askForMediaAccess('microphone')
+      return { granted, appName }
     } catch (e) {
       console.error('[mic-permission]', e)
-      return false
+      return { granted: false, appName }
     }
   })
   handle(IPC.systemImportAudio, async (): Promise<ImportedAudio | null> => {

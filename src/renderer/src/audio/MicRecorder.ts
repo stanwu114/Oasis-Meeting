@@ -30,8 +30,12 @@ export class MicRecorder {
   }
 
   async start(): Promise<void> {
-    const granted = await window.oasis.system.askMicPermission()
-    if (!granted) throw new Error('麦克风权限被拒绝,请在 系统设置 → 隐私与安全性 → 麦克风 中允许 Notion Oasis')
+    const { granted, appName } = await window.oasis.system.askMicPermission()
+    if (!granted) {
+      throw new Error(
+        `麦克风权限被拒绝。请打开 系统设置 → 隐私与安全性 → 麦克风,勾选「${appName}」后重试;若仍不行请重启应用。`
+      )
+    }
 
     const mime = MicRecorder.pickMimeType()
     this.stream = await navigator.mediaDevices.getUserMedia({

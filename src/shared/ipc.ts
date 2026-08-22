@@ -97,6 +97,12 @@ export interface ImportedAudio {
   buffer: ArrayBuffer
 }
 
+export interface MicPermissionResult {
+  granted: boolean
+  /** 系统设置 → 隐私与安全性 → 麦克风 中显示的应用名(开发模式为 Electron) */
+  appName: string
+}
+
 export interface SaveRecordingInput {
   pageId: string
   mimeType: string
@@ -138,7 +144,7 @@ export interface OasisApi {
     query(q: string): Promise<SearchResult[]>
   }
   system: {
-    askMicPermission(): Promise<boolean>
+    askMicPermission(): Promise<MicPermissionResult>
     importAudioFile(): Promise<ImportedAudio | null>
   }
   on: {
