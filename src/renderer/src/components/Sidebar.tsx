@@ -117,7 +117,7 @@ export function Sidebar() {
               disabled={recording}
               onClick={() => void useAppStore.getState().createPage(null)}
             >
-              <Icon name="plus" size={15} /> 新建 Meeting
+              新建 Meeting
             </button>
           </div>
 
