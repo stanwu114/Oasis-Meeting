@@ -1,12 +1,14 @@
 import { useEffect } from 'react'
 import { setHarnessWebview, useHarnessStore } from '../stores/harnessStore'
 
-/** 隐藏 dsh 自带的会话侧栏/详情栏,并强制中间会话区铺满(覆盖其内联宽度) */
+/** dsh 外层是 grid(内联 grid-template-columns: 280px 1fr 0px)。
+ *  隐藏侧/详情栏后轨道仍在、会话区会被塞进 280px 轨道——
+ *  必须直接把轨道模板覆盖成单列,会话区才能铺满。 */
 const HIDE_DSH_SIDEBAR_CSS = `
 [class*="sidebarCol"] { display: none !important; }
 [class*="detailsCol"] { display: none !important; }
 [class*="_handle"] { display: none !important; }
-[class*="centerCol"] { flex: 1 1 auto !important; width: auto !important; min-width: 0 !important; max-width: 100% !important; }
+[class*="frame"] { grid-template-columns: minmax(0, 1fr) !important; }
 `
 
 interface WebviewTagLike extends HTMLElement {
