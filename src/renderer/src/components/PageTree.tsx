@@ -75,7 +75,9 @@ export function PageTree() {
           >
             {children.length > 0 ? <Icon name="chevron" size={13} className={isExpanded ? 'chev expanded' : 'chev'} /> : null}
           </button>
-          <span className="page-icon">{page.icon ? <span>{page.icon}</span> : <Icon name="file" size={14} />}</span>
+          <span className="page-icon">
+            {page.icon ? <span>{page.icon}</span> : children.length > 0 || expanded[page.id] ? <Icon name="folder" size={14} /> : <Icon name="file" size={14} />}
+          </span>
           {editingId === page.id ? (
             <input
               className="rename-input"
@@ -113,7 +115,7 @@ export function PageTree() {
                   void useAppStore.getState().createPage(page.id)
                 }}
               >
-                添加子页面
+                归档 Meeting 到此
               </button>
               <button
                 type="button"

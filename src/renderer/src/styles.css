@@ -2491,3 +2491,46 @@ svg {
   padding: 6px 12px;
   font-size: 12.5px;
 }
+
+/* 侧栏空白区右键菜单 */
+.ctx-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+}
+
+.ctx-menu {
+  position: fixed;
+  z-index: 95;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  box-shadow: var(--shadow-lg);
+  padding: 5px;
+  min-width: 170px;
+  animation: popIn 0.12s ease-out;
+}
+
+.ctx-menu button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 7px;
+  font-size: 13px;
+  text-align: left;
+  color: var(--fg);
+  width: 100%;
+}
+
+.ctx-menu button:hover {
+  background: var(--bg-hover);
+}
+
+.ctx-menu svg {
+  color: var(--fg-faint);
+}
+
+.ctx-menu button:hover svg {
+  color: var(--accent);
+}
