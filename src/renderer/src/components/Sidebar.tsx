@@ -4,6 +4,7 @@ import { useRecorderStore } from '../stores/recorderStore'
 import { useHarnessStore } from '../stores/harnessStore'
 import { Icon } from './Icon'
 import { PageTree } from './PageTree'
+import logoUrl from '../assets/Oasis_Logo.svg'
 
 function formatBytes(bytes: number): string {
   if (bytes >= 1024 * 1024 * 1024) return `${(bytes / 1024 / 1024 / 1024).toFixed(2)} GB`
@@ -40,7 +41,7 @@ export function Sidebar() {
     <aside className="sidebar">
       <div className="sidebar-top" />
       <div className="sidebar-brand">
-        <span className="brand-wordmark">Oasis</span>
+        <img src={logoUrl} alt="Oasis" className="brand-logo" draggable={false} />
         <span className="brand-sub">Notebook</span>
       </div>
 
