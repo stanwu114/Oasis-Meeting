@@ -192,8 +192,13 @@ export async function exportMeetingToWord(data: ExportMeetingData): Promise<stri
 
   const buffer = await docx.Packer.toBuffer(doc)
 
-  // 保存对话框
-  const defaultName = `${data.title || '未命名会议'}.docx`
+  // 保存对话框(清理文件名中的非法字符)
+  const safeName = (data.title || '未命名会议')
+    .replace(/[\/\\:*?"<>|]/g, '-')  // 替换路径分隔符等
+    .replace(/\s+/g, '_')             // 空格转下划线
+    .replace(/@/g, '_')              // @ 转 _
+    .slice(0, 80)                     // 限制长度
+  const defaultName = `${safeName}.docx`
   const { canceled, filePath } = await saveDialog({
     defaultPath: join(app.getPath('downloads'), defaultName),
     filters: [{ name: 'Word 文档', extensions: ['docx'] }]
