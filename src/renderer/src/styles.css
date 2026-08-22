@@ -234,10 +234,10 @@ kbd {
   }
 }
 
-/* 页面右上动作按钮组 */
+/* 页面右上动作按钮组(避开全局 AI 按钮) */
 .page-actions {
   position: absolute;
-  top: 18px;
+  top: 56px;
   right: 26px;
   display: flex;
   gap: 8px;
