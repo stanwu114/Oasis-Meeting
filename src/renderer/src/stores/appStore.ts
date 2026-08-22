@@ -79,14 +79,13 @@ export const useAppStore = create<AppState>((set, get) => ({
       const pages = await api.pages.list()
       if (pages.length === 0) {
         // 首次运行:创建欢迎页
-        const detail = await api.pages.create(null, '欢迎使用 Notion Oasis')
+        const detail = await api.pages.create(null, '欢迎使用 Oasis NoteBook')
         await api.pages.updateContent(detail.id, welcomeDoc())
         set({ pages: await api.pages.list(), loaded: true })
-        await get().openPage(detail.id)
         return
       }
+      // 启动时显示欢迎页,不自动打开第一个页面
       set({ pages, loaded: true })
-      await get().openPage(pages[0].id)
     })()
     return initPromise
   },
@@ -150,8 +149,7 @@ export const useAppStore = create<AppState>((set, get) => ({
     await api.pages.trash(id)
     if (get().currentId === id) set({ currentId: null, currentContent: null, currentTitle: '' })
     await get().refresh()
-    const pages = get().pages
-    if (pages.length > 0 && !get().currentId) await get().openPage(pages[0].id)
+    // 删除后回到欢迎页
   },
 
   moveRelative: async (dragId, targetId, zone) => {
