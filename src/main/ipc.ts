@@ -41,7 +41,7 @@ export function registerIpc(): void {
     return db.createRecording({
       pageId: input.pageId,
       fileName,
-      mimeType: input.mimeType,
+      mimeType: media.normalizeMime(input.mimeType),
       durationMs: input.durationMs,
       language: 'auto'
     })

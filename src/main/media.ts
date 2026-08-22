@@ -25,6 +25,11 @@ export function mediaPath(fileName: string): string {
   return join(mediaDir, fileName)
 }
 
+/** audio/webm;codecs=opus → audio/webm */
+export function normalizeMime(mimeType: string): string {
+  return (mimeType.split(';')[0] || 'application/octet-stream').trim().toLowerCase()
+}
+
 const MIME_EXT: Record<string, string> = {
   'audio/webm': '.webm',
   'audio/mp4': '.m4a',
@@ -36,8 +41,21 @@ const MIME_EXT: Record<string, string> = {
   'audio/flac': '.flac'
 }
 
+/** 扩展名 → 响应 Content-Type */
+const EXT_MIME: Record<string, string> = {
+  webm: 'audio/webm',
+  m4a: 'audio/mp4',
+  mp3: 'audio/mpeg',
+  wav: 'audio/wav',
+  aac: 'audio/aac',
+  ogg: 'audio/ogg',
+  opus: 'audio/ogg',
+  flac: 'audio/flac',
+  bin: 'application/octet-stream'
+}
+
 export async function saveAudioFile(buffer: ArrayBuffer, mimeType: string): Promise<string> {
-  const ext = MIME_EXT[mimeType] ?? '.bin'
+  const ext = MIME_EXT[normalizeMime(mimeType)] ?? '.bin'
   const name = `${randomUUID()}${ext}`
   const file = mediaPath(name)
   await new Promise<void>((resolvePromise, reject) => {
@@ -66,13 +84,21 @@ export function registerMediaScheme(): void {
 
 /** 在 app ready 之后调用 */
 export function registerMediaProtocol(): void {
-  protocol.handle(MEDIA_SCHEME, (request) => {
+  protocol.handle(MEDIA_SCHEME, async (request) => {
     const url = new URL(request.url)
     const name = decodeURIComponent(url.pathname.replace(/^\//, ''))
     if (!SAFE_NAME.test(name)) return new Response('bad request', { status: 400 })
     const file = resolve(mediaDir, name)
     if (!file.startsWith(resolve(mediaDir))) return new Response('forbidden', { status: 403 })
-    return net.fetch(pathToFileURL(file).toString(), { headers: { 'Accept-Ranges': 'bytes' } })
+
+    const response = await net.fetch(pathToFileURL(file).toString())
+    // 渲染进程(file:// 源)需要 CORS 头才能 fetch 自定义协议
+    const headers = new Headers(response.headers)
+    headers.set('Access-Control-Allow-Origin', '*')
+    const ext = name.split('.').pop()?.toLowerCase() ?? ''
+    const contentType = EXT_MIME[ext]
+    if (contentType) headers.set('Content-Type', contentType)
+    return new Response(response.body, { status: response.status, headers })
   })
 }
 
