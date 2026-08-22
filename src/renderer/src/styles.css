@@ -2365,17 +2365,16 @@ svg {
 /* 内容区 */
 .console-content {
   padding: 14px 16px;
-  min-height: 120px;
-  max-height: 480px;
-  overflow-y: auto;
+  min-height: 100px;
 }
 
 .console-notes {
   width: 100%;
-  min-height: 120px;
+  min-height: 100px;
   border: none;
   outline: none;
-  resize: vertical;
+  resize: none;
+  overflow: hidden;
   background: transparent;
   color: var(--fg);
   font: inherit;
