@@ -1,11 +1,12 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
-import { insertParagraphsAfterSelection } from '../editor/bridge'
+import { useEffect, useRef, useState } from 'react'
 import { useUiStore } from '../stores/uiStore'
+import { getEditor } from '../editor/bridge'
+import { Icon } from './Icon'
 
 type Action = 'summarize' | 'polish' | 'proofread' | 'explain' | 'translate' | 'continue' | 'ask'
 
-const ACTIONS: { key: Action; label: string }[] = [
-  { key: 'polish', label: '润色写作' },
+const AI_ACTIONS: { key: Action; label: string }[] = [
+  { key: 'polish', label: '润色' },
   { key: 'proofread', label: '校对' },
   { key: 'explain', label: '解释' },
   { key: 'translate', label: '翻译' },
@@ -13,7 +14,16 @@ const ACTIONS: { key: Action; label: string }[] = [
   { key: 'ask', label: '问AI' }
 ]
 
-/** 编辑器内划词后浮现的 AI 工具条;结果可编辑后插入光标处 */
+const HIGHLIGHT_COLORS = [
+  { name: '', label: '清除', css: 'transparent' },
+  { name: 'yellow', label: '黄', css: '#fef3c7' },
+  { name: 'green', label: '绿', css: '#d1fae5' },
+  { name: 'blue', label: '蓝', css: '#dbeafe' },
+  { name: 'red', label: '红', css: '#fee2e2' },
+  { name: 'purple', label: '紫', css: '#f3e8ff' }
+]
+
+/** 划词悬浮条:格式(B/I/U/着重色)+ AI 动作 */
 export function AiSelectionBar() {
   const [visible, setVisible] = useState(false)
   const [pos, setPos] = useState({ top: 0, left: 0 })
@@ -22,10 +32,11 @@ export function AiSelectionBar() {
   const [question, setQuestion] = useState('')
   const [askMode, setAskMode] = useState(false)
   const [error, setError] = useState('')
-  const view = useUiStore((s) => s.view)
+  const [showColors, setShowColors] = useState(false)
   const selectedText = useRef('')
+  const view = useUiStore((s) => s.view)
 
-  const run = useCallback(async (action: Action): Promise<void> => {
+  const run = async (action: Action): Promise<void> => {
     const text = selectedText.current
     if (!text || phase === 'loading') return
     if (action === 'ask' && !askMode) {
@@ -34,6 +45,7 @@ export function AiSelectionBar() {
     }
     if (action === 'ask' && !question.trim()) return
     setPhase('loading')
+    setShowColors(false)
     try {
       const out = await window.oasis.ai.editorAction(action, text, action === 'ask' ? question.trim() : undefined)
       setResult(out)
@@ -42,7 +54,37 @@ export function AiSelectionBar() {
       setError(e instanceof Error ? e.message : String(e))
       setPhase('error')
     }
-  }, [phase, askMode, question])
+  }
+
+  /* 格式操作 */
+  const toggleStyle = (style: string): void => {
+    const editor = getEditor()
+    if (!editor) return
+    try {
+      const fn = editor as unknown as { toggleStyles?: (s: Record<string, unknown>) => void }
+      if (fn.toggleStyles) {
+        fn.toggleStyles({ [style]: true })
+      }
+    } catch {
+      document.execCommand(style)
+    }
+  }
+
+  const setHighlight = (color: string): void => {
+    const editor = getEditor()
+    if (!editor) return
+    try {
+      const fn = editor as unknown as {
+        removeStyles?: (s: Record<string, unknown>) => void
+        toggleStyles?: (s: Record<string, unknown>) => void
+      }
+      if (fn.removeStyles) fn.removeStyles({ backgroundColor: [] })
+      if (color && fn.toggleStyles) fn.toggleStyles({ backgroundColor: color })
+    } catch {
+      /* noop */
+    }
+    setShowColors(false)
+  }
 
   useEffect(() => {
     const onSelect = (): void => {
@@ -52,9 +94,9 @@ export function AiSelectionBar() {
         setVisible(false)
         setPhase('idle')
         setAskMode(false)
+        setShowColors(false)
         return
       }
-      // 只在编辑器内生效
       const node = sel.anchorNode
       const inEditor = node?.parentElement?.closest?.('.bn-editor')
       if (!inEditor) {
@@ -63,9 +105,10 @@ export function AiSelectionBar() {
       }
       const rect = sel.getRangeAt(0).getBoundingClientRect()
       selectedText.current = text
-      setPos({ top: Math.max(8, rect.top - 46), left: Math.max(12, rect.left + rect.width / 2 - 150) })
+      setPos({ top: Math.max(8, rect.top - 52), left: Math.max(12, rect.left + rect.width / 2 - 180) })
       setPhase('idle')
       setAskMode(false)
+      setShowColors(false)
       setVisible(true)
     }
     const onKey = (e: KeyboardEvent): void => {
@@ -86,9 +129,30 @@ export function AiSelectionBar() {
 
   return (
     <div className="ai-sel" style={{ top: pos.top, left: pos.left }}>
+      {/* ─── 格式 + AI 动作 ─── */}
       {phase === 'idle' && !askMode ? (
         <div className="ai-sel-bar">
-          {ACTIONS.map((a) => (
+          <button type="button" className="ai-fmt-btn" title="粗体" onMouseDown={(e) => e.preventDefault()} onClick={() => toggleStyle('bold')}>
+            <strong>B</strong>
+          </button>
+          <button type="button" className="ai-fmt-btn" title="斜体" onMouseDown={(e) => e.preventDefault()} onClick={() => toggleStyle('italic')}>
+            <em>I</em>
+          </button>
+          <button type="button" className="ai-fmt-btn" title="下划线" onMouseDown={(e) => e.preventDefault()} onClick={() => toggleStyle('underline')}>
+            <span style={{ textDecoration: 'underline' }}>U</span>
+          </button>
+          <span className="ai-sel-sep" />
+          <button
+            type="button"
+            className="ai-fmt-btn"
+            title="着重色"
+            onMouseDown={(e) => e.preventDefault()}
+            onClick={() => setShowColors((v) => !v)}
+          >
+            <Icon name="sparkles" size={12} />
+          </button>
+          <span className="ai-sel-sep" />
+          {AI_ACTIONS.map((a) => (
             <button key={a.key} type="button" className="ai-sel-btn" onMouseDown={(e) => e.preventDefault()} onClick={() => void run(a.key)}>
               {a.label}
             </button>
@@ -96,6 +160,24 @@ export function AiSelectionBar() {
         </div>
       ) : null}
 
+      {/* 着重色色板 */}
+      {showColors && phase === 'idle' ? (
+        <div className="ai-color-palette">
+          {HIGHLIGHT_COLORS.map((c) => (
+            <button
+              key={c.name || 'none'}
+              type="button"
+              className={`ai-color-swatch${c.name === '' ? ' none' : ''}`}
+              style={{ background: c.css }}
+              title={c.label}
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={() => setHighlight(c.name)}
+            />
+          ))}
+        </div>
+      ) : null}
+
+      {/* 问AI 输入 */}
       {askMode && phase === 'idle' ? (
         <div className="ai-sel-ask">
           <input
@@ -115,6 +197,7 @@ export function AiSelectionBar() {
         </div>
       ) : null}
 
+      {/* AI 结果 */}
       {phase === 'loading' ? (
         <div className="ai-sel-panel">
           <span className="spin" /> AI 正在处理…
@@ -138,13 +221,26 @@ export function AiSelectionBar() {
               type="button"
               className="btn primary small"
               onClick={() => {
-                if (insertParagraphsAfterSelection(result)) {
+                const editor = getEditor()
+                if (!editor) return
+                try {
+                  const anchor = editor.getTextCursorPosition().block
+                  const blocks = result
+                    .split('\n')
+                    .filter((l) => l.trim())
+                    .map((line) => ({
+                      type: /^[-*]\s/.test(line) ? 'bulletListItem' : 'paragraph',
+                      content: [{ type: 'text', text: line.replace(/^[-*]\s/, ''), styles: {} }]
+                    }))
+                  if (blocks.length > 0) editor.insertBlocks(blocks as never, anchor, 'after')
                   setVisible(false)
-                  useUiStore.getState().showToast('已插入笔记')
+                  useUiStore.getState().showToast('已插入下方')
+                } catch {
+                  /* noop */
                 }
               }}
             >
-              ✓ 插入下方
+              插入下方
             </button>
             <button
               type="button"

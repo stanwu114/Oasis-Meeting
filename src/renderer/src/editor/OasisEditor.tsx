@@ -221,7 +221,12 @@ export default function OasisEditor({ pageId }: { pageId: string }) {
           <span className="hint-text">输入 / 查看全部块类型</span>
         </div>
       ) : null}
-      <BlockNoteView editor={editor} theme={theme === 'dark' ? 'dark' : 'light'} slashMenu={false}>
+      <BlockNoteView
+          editor={editor}
+          theme={theme === 'dark' ? 'dark' : 'light'}
+          slashMenu={false}
+          formattingToolbar={false}
+        >
         <SuggestionMenuController triggerCharacter="/" getItems={getSlashItems} />
       </BlockNoteView>
       {!recorderBusy ? (
