@@ -10,7 +10,7 @@ import { useAppStore } from '../stores/appStore'
 import WaveSurfer from 'wavesurfer.js'
 
 /**
- * 会议控制台:常驻录音条 + 三个标签页(会议笔记 / 文字转写稿 / AI会议纪要)
+ * 会议控制台:常驻录音条 + 三个标签页(会议笔记 / 录音转写稿 / AI会议纪要)
  * 录音完成后自动切换到 AI 纪要标签。
  */
 
@@ -19,7 +19,7 @@ type RecStatus = 'idle' | 'recording' | 'paused' | 'importing' | 'transcribing' 
 
 const TAB_LABELS: { key: Tab; label: string }[] = [
   { key: 'notes', label: '会议笔记' },
-  { key: 'transcript', label: '文字转写稿' },
+  { key: 'transcript', label: '录音转写稿' },
   { key: 'summary', label: 'AI 会议纪要' }
 ]
 
@@ -459,9 +459,17 @@ function MeetingConsoleView({ block }: { block: { id: string; props: Record<stri
         {activeTab === 'transcript' ? (
           <div className="console-text">
             {block.props.transcript
-              ? block.props.transcript.split(/\n{2,}/).map((p, i) => (
-                  <p key={i} className="console-para">{p.replace(/^\[\d{1,2}:\d{2}(?::\d{2})?\]\s*/, '')}</p>
-                ))
+              ? block.props.transcript.split(/\n{2,}/).map((p, i) => {
+                  const m = /^\[(\d{1,2}:\d{2}(?::\d{2})?)\]\s*/.exec(p)
+                  const stamp = m ? m[1] : ''
+                  const text = m ? p.slice(m[0].length) : p
+                  return (
+                    <div key={i} className="console-para-row">
+                      {stamp ? <span className="console-stamp">{stamp}</span> : null}
+                      <span className="console-para-text">{text}</span>
+                    </div>
+                  )
+                })
               : busy ? <div className="console-loading"><div className="shimmer-line" style={{ width: '80%' }} /><div className="shimmer-line" style={{ width: '60%' }} /><div className="shimmer-line" style={{ width: '40%' }} /></div>
               : <span className="console-empty">录音完成后转写文稿会显示在这里</span>}
           </div>

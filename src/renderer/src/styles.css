@@ -2729,3 +2729,29 @@ svg {
   padding-left: 0;
   border: none;
 }
+
+/* 转写稿:时间戳 + 段落 */
+.console-para-row {
+  display: flex;
+  gap: 10px;
+  margin: 0 0 12px;
+  align-items: baseline;
+}
+
+.console-stamp {
+  flex-shrink: 0;
+  font-size: 11.5px;
+  color: var(--fg-faint);
+  font-variant-numeric: tabular-nums;
+  background: var(--bg-active);
+  border-radius: 5px;
+  padding: 1px 7px;
+  min-width: 44px;
+  text-align: center;
+}
+
+.console-para-text {
+  flex: 1;
+  min-width: 0;
+  line-height: 1.75;
+}
