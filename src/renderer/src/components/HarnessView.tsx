@@ -1,11 +1,12 @@
 import { useEffect } from 'react'
 import { setHarnessWebview, useHarnessStore } from '../stores/harnessStore'
 
-/** 隐藏 dsh 自带的会话侧栏、详情栏与拖拽手柄——只保留会话主界面 */
+/** 隐藏 dsh 自带的会话侧栏/详情栏,并强制中间会话区铺满(覆盖其内联宽度) */
 const HIDE_DSH_SIDEBAR_CSS = `
 [class*="sidebarCol"] { display: none !important; }
 [class*="detailsCol"] { display: none !important; }
 [class*="_handle"] { display: none !important; }
+[class*="centerCol"] { flex: 1 1 auto !important; width: auto !important; min-width: 0 !important; max-width: 100% !important; }
 `
 
 interface WebviewTagLike extends HTMLElement {
