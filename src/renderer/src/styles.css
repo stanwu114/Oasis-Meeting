@@ -544,9 +544,9 @@ kbd {
 
 /* ============ 编辑器 ============ */
 .editor-page {
-  max-width: 768px;
+  max-width: 960px;
   margin: 0 auto;
-  padding: 64px 52px 30vh;
+  padding: 64px 56px 30vh;
   position: relative;
 }
 
@@ -1894,9 +1894,10 @@ kbd {
 .meeting-meta-row {
   display: flex;
   align-items: center;
-  gap: 14px;
-  padding: 8px 0;
+  gap: 16px;
+  padding: 11px 0;
   border-bottom: 1px dashed var(--border);
+  flex-wrap: nowrap;
 }
 
 .meeting-meta-row:last-child {
@@ -1905,7 +1906,7 @@ kbd {
 
 .meeting-meta-label {
   flex-shrink: 0;
-  width: 76px;
+  width: 84px;
   font-size: 13px;
   font-weight: 600;
   color: var(--fg-muted);
@@ -1926,6 +1927,9 @@ kbd {
 .meeting-meta-input {
   flex: 1;
   min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   border: none;
   outline: none;
   background: transparent;

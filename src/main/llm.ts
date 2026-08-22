@@ -82,18 +82,33 @@ export async function runEditorAction(action: EditorAction, text: string, questi
   ])
 }
 
-/** 依据录音转写为会议起一个简短名称 */
-export async function meetingName(transcript: string): Promise<string> {
-  const name = await chat(
+/** 依据录音转写生成会议名称与主题 */
+export async function meetingName(transcript: string): Promise<{ name: string; topic: string }> {
+  const raw = await chat(
     [
       {
         role: 'system',
         content:
-          '根据会议录音转写文稿,为这场会议起一个简短的中文名称,不超过 10 个字,不要书名号和引号,不要以「会议」结尾(标题会自动补「会议」后缀),只输出名称本身。'
+          '根据会议录音转写文稿,输出一个 JSON 对象(不要代码块包裹):{"name":"会议名称","topic":"会议主题"}。name 不超过 10 个字、不要引号书名号、不要以「会议」结尾;topic 是一句话概括本次会议主题(15~30 字)。只输出 JSON。'
       },
       { role: 'user', content: transcript.slice(0, 6_000) }
     ],
-    { temperature: 0.4, maxTokens: 60 }
+    { temperature: 0.4, maxTokens: 200 }
   )
-  return name.replace(/["「」《》\s]/g, '').slice(0, 10)
+  let name = ''
+  let topic = ''
+  try {
+    const m = /\{[\s\S]*\}/.exec(raw)
+    if (m) {
+      const obj = JSON.parse(m[0]) as { name?: string; topic?: string }
+      name = obj.name ?? ''
+      topic = obj.topic ?? ''
+    }
+  } catch {
+    /* 兜底:第一行作名称 */
+  }
+  if (!name) name = raw.split('\n')[0] ?? ''
+  name = name.replace(/["「」《》\s]/g, '').slice(0, 10)
+  topic = topic.replace(/^["「]|["」]$/g, '').slice(0, 40)
+  return { name, topic }
 }

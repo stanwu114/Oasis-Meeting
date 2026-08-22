@@ -218,8 +218,8 @@ export interface OasisApi {
     ): Promise<string>
     /** 对整页正文生成结构化摘要 */
     summarizePage(pageId: string): Promise<string>
-    /** 依据录音转写为会议起名(≤10 字) */
-    meetingName(transcript: string): Promise<string>
+    /** 依据录音转写生成会议名称(≤10 字)与主题(一句话) */
+    meetingName(transcript: string): Promise<{ name: string; topic: string }>
   }
   harness: {
     start(): Promise<HarnessState>

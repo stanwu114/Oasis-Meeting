@@ -111,10 +111,10 @@ export default function OasisEditor({ pageId }: { pageId: string }) {
         namedRef.current = true
         void window.oasis.ai
           .meetingName(rec.transcript)
-          .then((name) => {
+          .then(({ name, topic }) => {
             if (!name) return
             try {
-              editor.updateBlock(meta.id as never, { props: { name } } as never)
+              editor.updateBlock(meta.id as never, { props: { name, topic: topic || meta.props.topic } } as never)
             } catch {
               /* noop */
             }
