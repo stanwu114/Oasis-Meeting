@@ -2241,3 +2241,196 @@ svg {
   font-size: 10px;
   color: var(--fg-faint);
 }
+
+/* ============ 会议控制台(常驻录音+三标签) ============ */
+.meeting-console {
+  margin: 4px 0 20px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--card);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+}
+
+/* 录音控制条 */
+.console-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+  min-height: 56px;
+}
+
+.console-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.console-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: 9px;
+  font-size: 13.5px;
+  font-weight: 600;
+  transition: filter 0.15s;
+}
+
+.console-btn.start {
+  background: var(--accent);
+  color: var(--on-accent);
+}
+
+.console-btn.start:hover {
+  filter: brightness(1.08);
+}
+
+.console-btn.pause {
+  background: var(--bg-active);
+  color: var(--fg);
+}
+
+.console-btn.stop {
+  background: var(--danger);
+  color: #fff;
+}
+
+.console-btn.stop:hover {
+  filter: brightness(1.06);
+}
+
+.console-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--accent);
+}
+
+.console-error {
+  font-size: 12.5px;
+  color: var(--danger);
+}
+
+.console-timer {
+  font-size: 18px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--fg);
+  flex-shrink: 0;
+}
+
+.console-timer.paused {
+  color: var(--fg-faint);
+}
+
+.console-wave {
+  flex: 1;
+  min-width: 0;
+  height: 36px;
+}
+
+/* 标签页 */
+.console-tabs {
+  display: flex;
+  gap: 0;
+  border-bottom: 1px solid var(--border);
+  padding: 0 16px;
+}
+
+.console-tab {
+  padding: 10px 16px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--fg-muted);
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  transition: color 0.12s, border-color 0.12s;
+}
+
+.console-tab:hover {
+  color: var(--fg);
+}
+
+.console-tab.on {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+  font-weight: 600;
+}
+
+/* 内容区 */
+.console-content {
+  padding: 14px 16px;
+  min-height: 120px;
+  max-height: 480px;
+  overflow-y: auto;
+}
+
+.console-notes {
+  width: 100%;
+  min-height: 120px;
+  border: none;
+  outline: none;
+  resize: vertical;
+  background: transparent;
+  color: var(--fg);
+  font: inherit;
+  font-size: 14px;
+  line-height: 1.75;
+}
+
+.console-notes::placeholder {
+  color: var(--fg-faint);
+}
+
+.console-text {
+  font-size: 14px;
+  line-height: 1.8;
+}
+
+.console-para {
+  margin: 0 0 10px;
+}
+
+.console-heading {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--fg);
+  margin: 14px 0 8px;
+}
+
+.console-heading:first-child {
+  margin-top: 0;
+}
+
+.console-bullet {
+  display: flex;
+  gap: 8px;
+  margin: 0 0 8px;
+  align-items: baseline;
+}
+
+.console-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--accent);
+  flex-shrink: 0;
+  transform: translateY(-2px);
+}
+
+.console-loading {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 8px 0;
+}
+
+.console-empty {
+  color: var(--fg-faint);
+  font-size: 13.5px;
+}

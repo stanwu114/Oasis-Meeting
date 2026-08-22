@@ -5,6 +5,7 @@ import { SuggestionMenuController, getDefaultReactSlashMenuItems, useCreateBlock
 import { BlockNoteView } from '@blocknote/mantine'
 import { RecordingBlock } from './recordingBlock'
 import { MeetingMetaBlock } from './meetingMetaBlock'
+import { MeetingConsoleBlock } from './meetingConsole'
 import { setEditor, insertSummaryAtDocStart } from './bridge'
 import { useAppStore } from '../stores/appStore'
 import { useRecordingsStore } from '../stores/recordingsStore'
@@ -18,7 +19,8 @@ export const schema = BlockNoteSchema.create({
   blockSpecs: {
     ...defaultBlockSpecs,
     recording: RecordingBlock(),
-    meetingMeta: MeetingMetaBlock()
+    meetingMeta: MeetingMetaBlock(),
+    meetingConsole: MeetingConsoleBlock()
   }
 })
 

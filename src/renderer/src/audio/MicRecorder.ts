@@ -113,6 +113,14 @@ export class MicRecorder {
     return { blob, durationMs }
   }
 
+  pause(): void {
+    try { this.recorder?.pause() } catch { /* noop */ }
+  }
+
+  resume(): void {
+    try { this.recorder?.resume() } catch { /* noop */ }
+  }
+
   cancel(): void {
     try {
       if (this.recorder && this.recorder.state !== 'inactive') this.recorder.stop()

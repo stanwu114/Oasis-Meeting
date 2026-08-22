@@ -124,6 +124,7 @@ export const useAppStore = create<AppState>((set, get) => ({
     if (useTemplate) {
       await api.pages.updateContent(detail.id, [
         { type: 'meetingMeta', props: { time: stamp } },
+        { type: 'meetingConsole', props: { time: stamp } },
         { type: 'paragraph', content: [], children: [] }
       ])
     }
