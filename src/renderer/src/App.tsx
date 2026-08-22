@@ -94,9 +94,6 @@ function EmptyState(): React.ReactNode {
         <button type="button" className="btn primary" onClick={() => void useAppStore.getState().createPage(null)}>
           ＋ 新建 Meeting
         </button>
-        <button type="button" className="btn ghost" onClick={() => void useRecorderStore.getState().start()}>
-          快速录音(自动建 Meeting)
-        </button>
       </div>
     </div>
   )
