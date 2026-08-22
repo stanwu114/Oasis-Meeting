@@ -1966,13 +1966,12 @@ kbd {
 }
 
 .brand-sub {
-  font-family: 'OasisWordmark', 'Helvetica Neue', sans-serif;
-  font-style: normal;
-  font-weight: 900;
+  font-family: Inter, -apple-system, 'Helvetica Neue', 'PingFang SC', sans-serif;
+  font-weight: 800;
   font-size: 24px;
   color: var(--fg);
   margin-left: 6px;
-  letter-spacing: -0.015em;
+  letter-spacing: -0.02em;
   line-height: 1;
   transform: translateY(1px);
 }

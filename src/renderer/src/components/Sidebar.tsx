@@ -42,7 +42,7 @@ export function Sidebar() {
       <div className="sidebar-top" />
       <div className="sidebar-brand">
         <img src={logoUrl} alt="Oasis" className="brand-logo" draggable={false} />
-        <span className="brand-sub">Notebook</span>
+        <span className="brand-sub">NoteBook</span>
       </div>
 
       {/* 界面切换:Meeting ↔ Harness */}
