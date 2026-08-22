@@ -439,13 +439,20 @@ function MeetingConsoleView({ block }: { block: { id: string; props: Record<stri
 
       <div className="console-content">
         {activeTab === 'notes' ? (
-          <textarea
-            className="console-notes"
-            value={notes}
-            onChange={(e) => onNotesChange(e.target.value)}
-            placeholder="在这里手动记录会议内容…"
-            rows={Math.max(4, notes.split('\n').length + 1)}
-          />
+          <div className="numbered-notes">
+            <div className="line-numbers">
+              {Array.from({ length: Math.max(1, notes.split('\n').length) }, (_, i) => (
+                <div key={i} className="line-num">{i + 1}.</div>
+              ))}
+            </div>
+            <textarea
+              className="console-notes numbered"
+              value={notes}
+              onChange={(e) => onNotesChange(e.target.value)}
+              placeholder="点击此处开始记录…"
+              rows={Math.max(4, notes.split('\n').length + 1)}
+            />
+          </div>
         ) : null}
         {activeTab === 'transcript' ? (
           <div className="console-text">

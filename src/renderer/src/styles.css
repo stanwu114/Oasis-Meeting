@@ -2695,3 +2695,37 @@ svg {
   flex: 1;
   min-width: 0;
 }
+
+/* 会议笔记:自动序号 */
+.numbered-notes {
+  display: flex;
+  gap: 0;
+  align-items: flex-start;
+}
+
+.line-numbers {
+  padding-top: 0;
+  text-align: right;
+  color: var(--fg-faint);
+  font-size: 14px;
+  line-height: 1.75;
+  min-width: 30px;
+  user-select: none;
+  flex-shrink: 0;
+  font-variant-numeric: tabular-nums;
+  padding-right: 8px;
+  border-right: 1px solid var(--border);
+  margin-right: 10px;
+}
+
+.line-num {
+  height: 24.5px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.console-notes.numbered {
+  padding-left: 0;
+  border: none;
+}
