@@ -32,7 +32,7 @@ export default function OasisEditor({ pageId }: { pageId: string }) {
 
   const editor = useCreateBlockNote({
     schema,
-    dictionary: zh as never,
+    dictionary: { ...(zh as never), placeholders: { default: '', heading: '', toggleListItem: '', bulletListItem: '', numberedListItem: '', checkListItem: '' } },
     initialContent: initialContent && initialContent.length > 0 ? (initialContent as never) : undefined
   })
 
