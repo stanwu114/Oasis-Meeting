@@ -7,6 +7,7 @@ import { TrashView } from './components/TrashView'
 import { RecordingsView } from './components/RecordingsView'
 import { AiSelectionBar } from './components/AiSelectionBar'
 import { ChatPanel } from './components/ChatPanel'
+import { ChatWorkspace } from './components/ChatWorkspace'
 import { useChatStore } from './stores/chatStore'
 import OasisEditor from './editor/OasisEditor'
 import { useAppStore } from './stores/appStore'
@@ -96,7 +97,13 @@ export default function App() {
       }
       if (mod && e.shiftKey && e.key.toLowerCase() === 'j') {
         e.preventDefault()
-        useUiStore.getState().setChatOpen(!useUiStore.getState().chatOpen)
+        const ui = useUiStore.getState()
+        if (ui.view === 'ai') {
+          ui.setView('editor')
+        } else {
+          ui.setView('ai')
+          ui.setChatOpen(false)
+        }
       }
       if (mod && e.shiftKey && e.key.toLowerCase() === 'r') {
         e.preventDefault()
@@ -116,6 +123,8 @@ export default function App() {
           <TrashView />
         ) : view === 'recordings' ? (
           <RecordingsView />
+        ) : view === 'ai' ? (
+          <ChatWorkspace />
         ) : loaded && currentId ? (
           <OasisEditor key={currentId} pageId={currentId} />
         ) : (
@@ -131,12 +140,12 @@ export default function App() {
         </>
       ) : null}
 
-      {!chatOpen ? (
+      {!chatOpen && view !== 'ai' ? (
         <button
           type="button"
           className="ai-toggle-fab"
           style={{ bottom: view === 'editor' && loaded && currentId ? 104 : 34 }}
-          title="打开 AI (⇧⌘J)"
+          title="打开 AI 面板 (⌘L);⇧⌘J 切换完整 AI 界面"
           onClick={() => useUiStore.getState().setChatOpen(true)}
         >
           ✨

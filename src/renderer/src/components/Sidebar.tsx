@@ -59,12 +59,8 @@ export function Sidebar() {
         >
           🎧 录音
         </button>
-        <button
-          type="button"
-          className={btn(false)}
-          onClick={() => useUiStore.getState().setChatOpen(!useUiStore.getState().chatOpen)}
-        >
-          💬 AI <kbd>⌘L</kbd>
+        <button type="button" className={btn(view === 'ai')} onClick={() => useUiStore.getState().setView('ai')}>
+          ✨ AI <kbd>⇧⌘J</kbd>
         </button>
         <button type="button" className={btn(false)} onClick={() => useUiStore.getState().setSearchOpen(true)}>
           🔍 搜索 <kbd>⌘K</kbd>

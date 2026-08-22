@@ -336,6 +336,100 @@ kbd {
   background: var(--accent-soft);
 }
 
+/* ============ 全屏 AI 界面 ============ */
+.chat-workspace {
+  display: flex;
+  height: 100vh;
+  animation: contentIn 0.22s ease-out;
+}
+
+.chat-side-col {
+  width: 250px;
+  flex-shrink: 0;
+  border-right: 1px solid var(--border);
+  background: var(--bg-sidebar);
+  display: flex;
+  flex-direction: column;
+  padding: 52px 10px 10px;
+  position: relative;
+}
+
+.chat-side-col::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 44px;
+  -webkit-app-region: drag;
+}
+
+.chat-side-top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.chat-side-top .icon-btn {
+  margin-left: auto;
+}
+
+.chat-new-btn {
+  flex: 1;
+  font-size: 13px;
+  padding: 7px 10px;
+}
+
+.chat-side-list {
+  flex: 1;
+  overflow-y: auto;
+  margin: 0 -4px;
+  padding: 0 4px;
+}
+
+.chat-side-foot {
+  font-size: 11px;
+  color: var(--fg-faint);
+  padding: 8px 6px 2px;
+  border-top: 1px solid var(--border);
+  text-align: center;
+}
+
+.chat-main-col {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg);
+}
+
+.chat-main-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 18px;
+  border-bottom: 1px solid var(--border);
+  -webkit-app-region: drag;
+}
+
+.chat-main-head .icon-btn,
+.chat-main-head .chat-title {
+  -webkit-app-region: no-drag;
+}
+
+.chat-main-col .chat-messages {
+  padding: 20px 24px;
+}
+
+.chat-main-col .chat-bubble {
+  max-width: 76%;
+}
+
+.chat-main-col .chat-input-area {
+  padding: 12px 24px 16px;
+}
+
 /* ============ AI 对话抽屉 ============ */
 .chat-drawer {
   flex-shrink: 0;
