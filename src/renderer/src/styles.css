@@ -1956,12 +1956,11 @@ kbd {
   font-display: swap;
 }
 
-.brand-wordmark {
-  font-family: 'OasisWordmark', 'Helvetica Neue', sans-serif;
-  font-style: italic;
+.brand-word {
+  font-family: 'BrandDisplay', Inter, -apple-system, sans-serif;
   font-weight: 900;
   font-size: 30px;
-  letter-spacing: -0.015em;
+  letter-spacing: -0.025em;
   line-height: 1;
   color: var(--fg);
 }
