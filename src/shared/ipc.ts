@@ -34,8 +34,14 @@ export const IPC = {
   aiEditorAction: 'ai:editor-action',
   aiSummarizePage: 'ai:summarize-page',
 
+  harnessStart: 'harness:start',
+  harnessStop: 'harness:stop',
+  harnessStatus: 'harness:status',
+  harnessSessions: 'harness:sessions',
+
   evtRecordingsChanged: 'evt:recordings-changed',
-  evtModelProgress: 'evt:model-progress'
+  evtModelProgress: 'evt:model-progress',
+  evtHarnessState: 'evt:harness-state'
 } as const
 
 export interface PageSummary {
@@ -186,11 +192,34 @@ export interface OasisApi {
     /** 对整页正文生成结构化摘要 */
     summarizePage(pageId: string): Promise<string>
   }
+  harness: {
+    start(): Promise<HarnessState>
+    stop(): Promise<void>
+    status(): Promise<HarnessState>
+    /** 读取 ~/.dsh 里的历史会话列表 */
+    sessions(): Promise<HarnessSession[]>
+  }
   on: {
     recordingsChanged(cb: (r: RecordingInfo) => void): () => void
     modelProgress(cb: (m: ModelStatus) => void): () => void
+    harnessStateChanged(cb: (s: HarnessState) => void): () => void
     appAction(cb: (action: string) => void): () => void
   }
+}
+
+/** Harness(dsh web)运行状态 */
+export interface HarnessState {
+  status: 'unavailable' | 'stopped' | 'starting' | 'ready' | 'error'
+  url: string | null
+  error: string | null
+}
+
+/** dsh 历史会话条目 */
+export interface HarnessSession {
+  id: string
+  title: string
+  timeMs: number
+  workspace: string
 }
 
 /** 录音转写支持的语言 */

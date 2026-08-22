@@ -6,6 +6,7 @@ import { SettingsModal } from './components/SettingsModal'
 import { TrashView } from './components/TrashView'
 import { RecordingsView } from './components/RecordingsView'
 import { AiSelectionBar } from './components/AiSelectionBar'
+import { HarnessView } from './components/HarnessView'
 import OasisEditor from './editor/OasisEditor'
 import { useAppStore } from './stores/appStore'
 import { useUiStore } from './stores/uiStore'
@@ -66,6 +67,8 @@ export default function App() {
           <TrashView />
         ) : view === 'recordings' ? (
           <RecordingsView />
+        ) : view === 'harness' ? (
+          <HarnessView />
         ) : loaded && currentId ? (
           <OasisEditor key={currentId} pageId={currentId} />
         ) : (

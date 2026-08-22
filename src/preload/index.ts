@@ -43,9 +43,16 @@ const api: OasisApi = {
     editorAction: (action, text, question) => ipcRenderer.invoke(IPC.aiEditorAction, action, text, question),
     summarizePage: (pageId) => ipcRenderer.invoke(IPC.aiSummarizePage, pageId)
   },
+  harness: {
+    start: () => ipcRenderer.invoke(IPC.harnessStart),
+    stop: () => ipcRenderer.invoke(IPC.harnessStop),
+    status: () => ipcRenderer.invoke(IPC.harnessStatus),
+    sessions: () => ipcRenderer.invoke(IPC.harnessSessions)
+  },
   on: {
     recordingsChanged: (cb) => subscribe(IPC.evtRecordingsChanged, cb),
     modelProgress: (cb) => subscribe(IPC.evtModelProgress, cb),
+    harnessStateChanged: (cb) => subscribe(IPC.evtHarnessState, cb),
     appAction: (cb) => subscribe('app:action', cb)
   }
 }

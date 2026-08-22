@@ -7,6 +7,8 @@ import { getModelStatus, ensureModelDownloaded } from './modelManager'
 import { enqueueTranscription } from './transcriber'
 import { enqueueSummary } from './summarizer'
 import { chat, runEditorAction } from './llm'
+import { startHarness, stopHarness, getHarnessState } from './dshRunner'
+import { listHarnessSessions } from './dshHistory'
 import { extractDocText } from '../shared/extract'
 
 /** 包装 handler:统一异常日志与向渲染进程抛错 */
@@ -104,6 +106,14 @@ export function registerIpc(): void {
       { temperature: 0.3 }
     )
   })
+
+  /* ---------- Harness(dsh) ---------- */
+  handle(IPC.harnessStart, () => startHarness())
+  handle(IPC.harnessStop, () => {
+    stopHarness()
+  })
+  handle(IPC.harnessStatus, () => getHarnessState())
+  handle(IPC.harnessSessions, () => listHarnessSessions())
 
   /* ---------- 搜索 ---------- */
   handle(IPC.searchQuery, (q: string) => db.searchPages(q.trim()))
