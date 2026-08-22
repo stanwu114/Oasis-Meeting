@@ -397,11 +397,11 @@ function MeetingConsoleView({ block }: { block: { id: string; props: Record<stri
           ) : null}
           {isRecording ? (
             <>
-              <button type="button" className="console-btn pause" onClick={togglePause}>
-                {recStatus === 'paused' ? '继续' : '暂停'}
+              <button type="button" className="console-icon-btn pause" onClick={togglePause} title={recStatus === 'paused' ? '继续' : '暂停'}>
+                {recStatus === 'paused' ? <Icon name="play" size={14} /> : <Icon name="stop" size={14} />}
               </button>
-              <button type="button" className="console-btn stop" onClick={() => void stopRec()}>
-                <Icon name="stop" size={13} /> 结束录音
+              <button type="button" className="console-icon-btn stop" onClick={() => void stopRec()} title="结束录音">
+                <Icon name="close" size={14} />
               </button>
             </>
           ) : null}
@@ -413,10 +413,10 @@ function MeetingConsoleView({ block }: { block: { id: string; props: Record<stri
           {recStatus === 'error' ? <span className="console-error">{errorMsg}</span> : null}
         </div>
         {isRecording ? (
-          <>
+          <div className="console-live">
             <span className={`console-timer${recStatus === 'paused' ? ' paused' : ''}`}>{formatDuration(elapsed)}</span>
             <WaveCanvas recorder={recorderRef.current} active={recStatus === 'recording'} />
-          </>
+          </div>
         ) : null}
       </div>
 

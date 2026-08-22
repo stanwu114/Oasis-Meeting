@@ -2654,3 +2654,42 @@ svg {
   inset: 0;
   z-index: 29;
 }
+
+/* 录音中的图标按钮(紧凑) */
+.console-icon-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: filter 0.12s;
+  flex-shrink: 0;
+}
+
+.console-icon-btn.pause {
+  background: var(--bg-active);
+  color: var(--fg);
+}
+
+.console-icon-btn.pause:hover {
+  filter: brightness(0.92);
+}
+
+.console-icon-btn.stop {
+  background: var(--danger);
+  color: #fff;
+}
+
+.console-icon-btn.stop:hover {
+  filter: brightness(1.06);
+}
+
+/* 计时 + 波形紧贴容器 */
+.console-live {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+}
