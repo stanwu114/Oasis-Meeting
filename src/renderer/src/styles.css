@@ -1,55 +1,55 @@
 /* ============ 设计变量 ============ */
 :root {
-  /* 暖纸墨 + 琥珀 — Editorial Warm(浅色) */
-  --bg: #fbfaf7;
-  --bg-sidebar: #f4f1eb;
-  --bg-subtle: #f7f5f1;
-  --bg-hover: rgba(41, 34, 27, 0.055);
-  --bg-active: rgba(41, 34, 27, 0.09);
-  --fg: #1f1a14;
-  --fg-muted: #5c554c;
-  --fg-faint: #a39c92;
-  --border: #e8e4dc;
-  --border-strong: #d8d2c7;
-  --accent: #b45306;
+  /* Oasis 品牌色 — 中性纸灰(浅灰 #F5F5F5 / 深灰 #333333)+ 品牌橙 #FF7A00 */
+  --bg: #fafaf9;
+  --bg-sidebar: #f1f1f0;
+  --bg-subtle: #f5f5f5;
+  --bg-hover: rgba(31, 30, 28, 0.055);
+  --bg-active: rgba(31, 30, 28, 0.09);
+  --fg: #333333;
+  --fg-muted: #686561;
+  --fg-faint: #a6a29d;
+  --border: #e7e6e4;
+  --border-strong: #d6d4d1;
+  --accent: #ff7a00;
   --on-accent: #ffffff;
-  --accent-soft: rgba(180, 83, 6, 0.11);
+  --accent-soft: rgba(255, 122, 0, 0.11);
   --danger: #dc2626;
   --danger-soft: rgba(220, 38, 38, 0.1);
   --ok: #167a3e;
   --ok-soft: rgba(22, 122, 62, 0.1);
-  --wave: #e3ded4;
-  --wave-progress: #b45306;
+  --wave: #e6e4e1;
+  --wave-progress: #ff7a00;
   --card: #ffffff;
-  --shadow-sm: 0 1px 2px rgba(41, 34, 27, 0.05), 0 2px 8px rgba(41, 34, 27, 0.04);
-  --shadow-lg: 0 16px 48px rgba(41, 34, 27, 0.16), 0 4px 12px rgba(41, 34, 27, 0.06);
+  --shadow-sm: 0 1px 2px rgba(26, 25, 24, 0.05), 0 2px 8px rgba(26, 25, 24, 0.04);
+  --shadow-lg: 0 16px 48px rgba(26, 25, 24, 0.16), 0 4px 12px rgba(26, 25, 24, 0.06);
   --radius: 10px;
   font-family: Inter, -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei',
     'Helvetica Neue', sans-serif;
 }
 
 html.dark {
-  /* 暖炭 + 琥珀(深色) */
-  --bg: #1a1815;
-  --bg-sidebar: #201d19;
-  --bg-subtle: #1e1b18;
-  --bg-hover: rgba(235, 226, 214, 0.055);
-  --bg-active: rgba(235, 226, 214, 0.095);
-  --fg: #ece7de;
-  --fg-muted: #b0a89c;
-  --fg-faint: #7c756b;
-  --border: #2c2823;
-  --border-strong: #3a352e;
-  --accent: #e8901e;
-  --on-accent: #231a0c;
-  --accent-soft: rgba(232, 144, 30, 0.15);
+  /* 中性炭 + 品牌橙(深色) */
+  --bg: #191919;
+  --bg-sidebar: #1f1f1e;
+  --bg-subtle: #1c1c1b;
+  --bg-hover: rgba(233, 231, 228, 0.055);
+  --bg-active: rgba(233, 231, 228, 0.095);
+  --fg: #ebe9e6;
+  --fg-muted: #aeaca8;
+  --fg-faint: #7d7b77;
+  --border: #2b2b2a;
+  --border-strong: #3a3a38;
+  --accent: #ff8a1a;
+  --on-accent: #2b1600;
+  --accent-soft: rgba(255, 138, 26, 0.15);
   --danger: #f06666;
   --danger-soft: rgba(240, 102, 102, 0.13);
   --ok: #4cba7d;
   --ok-soft: rgba(76, 186, 125, 0.12);
-  --wave: #35302a;
-  --wave-progress: #e8901e;
-  --card: #242019;
+  --wave: #333332;
+  --wave-progress: #ff8a1a;
+  --card: #242423;
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.28), 0 2px 8px rgba(0, 0, 0, 0.2);
   --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.55), 0 4px 12px rgba(0, 0, 0, 0.35);
 }
@@ -2157,7 +2157,7 @@ svg {
 
 /* 空状态 */
 .empty-logo svg {
-  filter: drop-shadow(0 6px 16px rgba(180, 83, 6, 0.25));
+  filter: drop-shadow(0 6px 16px rgba(255, 122, 0, 0.28));
 }
 
 .empty-state h1 {
@@ -2532,5 +2532,10 @@ svg {
 }
 
 .ctx-menu button:hover svg {
+  color: var(--accent);
+}
+
+/* Project 文件夹图标颜色 */
+.page-icon .icon-project {
   color: var(--accent);
 }

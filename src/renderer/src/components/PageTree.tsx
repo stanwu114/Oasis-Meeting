@@ -76,7 +76,9 @@ export function PageTree() {
             {children.length > 0 ? <Icon name="chevron" size={13} className={isExpanded ? 'chev expanded' : 'chev'} /> : null}
           </button>
           <span className="page-icon">
-            {page.icon ? <span>{page.icon}</span> : children.length > 0 || expanded[page.id] ? <Icon name="folder" size={14} /> : <Icon name="file" size={14} />}
+            {page.icon === 'project' || children.length > 0 || expanded[page.id]
+              ? <Icon name="folder" size={14} className="icon-project" />
+              : <Icon name="calendar" size={14} />}
           </span>
           {editingId === page.id ? (
             <input

@@ -23,9 +23,10 @@ export function Sidebar() {
   const totalDownloaded = modelStatus?.files.reduce((acc, f) => acc + f.downloadedBytes, 0) ?? 0
   const btn = (active: boolean): string => `sidebar-btn${active ? ' active' : ''}`
 
-  const createProject = (): void => {
+  const createProject = async (): Promise<void> => {
     setCtxMenu(null)
-    void useAppStore.getState().createPage(null, '新建 Project')
+    const id = await useAppStore.getState().createPage(null, '新建 Project', { select: true })
+    void useAppStore.getState().setIcon(id, 'project')
   }
 
   return (

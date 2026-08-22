@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" fill="none">
+  <!-- Oasis 应用图标(macOS):浅暖底 + 品牌橙 "开放 O" -->
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FBFAF8" />
+      <stop offset="1" stop-color="#F0EDE8" />
+    </linearGradient>
+    <linearGradient id="ring" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FF8A1A" />
+      <stop offset="1" stop-color="#F26F00" />
+    </linearGradient>
+  </defs>
+  <path d="M0 248 C0 111 111 0 248 0 L776 0 C913 0 1024 111 1024 248 L1024 776 C1024 913 913 1024 776 1024 L248 1024 C111 1024 0 913 0 776 Z" fill="url(#bg)" />
+  <path d="M0 248 C0 111 111 0 248 0 L776 0 C913 0 1024 111 1024 248 L1024 776 C1024 913 913 1024 776 1024 L248 1024 C111 1024 0 913 0 776 Z" fill="none" stroke="rgba(0,0,0,0.05)" stroke-width="2" />
+  <circle cx="512" cy="512" r="315" stroke="url(#ring)" stroke-width="170"
+    stroke-linecap="round" stroke-dasharray="1629.2 350" />
+</svg>

@@ -45,7 +45,7 @@ function WaveCanvas({ recorder, active }: { recorder: MicRecorder | null; active
           ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
           ctx.clearRect(0, 0, w, h)
           const style = getComputedStyle(document.documentElement)
-          ctx.fillStyle = style.getPropertyValue('--accent').trim() || '#b45306'
+          ctx.fillStyle = style.getPropertyValue('--accent').trim() || '#ff7a00'
           const barW = 3
           const gap = 2
           const count = Math.max(1, Math.floor(w / (barW + gap)))
@@ -87,7 +87,7 @@ function PlaybackPlayer({ recordingId }: { recordingId: string }): React.ReactNo
         url,
         height: 36,
         waveColor: style.getPropertyValue('--wave').trim() || '#e3ded4',
-        progressColor: style.getPropertyValue('--accent').trim() || '#b45306',
+        progressColor: style.getPropertyValue('--accent').trim() || '#ff7a00',
         barWidth: 2,
         barGap: 1,
         barRadius: 2,
