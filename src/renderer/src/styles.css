@@ -1976,12 +1976,11 @@ kbd {
 .brand-sub {
   font-family: 'BrandDisplay', Inter, -apple-system, sans-serif;
   font-weight: 900;
-  font-size: 28px;
+  font-size: 32px;
   color: var(--fg);
   margin-left: 7px;
   letter-spacing: -0.025em;
   line-height: 1;
-  transform: translateY(1px);
 }
 
 .empty-wordmark {
