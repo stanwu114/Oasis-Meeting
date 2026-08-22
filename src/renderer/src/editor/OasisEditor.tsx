@@ -200,16 +200,6 @@ export default function OasisEditor({ pageId }: { pageId: string }) {
 
   return (
     <div className="editor-page">
-      <div className="page-actions">
-        <button
-          type="button"
-          className="page-ai-btn"
-          title="将会议信息与 AI 纪要导出为 Word 文档"
-          onClick={() => void exportMeeting()}
-        >
-          导出 Meeting
-        </button>
-      </div>
       <textarea
         className="page-title"
         value={title}
@@ -224,6 +214,16 @@ export default function OasisEditor({ pageId }: { pageId: string }) {
           }
         }}
       />
+      <div className="export-row">
+        <button
+          type="button"
+          className="page-ai-btn"
+          title="将会议信息与 AI 纪要导出为 Word 文档"
+          onClick={() => void exportMeeting()}
+        >
+          导出 Meeting
+        </button>
+      </div>
       {docEmpty ? (
         <div className="empty-doc-hints">
           <button type="button" className="hint-chip record" disabled={recorderBusy} onClick={() => void useRecorderStore.getState().start()}>

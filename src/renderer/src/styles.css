@@ -2864,3 +2864,9 @@ svg {
   color: var(--danger);
   font-weight: 500;
 }
+
+.export-row {
+  display: flex;
+  justify-content: flex-end;
+  margin: -4px 0 8px;
+}
