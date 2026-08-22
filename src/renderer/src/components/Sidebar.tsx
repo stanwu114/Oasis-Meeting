@@ -37,6 +37,30 @@ export function Sidebar() {
         <span className="brand-sub">Meeting</span>
       </div>
 
+      {/* 界面切换:Meeting ↔ Harness */}
+      <div className="mode-switch">
+        <button
+          type="button"
+          className={`mode-btn${view !== 'harness' ? ' on' : ''}`}
+          onClick={() => {
+            useUiStore.getState().setView('editor')
+            const id = useAppStore.getState().currentId
+            if (id) void useAppStore.getState().openPage(id)
+          }}
+        >
+          <Icon name="calendar" size={14} /> Meeting
+        </button>
+        <button
+          type="button"
+          className={`mode-btn${view === 'harness' ? ' on' : ''}`}
+          onClick={() => useUiStore.getState().setView('harness')}
+        >
+          <Icon name="blocks" size={14} /> Harness
+        </button>
+      </div>
+
+      {view !== 'harness' ? (
+        <>
       <div className="sidebar-actions">
         <button
           type="button"
@@ -74,6 +98,15 @@ export function Sidebar() {
           </>
         ) : null}
       </div>
+        </>
+      ) : (
+        <div className="sidebar-pages">
+          <div className="sidebar-pages-head">Harness</div>
+          <div className="tree-empty" style={{ paddingTop: 20, textAlign: 'center' }}>
+            点击上方 Harness 标签页进入
+          </div>
+        </div>
+      )}
 
       <div className="sidebar-bottom">
         <button type="button" className={btn(view === 'trash')} onClick={() => useUiStore.getState().setView('trash')}>
