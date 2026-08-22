@@ -45,16 +45,16 @@ function WaveCanvas({ recorder, active }: { recorder: MicRecorder | null; active
           ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
           ctx.clearRect(0, 0, w, h)
           const style = getComputedStyle(document.documentElement)
-          ctx.fillStyle = style.getPropertyValue('--accent').trim() || '#ff7a00'
+          ctx.fillStyle = style.getPropertyValue('--accent').trim() || '#b45306'
           const barW = 3
           const gap = 2
           const count = Math.max(1, Math.floor(w / (barW + gap)))
           const view = levels.slice(-count)
-          const x0 = w - view.length * (barW + gap)
+          // 从左往右画:紧贴计时器,随录音时间增长向右填充
           for (let i = 0; i < view.length; i++) {
             const v = Math.max(0.06, Math.min(1, view[i]))
             const barH = v * h * 0.9
-            ctx.fillRect(x0 + i * (barW + gap), (h - barH) / 2, barW, barH)
+            ctx.fillRect(i * (barW + gap), (h - barH) / 2, barW, barH)
           }
         }
       }
