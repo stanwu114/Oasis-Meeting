@@ -373,6 +373,75 @@ kbd {
   max-width: 768px;
   margin: 0 auto;
   padding: 64px 52px 30vh;
+  position: relative;
+}
+
+/* 空文档快捷入口 */
+.empty-doc-hints {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 18px;
+  flex-wrap: wrap;
+}
+
+.hint-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 15px;
+  border-radius: 9px;
+  border: 1px solid var(--border);
+  background: var(--bg-subtle);
+  color: var(--fg);
+  font-size: 13.5px;
+  font-weight: 500;
+  transition: border-color 0.12s, box-shadow 0.12s;
+}
+
+.hint-chip:hover {
+  border-color: var(--border-strong);
+  box-shadow: var(--shadow-sm);
+}
+
+.hint-chip.record {
+  color: var(--accent);
+  border-color: transparent;
+  background: var(--accent-soft);
+}
+
+.hint-chip:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+.hint-text {
+  font-size: 12.5px;
+  color: var(--fg-faint);
+}
+
+/* 页面内录音悬浮按钮 */
+.record-fab {
+  position: fixed;
+  right: 34px;
+  bottom: 34px;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #fff;
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-lg);
+  z-index: 60;
+  transition: transform 0.15s, filter 0.15s;
+}
+
+.record-fab:hover {
+  transform: scale(1.07);
+  filter: brightness(1.06);
 }
 
 .page-title {

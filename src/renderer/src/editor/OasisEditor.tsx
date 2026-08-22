@@ -1,13 +1,15 @@
-import { useEffect, useRef } from 'react'
-import { BlockNoteSchema, defaultBlockSpecs } from '@blocknote/core'
+import { useEffect, useRef, useState } from 'react'
+import { BlockNoteSchema, defaultBlockSpecs, filterSuggestionItems } from '@blocknote/core'
 import { zh } from '@blocknote/core/locales'
-import { useCreateBlockNote } from '@blocknote/react'
+import { SuggestionMenuController, getDefaultReactSlashMenuItems, useCreateBlockNote } from '@blocknote/react'
 import { BlockNoteView } from '@blocknote/mantine'
 import { RecordingBlock } from './recordingBlock'
 import { setEditor } from './bridge'
 import { useAppStore } from '../stores/appStore'
 import { useRecordingsStore } from '../stores/recordingsStore'
 import { useUiStore } from '../stores/uiStore'
+import { useRecorderStore } from '../stores/recorderStore'
+import { importAudioAndTranscribe } from '../audio/pipeline'
 
 export const schema = BlockNoteSchema.create({
   blockSpecs: {
@@ -20,12 +22,27 @@ export default function OasisEditor({ pageId }: { pageId: string }) {
   const title = useAppStore((s) => s.currentTitle)
   const initialContent = useAppStore.getState().currentContent
   const theme = useUiStore((s) => s.theme)
+  const recorderBusy = useRecorderStore((s) => s.phase !== 'idle')
+  const [docEmpty, setDocEmpty] = useState(!(initialContent && initialContent.length > 0))
 
   const editor = useCreateBlockNote({
     schema,
     dictionary: zh as never,
     initialContent: initialContent && initialContent.length > 0 ? (initialContent as never) : undefined
   })
+
+  const isDocEmpty = (): boolean => {
+    const doc = editor.document as Array<{ type: string; content?: unknown; children?: unknown[] }>
+    if (doc.length === 0) return true
+    if (doc.length > 1) return false
+    const only = doc[0]
+    const hasText = Array.isArray(only.content) && only.content.length > 0
+    return only.type === 'paragraph' && !hasText && !(only.children && only.children.length > 0)
+  }
+
+  /* / 菜单:默认项 + 录音转写 + 导入音频 */
+  const getSlashItems = async (query: string) =>
+    filterSuggestionItems([...getDefaultReactSlashMenuItems(editor), recordSlashItem, importSlashItem], query)
 
   /* 注册编辑器桥 + 载入本页录音状态 */
   useEffect(() => {
@@ -34,10 +51,11 @@ export default function OasisEditor({ pageId }: { pageId: string }) {
     return () => setEditor(null)
   }, [editor, pageId])
 
-  /* 内容防抖保存 */
+  /* 内容防抖保存 + 空文档检测 */
   const saveTimer = useRef<number | null>(null)
   useEffect(() => {
     const unsubscribe = editor.onChange(() => {
+      setDocEmpty(isDocEmpty())
       if (saveTimer.current) window.clearTimeout(saveTimer.current)
       saveTimer.current = window.setTimeout(() => {
         void window.oasis.pages.updateContent(pageId, editor.document as never)
@@ -98,7 +116,48 @@ export default function OasisEditor({ pageId }: { pageId: string }) {
           }
         }}
       />
-      <BlockNoteView editor={editor} theme={theme === 'dark' ? 'dark' : 'light'} />
+      {docEmpty ? (
+        <div className="empty-doc-hints">
+          <button type="button" className="hint-chip record" disabled={recorderBusy} onClick={() => void useRecorderStore.getState().start()}>
+            🎙 开始录音转写
+          </button>
+          <button type="button" className="hint-chip" disabled={recorderBusy} onClick={() => void importAudioAndTranscribe()}>
+            ⬆ 导入音频转写
+          </button>
+          <span className="hint-text">输入 / 查看全部块类型</span>
+        </div>
+      ) : null}
+      <BlockNoteView editor={editor} theme={theme === 'dark' ? 'dark' : 'light'} slashMenu={false}>
+        <SuggestionMenuController triggerCharacter="/" getItems={getSlashItems} />
+      </BlockNoteView>
+      {!recorderBusy ? (
+        <button
+          type="button"
+          className="record-fab"
+          title="在当前笔记中录音转写"
+          onClick={() => void useRecorderStore.getState().start()}
+        >
+          🎙
+        </button>
+      ) : null}
     </div>
   )
+}
+
+const recordSlashItem = {
+  title: '录音转写',
+  subtext: '录制一段音频,停止后本地转写',
+  aliases: ['录音', '转写', 'record', 'audio', 'meeting', '会议'],
+  group: 'Media' as const,
+  icon: <span style={{ fontSize: 17 }}>🎙</span>,
+  onItemClick: () => void useRecorderStore.getState().start()
+}
+
+const importSlashItem = {
+  title: '导入音频转写',
+  subtext: '选择本地音频文件,本地转写',
+  aliases: ['导入', '音频', 'import', 'mp3', 'wav'],
+  group: 'Media' as const,
+  icon: <span style={{ fontSize: 17 }}>⬆</span>,
+  onItemClick: () => void importAudioAndTranscribe()
 }

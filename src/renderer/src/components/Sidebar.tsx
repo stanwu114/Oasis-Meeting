@@ -1,7 +1,6 @@
 import { useAppStore } from '../stores/appStore'
 import { useUiStore } from '../stores/uiStore'
 import { useRecorderStore } from '../stores/recorderStore'
-import { importAudioAndTranscribe } from '../audio/pipeline'
 import { PageTree } from './PageTree'
 
 function formatBytes(bytes: number): string {
@@ -37,23 +36,7 @@ export function Sidebar() {
           disabled={recording}
           onClick={() => void useAppStore.getState().createPage(null)}
         >
-          ＋ 新建页面
-        </button>
-        <button
-          type="button"
-          className="sidebar-btn primary record"
-          disabled={recording}
-          onClick={() => void useRecorderStore.getState().start()}
-        >
-          🎙 {recording ? '录音中…' : '开始录音'}
-        </button>
-        <button
-          type="button"
-          className="sidebar-btn"
-          disabled={recording}
-          onClick={() => void importAudioAndTranscribe()}
-        >
-          ⬆ 导入音频
+          ＋ 新建笔记
         </button>
       </div>
 
