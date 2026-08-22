@@ -6,6 +6,7 @@ import { MicRecorder } from '../audio/MicRecorder'
 import fixWebmDuration from 'fix-webm-duration'
 import { decodeToPcm16kMono } from '../audio/pcm'
 import { getEditor } from './bridge'
+import { useAppStore } from '../stores/appStore'
 
 /**
  * 会议控制台:常驻录音条 + 三个标签页(会议笔记 / 文字转写稿 / AI会议纪要)
@@ -174,7 +175,7 @@ function MeetingConsoleView({ block }: { block: { id: string; props: Record<stri
       // 保存录音文件
       const buffer = await fixed.arrayBuffer()
       const recInfo = await window.oasis.recordings.save({
-        pageId: block.props.pageId || '',
+        pageId: useAppStore.getState().currentId || '',
         mimeType: fixed.type || 'audio/webm',
         durationMs,
         buffer
@@ -250,7 +251,7 @@ function MeetingConsoleView({ block }: { block: { id: string; props: Record<stri
       const blob = new Blob([imported.buffer], { type: imported.mimeType })
       const { pcm, durationMs } = await decodeToPcm16kMono(blob)
       const recInfo = await window.oasis.recordings.save({
-        pageId: block.props.pageId || '',
+        pageId: useAppStore.getState().currentId || '',
         mimeType: imported.mimeType,
         durationMs,
         buffer: imported.buffer
@@ -403,7 +404,6 @@ export const MeetingConsoleBlock = createReactBlockSpec(
       activeTab: { default: 'notes' },
       recordingId: { default: '' },
       durationMs: { default: 0 },
-      pageId: { default: '' }
     },
     content: 'none'
   },
