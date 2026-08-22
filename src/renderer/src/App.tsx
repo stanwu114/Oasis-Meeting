@@ -7,7 +7,7 @@ import { TrashView } from './components/TrashView'
 import { RecordingsView } from './components/RecordingsView'
 import { AiSelectionBar } from './components/AiSelectionBar'
 import { HarnessView } from './components/HarnessView'
-import OasisEditor from './editor/OasisEditor'
+import MeetingPage from './components/MeetingPage'
 import { ProjectView } from './components/ProjectView'
 import { useAppStore } from './stores/appStore'
 import { useUiStore } from './stores/uiStore'
@@ -74,7 +74,7 @@ export default function App() {
         ) : loaded && currentId && currentIcon === 'project' ? (
           <ProjectView key={currentId} pageId={currentId} />
         ) : loaded && currentId ? (
-          <OasisEditor key={currentId} pageId={currentId} />
+          <MeetingPage key={currentId} pageId={currentId} />
         ) : (
           <EmptyState />
         )}

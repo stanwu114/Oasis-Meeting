@@ -122,11 +122,10 @@ export const useAppStore = create<AppState>((set, get) => ({
     const stamp = title ? '' : beijingStamp()
     const detail = await api.pages.create(parentId, title ?? `未命名会议@${stamp}`)
     if (useTemplate) {
-      await api.pages.updateContent(detail.id, [
-        { type: 'meetingMeta', props: { time: stamp } },
-        { type: 'meetingConsole', props: { time: stamp } },
-        { type: 'paragraph', content: [], children: [] }
-      ])
+      await api.pages.updateContent(detail.id, {
+        meta: { name: '', location: '', topic: '', time: stamp, participants: '' },
+        console: { notes: '', transcript: '', summary: '', status: 'idle', recordingId: '', durationMs: 0, activeTab: 'notes' }
+      })
     }
     await get().refresh()
     if (parentId) set((s) => ({ expanded: { ...s.expanded, [parentId]: true } }))
