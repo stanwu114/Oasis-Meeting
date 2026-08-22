@@ -50,11 +50,12 @@ function WaveCanvas({ recorder, active }: { recorder: MicRecorder | null; active
           const gap = 2
           const count = Math.max(1, Math.floor(w / (barW + gap)))
           const view = levels.slice(-count)
+          // 柱子从计时器旁(画布左缘)开始,向右延伸
+          // 最旧的柱子在左(贴计时器),最新的在右(贴右边缘),新的从右侧进来把旧的往左推
           for (let i = 0; i < view.length; i++) {
-            // 固定柱宽,右对齐:最新在右边缘,旧的往左推;刚开始空白就空白
-            const v = Math.max(0.04, Math.min(1, view[view.length - 1 - i]))
+            const v = Math.max(0.04, Math.min(1, view[i]))
             const barH = v * h * 0.95
-            const x = w - (i + 1) * (barW + gap)
+            const x = i * (barW + gap)
             ctx.fillRect(x, (h - barH) / 2, barW, barH)
           }
         }
