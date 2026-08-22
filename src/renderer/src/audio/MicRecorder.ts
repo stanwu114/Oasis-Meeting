@@ -6,7 +6,7 @@ export interface RecordingResult {
   durationMs: number
 }
 
-const LEVEL_BARS = 96 // 可视化保留的柱数
+const LEVEL_BARS = 2000 // 可视化保留的柱数
 const BAR_INTERVAL = 60 // 每根柱代表的毫秒数
 
 export class MicRecorder {
