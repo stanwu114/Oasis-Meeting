@@ -226,6 +226,7 @@ export default function OasisEditor({ pageId }: { pageId: string }) {
           theme={theme === 'dark' ? 'dark' : 'light'}
           slashMenu={false}
           formattingToolbar={false}
+          sideMenu={false}
         >
         <SuggestionMenuController triggerCharacter="/" getItems={getSlashItems} />
       </BlockNoteView>
