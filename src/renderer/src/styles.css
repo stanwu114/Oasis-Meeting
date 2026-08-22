@@ -2344,7 +2344,6 @@ svg {
 .console-wave {
   flex: 1;
   min-width: 0;
-  max-width: 280px;
   height: 36px;
 }
 
