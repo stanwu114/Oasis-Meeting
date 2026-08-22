@@ -1941,6 +1941,14 @@ kbd {
 /* Oasis 乐队字标:官方 logo 为 Helvetica Black Italic(商业授权),
    内置开源等价物 Archivo Black Italic(Google Fonts / OFL) */
 @font-face {
+  font-family: 'BrandDisplay';
+  src: url('./assets/fonts/montserrat-latin-900-normal.woff2') format('woff2');
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
   font-family: 'OasisWordmark';
   src: url('./assets/fonts/archivo-latin-900-italic.woff2') format('woff2');
   font-weight: 900;
@@ -1966,12 +1974,12 @@ kbd {
 }
 
 .brand-sub {
-  font-family: Inter, -apple-system, 'Helvetica Neue', 'PingFang SC', sans-serif;
-  font-weight: 800;
-  font-size: 24px;
+  font-family: 'BrandDisplay', Inter, -apple-system, sans-serif;
+  font-weight: 900;
+  font-size: 28px;
   color: var(--fg);
-  margin-left: 6px;
-  letter-spacing: -0.02em;
+  margin-left: 7px;
+  letter-spacing: -0.025em;
   line-height: 1;
   transform: translateY(1px);
 }
