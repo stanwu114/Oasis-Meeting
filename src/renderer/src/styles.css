@@ -343,8 +343,10 @@ kbd {
 }
 
 .sidebar-btn.primary {
-  color: var(--fg);
-  font-weight: 500;
+  color: var(--accent);
+  font-weight: 600;
+  font-size: 14.5px;
+  padding: 8px 10px;
 }
 
 .sidebar-btn.record {
