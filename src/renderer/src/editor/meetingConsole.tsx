@@ -534,12 +534,20 @@ function MeetingConsoleView({ block }: { block: { id: string; props: Record<stri
           </>
         ) : null}
         {activeTab === 'summary' ? (
-          <div className="console-text">
+          <div className="console-text summary-body">
             {block.props.summary ? (
               block.props.summary.split('\n').map((line, i) => {
                 const t = line.trim()
                 if (!t) return null
-                if (t.startsWith('## ')) return <div key={i} className="console-heading">{t.slice(3)}</div>
+                if (t.startsWith('## ')) {
+                  const title = t.slice(3)
+                  return (
+                    <div key={i} className="console-heading-section">
+                      <span className="console-heading-bar" />
+                      <span className="console-heading">{title}</span>
+                    </div>
+                  )
+                }
                 if (/^[-*]\s/.test(t)) return <div key={i} className="console-bullet"><span className="console-dot" /><span>{t.replace(/^[-*]\s/, '')}</span></div>
                 return <p key={i} className="console-para">{t}</p>
               })

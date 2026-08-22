@@ -2819,3 +2819,29 @@ svg {
   border-radius: 3px;
   padding: 0 2px;
 }
+
+/* AI 纪要:分区标题 */
+.console-heading-section {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 20px 0 10px;
+}
+
+.console-heading-section:first-child {
+  margin-top: 0;
+}
+
+.console-heading-bar {
+  width: 3.5px;
+  height: 18px;
+  border-radius: 2px;
+  background: var(--accent);
+  flex-shrink: 0;
+}
+
+.console-heading {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--fg);
+}
