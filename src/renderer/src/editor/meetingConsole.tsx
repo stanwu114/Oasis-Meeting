@@ -511,7 +511,7 @@ function MeetingConsoleView({ block }: { block: { id: string; props: Record<stri
               ? transcriptMatches.map(({ stamp, text, highlight }, i) => (
                   <div key={i} className="console-para-row">
                     {stamp ? (
-                      <button type="button" className="console-stamp clickable" onClick={() => seekToStamp(stamp)} title="点击跳转播放">
+                      <button type="button" className={`console-stamp clickable${activeStamp === stamp ? ' active' : ''}`} onClick={() => seekToStamp(stamp)} title="点击跳转播放">
                         {stamp}
                       </button>
                     ) : null}
