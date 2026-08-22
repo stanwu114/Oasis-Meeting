@@ -40,8 +40,8 @@ export function Sidebar() {
     <aside className="sidebar">
       <div className="sidebar-top" />
       <div className="sidebar-brand">
-        <Icon name="palm" size={17} />
-        <span className="brand-name">Notion Oasis</span>
+        <span className="brand-wordmark">Oasis</span>
+        <span className="brand-sub">Notebook</span>
       </div>
 
       {/* 界面切换:Meeting ↔ Harness */}

@@ -306,7 +306,7 @@ export function SettingsModal() {
         <section className="settings-section">
           <h3>关于</h3>
           <p className="settings-about">
-            Notion Oasis v0.1.0 — 本地优先的笔记与录音转写。所有数据保存在本机
+            Oasis Notebook v0.1.0 — 本地优先的会议记录与录音转写。所有数据保存在本机
             (数据库、音频与模型均在应用数据目录),除首次下载模型外不联网。
           </p>
         </section>

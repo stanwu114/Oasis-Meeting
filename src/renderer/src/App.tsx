@@ -1,6 +1,5 @@
 import { useEffect } from 'react'
 import { Sidebar } from './components/Sidebar'
-import { Icon } from './components/Icon'
 import { RecorderOverlay } from './components/RecorderOverlay'
 import { SearchModal } from './components/SearchModal'
 import { SettingsModal } from './components/SettingsModal'
@@ -89,8 +88,7 @@ export default function App() {
 function EmptyState(): React.ReactNode {
   return (
     <div className="empty-state">
-      <div className="empty-logo"><Icon name="palm" size={46} /></div>
-      <h1>Notion Oasis</h1>
+      <div className="empty-wordmark">Oasis <span className="note">Notebook</span></div>
       <p>本地优先的会议记录空间 · 录音在本机转写,数据不出电脑</p>
       <div className="empty-actions">
         <button type="button" className="btn primary" onClick={() => void useAppStore.getState().createPage(null)}>
