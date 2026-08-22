@@ -7,6 +7,7 @@ import fixWebmDuration from 'fix-webm-duration'
 import { decodeToPcm16kMono } from '../audio/pcm'
 import { getEditor } from './bridge'
 import { useAppStore } from '../stores/appStore'
+import WaveSurfer from 'wavesurfer.js'
 
 /**
  * 会议控制台:常驻录音条 + 三个标签页(会议笔记 / 文字转写稿 / AI会议纪要)
@@ -63,6 +64,71 @@ function WaveCanvas({ recorder, active }: { recorder: MicRecorder | null; active
     return () => cancelAnimationFrame(raf)
   }, [active, recorder])
   return <canvas ref={canvasRef} className="console-wave" />
+}
+
+/* ---------- 回放播放器(wavesurfer) ---------- */
+function PlaybackPlayer({ recordingId }: { recordingId: string }): React.ReactNode {
+  const containerRef = useRef<HTMLDivElement>(null)
+  const wsRef = useRef<WaveSurfer | null>(null)
+  const [playing, setPlaying] = useState(false)
+  const [current, setCurrent] = useState(0)
+  const [duration, setDuration] = useState(0)
+  const [ready, setReady] = useState(false)
+
+  useEffect(() => {
+    let url: string | null = null
+    let cancelled = false
+    void window.oasis.recordings.readAudio(recordingId).then((buf) => {
+      if (cancelled || !buf || !containerRef.current) return
+      url = URL.createObjectURL(new Blob([buf]))
+      const style = getComputedStyle(document.documentElement)
+      const ws = WaveSurfer.create({
+        container: containerRef.current,
+        url,
+        height: 36,
+        waveColor: style.getPropertyValue('--wave').trim() || '#e3ded4',
+        progressColor: style.getPropertyValue('--accent').trim() || '#b45306',
+        barWidth: 2,
+        barGap: 1,
+        barRadius: 2,
+        cursorWidth: 0,
+        normalize: true
+      })
+      wsRef.current = ws
+      ws.on('ready', () => {
+        setReady(true)
+        setDuration(ws.getDuration())
+      })
+      ws.on('timeupdate', (t: number) => setCurrent(t))
+      ws.on('play', () => setPlaying(true))
+      ws.on('pause', () => setPlaying(false))
+      ws.on('finish', () => setPlaying(false))
+    })
+    return () => {
+      cancelled = true
+      wsRef.current?.destroy()
+      wsRef.current = null
+      if (url) URL.revokeObjectURL(url)
+    }
+  }, [recordingId])
+
+  return (
+    <div className="console-playback">
+      <button
+        type="button"
+        className="console-play-btn"
+        onClick={() => wsRef.current?.playPause()}
+        disabled={!ready}
+        aria-label={playing ? '暂停' : '播放'}
+      >
+        <Icon name={playing ? 'stop' : 'play'} size={13} />
+      </button>
+      <div className="console-play-wave" ref={containerRef} />
+      <span className="console-play-time">
+        {ready ? `${formatDuration(current * 1000)} / ${formatDuration(duration * 1000)}` : '加载中…'}
+      </span>
+    </div>
+  )
 }
 
 /* ---------- 主组件 ---------- */
@@ -300,16 +366,32 @@ function MeetingConsoleView({ block }: { block: { id: string; props: Record<stri
 
   return (
     <div className="meeting-console">
-      {/* ─── 录音控制条(常驻) ─── */}
+      {/* ─── 录音控制条 ─── */}
       <div className="console-bar">
+        {/* 已有录音:显示回放播放器 */}
+        {recStatus === 'done' && block.props.recordingId ? (
+          <PlaybackPlayer recordingId={block.props.recordingId} />
+        ) : null}
+
         <div className="console-controls">
-          {recStatus === 'idle' || recStatus === 'done' || recStatus === 'error' ? (
+          {/* 回放状态下也可以重新录音/导入 */}
+          {recStatus === 'idle' || recStatus === 'error' ? (
             <>
               <button type="button" className="console-btn start" onClick={() => void startRec()}>
                 <Icon name="mic" size={16} /> 开始录音
               </button>
               <button type="button" className="console-btn ghost" onClick={() => void importAudio()} title="导入音频文件(mp3/m4a/wav 等),自动转写并生成纪要">
                 <Icon name="upload" size={14} /> 导入音频
+              </button>
+            </>
+          ) : null}
+          {recStatus === 'done' ? (
+            <>
+              <button type="button" className="console-btn ghost small" onClick={() => void startRec()}>
+                <Icon name="mic" size={14} /> 重新录音
+              </button>
+              <button type="button" className="console-btn ghost small" onClick={() => void importAudio()}>
+                <Icon name="upload" size={13} /> 导入音频
               </button>
             </>
           ) : null}
