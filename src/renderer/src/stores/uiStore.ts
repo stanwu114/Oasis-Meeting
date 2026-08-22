@@ -2,7 +2,7 @@ import { create } from 'zustand'
 import type { ModelStatus } from '../../../shared/ipc'
 
 export type Theme = 'light' | 'dark'
-export type View = 'editor' | 'recordings' | 'ai' | 'trash'
+export type View = 'editor' | 'recordings' | 'trash'
 
 interface UiState {
   view: View

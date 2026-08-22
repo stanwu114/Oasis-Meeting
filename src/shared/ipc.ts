@@ -31,9 +31,6 @@ export const IPC = {
   systemImportAudio: 'system:import-audio',
   systemOpenExternal: 'system:open-external',
 
-  aiStart: 'ai:start',
-  aiStop: 'ai:stop',
-  aiStatus: 'ai:status',
   aiEditorAction: 'ai:editor-action',
   aiSummarizePage: 'ai:summarize-page',
 
@@ -46,10 +43,10 @@ export const IPC = {
   evtAiChatDelta: 'evt:ai-chat-delta',
   evtAiChatDone: 'evt:ai-chat-done',
   evtAiChatError: 'evt:ai-chat-error',
+  evtAiChatStatus: 'evt:ai-chat-status',
 
   evtRecordingsChanged: 'evt:recordings-changed',
-  evtModelProgress: 'evt:model-progress',
-  evtAiState: 'evt:ai-state'
+  evtModelProgress: 'evt:model-progress'
 } as const
 
 export interface PageSummary {
@@ -191,43 +188,34 @@ export interface OasisApi {
     openExternal(url: string): Promise<void>
   }
   ai: {
-    start(): Promise<AiPanelState>
-    stop(): Promise<void>
-    status(): Promise<AiPanelState>
     /** 划词动作:总结/润色/翻译/续写/自由提问 */
     editorAction(action: 'summarize' | 'polish' | 'translate' | 'continue' | 'ask', text: string, question?: string): Promise<string>
     /** 对整页正文生成结构化摘要 */
     summarizePage(pageId: string): Promise<string>
   }
   chat: {
-    /** 发送消息,立即返回会话 id;回复经 aiChatDelta/Done/Error 事件流回 */
+    /** 发送消息,立即返回会话 id;回复经 aiChatDelta/Done/Error/Status 事件流回 */
     send(input: SendChatInput): Promise<{ conversationId: string }>
     stop(): Promise<void>
-    conversations(): Promise<AiConversation[]>
+    conversations(kind?: 'chat' | 'agent'): Promise<AiConversation[]>
     messages(conversationId: string): Promise<AiChatMessage[]>
     delete(conversationId: string): Promise<void>
   }
   on: {
     recordingsChanged(cb: (r: RecordingInfo) => void): () => void
     modelProgress(cb: (m: ModelStatus) => void): () => void
-    aiStateChanged(cb: (s: AiPanelState) => void): () => void
     aiChatDelta(cb: (d: AiChatDelta) => void): () => void
     aiChatDone(cb: (d: AiChatDone) => void): () => void
     aiChatError(cb: (e: { conversationId: string; error: string }) => void): () => void
+    aiChatStatus(cb: (s: { conversationId: string; status: string }) => void): () => void
     appAction(cb: (action: string) => void): () => void
   }
-}
-
-/** AI 面板(内嵌 dsh web)状态 */
-export interface AiPanelState {
-  status: 'unavailable' | 'stopped' | 'starting' | 'ready' | 'error'
-  url: string | null
-  error: string | null
 }
 
 export interface AiConversation {
   id: string
   title: string
+  kind: 'chat' | 'agent'
   createdAt: string
   updatedAt: string
 }
@@ -243,6 +231,8 @@ export interface AiChatMessage {
 export interface SendChatInput {
   conversationId: string | null
   text: string
+  /** chat = 直连 DeepSeek 对话;agent = 经 SDK 驱动的完整智能体(带工具) */
+  mode: 'chat' | 'agent'
   /** 附带的笔记上下文:页面正文与选中文本 */
   contextPageId: string | null
   contextSelection: string | null

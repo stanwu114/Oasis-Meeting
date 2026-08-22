@@ -40,26 +40,23 @@ const api: OasisApi = {
     openExternal: (url) => ipcRenderer.invoke(IPC.systemOpenExternal, url)
   },
   ai: {
-    start: () => ipcRenderer.invoke(IPC.aiStart),
-    stop: () => ipcRenderer.invoke(IPC.aiStop),
-    status: () => ipcRenderer.invoke(IPC.aiStatus),
     editorAction: (action, text, question) => ipcRenderer.invoke(IPC.aiEditorAction, action, text, question),
     summarizePage: (pageId) => ipcRenderer.invoke(IPC.aiSummarizePage, pageId)
   },
   chat: {
     send: (input) => ipcRenderer.invoke(IPC.aiChatSend, input),
     stop: () => ipcRenderer.invoke(IPC.aiChatStop),
-    conversations: () => ipcRenderer.invoke(IPC.aiChatConversations),
+    conversations: (kind) => ipcRenderer.invoke(IPC.aiChatConversations, kind),
     messages: (conversationId) => ipcRenderer.invoke(IPC.aiChatMessages, conversationId),
     delete: (conversationId) => ipcRenderer.invoke(IPC.aiChatDelete, conversationId)
   },
   on: {
     recordingsChanged: (cb) => subscribe(IPC.evtRecordingsChanged, cb),
     modelProgress: (cb) => subscribe(IPC.evtModelProgress, cb),
-    aiStateChanged: (cb) => subscribe(IPC.evtAiState, cb),
     aiChatDelta: (cb) => subscribe(IPC.evtAiChatDelta, cb),
     aiChatDone: (cb) => subscribe(IPC.evtAiChatDone, cb),
     aiChatError: (cb) => subscribe(IPC.evtAiChatError, cb),
+    aiChatStatus: (cb) => subscribe(IPC.evtAiChatStatus, cb),
     appAction: (cb) => subscribe('app:action', cb)
   }
 }

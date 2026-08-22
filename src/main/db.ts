@@ -97,6 +97,10 @@ function migrate(): void {
     `)
     db.pragma('user_version = 3')
   }
+  if (version < 4) {
+    db.exec(`ALTER TABLE ai_conversations ADD COLUMN kind TEXT NOT NULL DEFAULT 'chat';`)
+    db.pragma('user_version = 4')
+  }
 }
 
 /* ---------- 行映射 ---------- */
@@ -411,6 +415,7 @@ export function setSummaryText(id: string, summary: string): void {
 export interface AiConversationRow {
   id: string
   title: string
+  kind: 'chat' | 'agent'
   createdAt: string
   updatedAt: string
 }
@@ -423,24 +428,34 @@ export interface AiMessageRow {
   createdAt: string
 }
 
-export function createAiConversation(): AiConversationRow {
+export function createAiConversation(kind: 'chat' | 'agent' = 'chat'): AiConversationRow {
   const id = randomUUID()
-  db.prepare(`INSERT INTO ai_conversations (id) VALUES (?)`).run(id)
+  db.prepare(`INSERT INTO ai_conversations (id, kind) VALUES (?, ?)`).run(id, kind)
   return getAiConversation(id)!
 }
 
 export function getAiConversation(id: string): AiConversationRow | null {
   const row = db.prepare(`SELECT * FROM ai_conversations WHERE id = ?`).get(id) as
-    | { id: string; title: string; created_at: string; updated_at: string }
+    | { id: string; title: string; kind: string; created_at: string; updated_at: string }
     | undefined
-  return row ? { id: row.id, title: row.title, createdAt: row.created_at, updatedAt: row.updated_at } : null
+  return row
+    ? { id: row.id, title: row.title, kind: row.kind as 'chat' | 'agent', createdAt: row.created_at, updatedAt: row.updated_at }
+    : null
 }
 
-export function listAiConversations(): AiConversationRow[] {
-  const rows = db
-    .prepare(`SELECT * FROM ai_conversations ORDER BY updated_at DESC LIMIT 100`)
-    .all() as { id: string; title: string; created_at: string; updated_at: string }[]
-  return rows.map((r) => ({ id: r.id, title: r.title, createdAt: r.created_at, updatedAt: r.updated_at }))
+export function listAiConversations(kind?: 'chat' | 'agent'): AiConversationRow[] {
+  const rows = (
+    kind
+      ? db.prepare(`SELECT * FROM ai_conversations WHERE kind = ? ORDER BY updated_at DESC LIMIT 100`).all(kind)
+      : db.prepare(`SELECT * FROM ai_conversations ORDER BY updated_at DESC LIMIT 100`).all()
+  ) as { id: string; title: string; kind: string; created_at: string; updated_at: string }[]
+  return rows.map((r) => ({
+    id: r.id,
+    title: r.title,
+    kind: r.kind as 'chat' | 'agent',
+    createdAt: r.created_at,
+    updatedAt: r.updated_at
+  }))
 }
 
 export function appendAiMessage(conversationId: string, role: 'user' | 'assistant', content: string): AiMessageRow {

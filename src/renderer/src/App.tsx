@@ -5,7 +5,6 @@ import { SearchModal } from './components/SearchModal'
 import { SettingsModal } from './components/SettingsModal'
 import { TrashView } from './components/TrashView'
 import { RecordingsView } from './components/RecordingsView'
-import { AiPanel } from './components/AiPanel'
 import { AiSelectionBar } from './components/AiSelectionBar'
 import { ChatPanel } from './components/ChatPanel'
 import { useChatStore } from './stores/chatStore'
@@ -46,6 +45,9 @@ export default function App() {
     const offErr = window.oasis.on.aiChatError((e) => {
       useChatStore.getState().onError(e.conversationId, e.error)
     })
+    const offStatus = window.oasis.on.aiChatStatus((s) => {
+      useChatStore.getState().onStatus(s.conversationId, s.status)
+    })
     return () => {
       offRec()
       offModel()
@@ -53,6 +55,7 @@ export default function App() {
       offDelta()
       offDone()
       offErr()
+      offStatus()
     }
   }, [])
 
@@ -86,8 +89,6 @@ export default function App() {
           <TrashView />
         ) : view === 'recordings' ? (
           <RecordingsView />
-        ) : view === 'ai' ? (
-          <AiPanel />
         ) : loaded && currentId ? (
           <OasisEditor key={currentId} pageId={currentId} />
         ) : (

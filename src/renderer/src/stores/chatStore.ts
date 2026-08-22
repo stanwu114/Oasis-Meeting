@@ -3,15 +3,20 @@ import type { AiChatMessage, AiConversation } from '../../../shared/ipc'
 import { useAppStore } from './appStore'
 import { useUiStore } from './uiStore'
 
+export type ChatMode = 'chat' | 'agent'
+
 interface ChatState {
+  mode: ChatMode
   conversations: AiConversation[]
   currentId: string | null
   messages: AiChatMessage[]
   streamingText: string
+  statusText: string
   sending: boolean
   contextPageOn: boolean
   historyOpen: boolean
 
+  setMode(mode: ChatMode): Promise<void>
   load(): Promise<void>
   select(id: string): Promise<void>
   newChat(): void
@@ -24,6 +29,7 @@ interface ChatState {
   onDelta(conversationId: string, delta: string): void
   onDone(conversationId: string, content: string): void
   onError(conversationId: string, error: string): void
+  onStatus(conversationId: string, status: string): void
 }
 
 function currentSelection(): string | null {
@@ -33,26 +39,34 @@ function currentSelection(): string | null {
 }
 
 export const useChatStore = create<ChatState>((set, get) => ({
+  mode: 'chat',
   conversations: [],
   currentId: null,
   messages: [],
   streamingText: '',
+  statusText: '',
   sending: false,
   contextPageOn: true,
   historyOpen: false,
 
+  setMode: async (mode) => {
+    if (mode === get().mode) return
+    set({ mode, messages: [], streamingText: '', statusText: '', currentId: null, historyOpen: false })
+    await get().load()
+  },
+
   load: async () => {
-    const conversations = await window.oasis.chat.conversations()
+    const conversations = await window.oasis.chat.conversations(get().mode)
     set({ conversations })
     if (conversations.length > 0 && !get().currentId) await get().select(conversations[0].id)
   },
 
   select: async (id) => {
     const messages = await window.oasis.chat.messages(id)
-    set({ currentId: id, messages, streamingText: '', historyOpen: false })
+    set({ currentId: id, messages, streamingText: '', statusText: '', historyOpen: false })
   },
 
-  newChat: () => set({ currentId: null, messages: [], streamingText: '', historyOpen: false }),
+  newChat: () => set({ currentId: null, messages: [], streamingText: '', statusText: '', historyOpen: false }),
 
   send: async (text) => {
     const t = text.trim()
@@ -64,16 +78,18 @@ export const useChatStore = create<ChatState>((set, get) => ({
       content: t,
       createdAt: new Date().toISOString()
     }
-    set((s) => ({ messages: [...s.messages, optimistic], sending: true, streamingText: '' }))
+    set((s) => ({ messages: [...s.messages, optimistic], sending: true, streamingText: '', statusText: '' }))
     try {
       const { conversationId } = await window.oasis.chat.send({
         conversationId: get().currentId,
         text: t,
+        mode: get().mode,
         contextPageId: get().contextPageOn ? useAppStore.getState().currentId : null,
         contextSelection: currentSelection()
       })
       if (conversationId !== get().currentId) set({ currentId: conversationId })
-      await get().load()
+      const conversations = await window.oasis.chat.conversations(get().mode)
+      set({ conversations })
     } catch (e) {
       useUiStore.getState().showToast(`发送失败:${e instanceof Error ? e.message : String(e)}`, 'error')
       set((s) => ({ messages: s.messages.filter((m) => m.id !== optimistic.id), sending: false }))
@@ -99,7 +115,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
 
   onDelta: (conversationId, delta) => {
     if (conversationId !== get().currentId) return
-    set((s) => ({ streamingText: s.streamingText + delta }))
+    set((s) => ({ streamingText: s.streamingText + delta, statusText: '' }))
   },
 
   onDone: (conversationId, content) => {
@@ -116,6 +132,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
         }
       ],
       streamingText: '',
+      statusText: '',
       sending: false
     }))
   },
@@ -123,6 +140,11 @@ export const useChatStore = create<ChatState>((set, get) => ({
   onError: (conversationId, error) => {
     if (conversationId !== get().currentId) return
     useUiStore.getState().showToast(`AI 回复出错:${error}`, 'error')
-    set({ sending: false, streamingText: '' })
+    set({ sending: false, streamingText: '', statusText: '' })
+  },
+
+  onStatus: (conversationId, status) => {
+    if (conversationId !== get().currentId) return
+    set({ statusText: status })
   }
 }))
