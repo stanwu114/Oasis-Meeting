@@ -132,10 +132,10 @@ function mkText(s: string): never {
 }
 
 /**
- * 「确认总结并转为正文」:AI 总结(## 标题 / - 条目 / 段落)+ 分隔线 + 完整转写文稿,
- * 依次插入录音块之后,形成一篇完整会议纪要。
+ * 「确认总结并转为正文」:只把 AI 总结(## 标题 / - 条目 / 段落)插入录音块之后。
+ * 转写文稿保留在录音块内,不进正文;需要时可点「仅转文稿」手动插入。
  */
-export function insertMeetingNotesAsBody(recordingBlockId: string, summary: string, transcript: string): void {
+export function insertMeetingNotesAsBody(recordingBlockId: string, summary: string): void {
   const editor = currentEditor
   if (!editor) return
   const anchor = editor.getBlock(recordingBlockId)
@@ -156,16 +156,6 @@ export function insertMeetingNotesAsBody(recordingBlockId: string, summary: stri
     } else {
       blocks.push({ type: 'paragraph', content: text(line) })
     }
-  }
-
-  const transcriptParagraphs = transcript
-    .split(/\n{2,}/)
-    .map((t) => t.replace(/^\[\d{1,2}:\d{2}(?::\d{2})?\]\s*/, '').trim())
-    .filter(Boolean)
-  if (transcriptParagraphs.length > 0) {
-    blocks.push({ type: 'divider' as string })
-    blocks.push({ type: 'heading', props: { level: 3 }, content: text('转写文稿') })
-    for (const p of transcriptParagraphs) blocks.push({ type: 'paragraph', content: text(p) })
   }
 
   if (blocks.length === 0) return

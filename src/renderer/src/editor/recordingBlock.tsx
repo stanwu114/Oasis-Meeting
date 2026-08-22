@@ -118,8 +118,8 @@ function RecordingBlockView({ block }: { block: { id: string; props: Record<stri
 
   const handleConfirmSummary = (): void => {
     if (!summary) return
-    insertMeetingNotesAsBody(block.id, summary, transcript)
-    showToast('已将 AI 总结与转写文稿插入正文')
+    insertMeetingNotesAsBody(block.id, summary)
+    showToast('已将 AI 总结插入正文')
   }
 
   return (
