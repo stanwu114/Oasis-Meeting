@@ -2668,21 +2668,23 @@ svg {
 }
 
 .console-icon-btn.pause {
-  background: var(--bg-active);
-  color: var(--fg);
+  background: var(--accent-soft);
+  color: var(--accent);
 }
 
 .console-icon-btn.pause:hover {
-  filter: brightness(0.92);
+  background: var(--accent-soft);
+  filter: brightness(0.95);
 }
 
 .console-icon-btn.stop {
-  background: var(--danger);
-  color: #fff;
+  background: var(--accent);
+  color: var(--on-accent);
 }
 
 .console-icon-btn.stop:hover {
-  filter: brightness(1.06);
+  background: var(--accent);
+  filter: brightness(1.08);
 }
 
 /* 计时 + 波形紧贴容器 */
