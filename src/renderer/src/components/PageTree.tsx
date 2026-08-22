@@ -109,36 +109,30 @@ export function PageTree() {
             <Icon name="dots" size={14} />
           </button>
           {menuId === page.id ? (
-            <div className="row-menu" onClick={(e) => e.stopPropagation()}>
-              <button
-                type="button"
-                onClick={() => {
-                  setMenuId(null)
-                  void useAppStore.getState().createPage(page.id)
-                }}
-              >
-                归档 Meeting 到此
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setMenuId(null)
-                  setEditingId(page.id)
-                }}
-              >
-                重命名
-              </button>
-              <button
-                type="button"
-                className="danger"
-                onClick={() => {
-                  setMenuId(null)
-                  void useAppStore.getState().trashPage(page.id)
-                }}
-              >
-                移到回收站
-              </button>
-            </div>
+            <>
+              <div className="menu-overlay" onClick={() => setMenuId(null)} />
+              <div className="row-menu">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMenuId(null)
+                    setEditingId(page.id)
+                  }}
+                >
+                  重命名
+                </button>
+                <button
+                  type="button"
+                  className="danger"
+                  onClick={() => {
+                    setMenuId(null)
+                    void useAppStore.getState().trashPage(page.id)
+                  }}
+                >
+                  移到回收站
+                </button>
+              </div>
+            </>
           ) : null}
         </div>
         {isExpanded ? children.map((c) => renderRow(c, depth + 1)) : null}

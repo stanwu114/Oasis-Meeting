@@ -2634,3 +2634,10 @@ svg {
   font-size: 14px;
   margin: 0 0 16px;
 }
+
+/* 行菜单遮罩(点击其他地方关闭) */
+.menu-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 29;
+}
