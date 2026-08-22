@@ -121,14 +121,6 @@ export default function OasisEditor({ pageId }: { pageId: string }) {
         <button
           type="button"
           className="page-ai-btn"
-          title="和 AI 对话,自动携带本页内容 (⌘L)"
-          onClick={() => useUiStore.getState().setChatOpen(!useUiStore.getState().chatOpen)}
-        >
-          💬 AI 对话
-        </button>
-        <button
-          type="button"
-          className="page-ai-btn"
           disabled={summarizing || docEmpty}
           title="对本页内容生成 AI 摘要,插入到页首"
           onClick={() => void summarizePage()}

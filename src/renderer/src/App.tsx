@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Sidebar } from './components/Sidebar'
 import { RecorderOverlay } from './components/RecorderOverlay'
 import { SearchModal } from './components/SearchModal'
@@ -21,6 +21,29 @@ export default function App() {
   const loaded = useAppStore((s) => s.loaded)
   const toast = useUiStore((s) => s.toast)
   const toastKind = useUiStore((s) => s.toastKind)
+  const [chatWidth, setChatWidth] = useState(() => {
+    const saved = Number(localStorage.getItem('oasis.chatWidth'))
+    return saved >= 320 && saved <= 640 ? saved : 400
+  })
+  const chatWidthRef = useRef(chatWidth)
+  chatWidthRef.current = chatWidth
+
+  /* 拖拽调整 AI 分栏宽度 */
+  const startResize = (e: React.MouseEvent): void => {
+    e.preventDefault()
+    const startX = e.clientX
+    const startWidth = chatWidthRef.current
+    const onMove = (ev: MouseEvent): void => {
+      setChatWidth(Math.max(320, Math.min(640, startWidth + (startX - ev.clientX))))
+    }
+    const onUp = (): void => {
+      localStorage.setItem('oasis.chatWidth', String(chatWidthRef.current))
+      window.removeEventListener('mousemove', onMove)
+      window.removeEventListener('mouseup', onUp)
+    }
+    window.addEventListener('mousemove', onMove)
+    window.addEventListener('mouseup', onUp)
+  }
 
   /* 初始化 + 事件订阅 */
   useEffect(() => {
@@ -96,9 +119,23 @@ export default function App() {
         )}
       </main>
       {chatOpen ? (
-        <aside className="chat-drawer">
-          <ChatPanel />
-        </aside>
+        <>
+          <div className="chat-resize-handle" onMouseDown={startResize} />
+          <aside className="chat-drawer" style={{ width: chatWidth }}>
+            <ChatPanel />
+          </aside>
+        </>
+      ) : null}
+
+      {!chatOpen ? (
+        <button
+          type="button"
+          className="ai-toggle-fab"
+          title="打开 AI 分栏 (⌘L)"
+          onClick={() => useUiStore.getState().setChatOpen(true)}
+        >
+          ✨ AI
+        </button>
       ) : null}
 
       <RecorderOverlay />

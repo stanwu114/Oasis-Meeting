@@ -1,22 +1,18 @@
 import { useEffect, useRef, useState } from 'react'
-import { useChatStore, type ChatMode } from '../stores/chatStore'
+import { useChatStore } from '../stores/chatStore'
 import { useAppStore } from '../stores/appStore'
 import { useUiStore } from '../stores/uiStore'
 import { insertParagraphsAfterSelection } from '../editor/bridge'
 
-const CHAT_SUGGESTIONS = [
-  { label: '📝 总结当前页面', text: '帮我总结一下当前这篇笔记,给出要点。' },
-  { label: '✅ 提取待办', text: '从当前笔记里提取所有待办事项和行动项。' },
-  { label: '💡 续写建议', text: '基于当前笔记,给我 3 个可以继续展开的方向建议。' }
+/** Notion 式快捷动作(带页面上下文发送) */
+const QUICK_ACTIONS = [
+  { label: '📝 总结本页', text: '总结当前这篇笔记,给出要点。' },
+  { label: '🔤 翻译', text: '把当前笔记内容翻译成英文(若已是英文则译成中文)。' },
+  { label: '✨ 润色', text: '润色当前笔记:修正错别字与标点、理顺语句,保持原意。' },
+  { label: '✅ 提取待办', text: '从当前笔记里提取所有待办事项与行动项。' }
 ]
 
-const AGENT_SUGGESTIONS = [
-  { label: '🗂 整理工作目录', text: '列出当前工作目录下的主要文件,并按用途分类说明。' },
-  { label: '🔍 分析笔记工程', text: '查看当前笔记目录里最近修改的文件,总结最近在做什么。' },
-  { label: '📊 生成页面清单', text: '基于当前笔记内容,帮我规划下一步行动并说明理由。' }
-]
-
-/** 原生 AI 对话抽屉:💬 直连对话 / 🤖 智能体(SDK 驱动,带工具)双模式 */
+/** 原生 AI 分栏:Notion 式操作——快捷动作、页面上下文、一键回写 */
 export function ChatPanel() {
   const mode = useChatStore((s) => s.mode)
   const conversations = useChatStore((s) => s.conversations)
@@ -58,41 +54,22 @@ export function ChatPanel() {
     void useChatStore.getState().send(value)
   }
 
-  const title = conversations.find((c) => c.id === currentId)?.title ?? (mode === 'agent' ? '智能体任务' : '新对话')
-  const suggestions = mode === 'agent' ? AGENT_SUGGESTIONS : CHAT_SUGGESTIONS
+  const title = conversations.find((c) => c.id === currentId)?.title ?? 'AI'
 
   return (
     <div className="chat-panel">
-      <div className="chat-tabs">
-        <button
-          type="button"
-          className={`chat-tab${mode === 'chat' ? ' on' : ''}`}
-          onClick={() => void useChatStore.getState().setMode('chat' as ChatMode)}
-        >
-          💬 对话
-        </button>
-        <button
-          type="button"
-          className={`chat-tab${mode === 'agent' ? ' on' : ''}`}
-          onClick={() => void useChatStore.getState().setMode('agent' as ChatMode)}
-        >
-          🤖 智能体
+      <div className="chat-header">
+        <button type="button" className="chat-title" onClick={() => useChatStore.getState().setHistoryOpen(!historyOpen)}>
+          ✨ {title} <span className="chat-caret">{historyOpen ? '▾' : '▸'}</span>
         </button>
         <div className="chat-header-actions">
-          <button type="button" className="icon-btn" title={mode === 'agent' ? '新任务' : '新对话'} onClick={() => useChatStore.getState().newChat()}>
+          <button type="button" className="icon-btn" title="新对话" onClick={() => useChatStore.getState().newChat()}>
             ＋
           </button>
           <button type="button" className="icon-btn" title="关闭 (⌘L)" onClick={() => useUiStore.getState().setChatOpen(false)}>
             ✕
           </button>
         </div>
-      </div>
-
-      <div className="chat-header">
-        <button type="button" className="chat-title" onClick={() => useChatStore.getState().setHistoryOpen(!historyOpen)}>
-          {title} <span className="chat-caret">{historyOpen ? '▾' : '▸'}</span>
-        </button>
-        {mode === 'agent' ? <span className="chat-mode-hint">可执行工具与命令</span> : null}
       </div>
 
       {historyOpen ? (
@@ -119,28 +96,12 @@ export function ChatPanel() {
       <div className="chat-messages" ref={scrollRef}>
         {messages.length === 0 && !streamingText ? (
           <div className="chat-welcome">
-            <div className="chat-welcome-icon">{mode === 'agent' ? '🤖' : '💬'}</div>
+            <div className="chat-welcome-icon">✨</div>
             <p>
-              {mode === 'agent' ? (
-                <>
-                  智能体模式:由 DeepSeek Harness 引擎驱动,<b>可执行工具与命令</b>(读写文件、运行 bash 等),
-                  过程会显示思考与工具调用状态。
-                </>
-              ) : (
-                <>
-                  和 AI 对话,它会自动带上
-                  <b>当前笔记{contextPageOn && pageId ? `「${pageTitle || '无标题'}」` : ''}</b>
-                  的内容作为上下文。
-                </>
-              )}
+              和 AI 一起处理
+              <b>当前笔记{contextPageOn && pageId ? `「${pageTitle || '无标题'}」` : ''}</b>
+              ——用下方快捷动作,或直接提问;回复可一键写回笔记。
             </p>
-            <div className="chat-suggestions">
-              {suggestions.map((s) => (
-                <button key={s.label} type="button" onClick={() => send(s.text)}>
-                  {s.label}
-                </button>
-              ))}
-            </div>
           </div>
         ) : null}
 
@@ -185,6 +146,20 @@ export function ChatPanel() {
       </div>
 
       <div className="chat-input-area">
+        <div className="chat-quick-row">
+          {QUICK_ACTIONS.map((a) => (
+            <button
+              key={a.label}
+              type="button"
+              className="chat-quick-btn"
+              disabled={sending || !pageId}
+              title={pageId ? a.text : '先打开一篇笔记'}
+              onClick={() => send(a.text)}
+            >
+              {a.label}
+            </button>
+          ))}
+        </div>
         <div className="chat-context-row">
           <button
             type="button"
@@ -195,6 +170,14 @@ export function ChatPanel() {
             📌 引用当前页面{contextPageOn && pageTitle ? `:${pageTitle.slice(0, 12)}` : ''}
           </button>
           {selectionLen >= 2 ? <span className="chat-chip on static">✂️ 选中 {selectionLen} 字</span> : null}
+          <button
+            type="button"
+            className={`chat-chip${mode === 'agent' ? ' on' : ''}`}
+            title={mode === 'agent' ? '智能体模式:AI 可执行工具与命令(会开启新对话)' : '开启后 AI 可执行工具与命令(bash/文件读写)'}
+            onClick={() => void useChatStore.getState().setMode(mode === 'agent' ? 'chat' : 'agent')}
+          >
+            {mode === 'agent' ? '🤖 工具执行 开' : '🤖 工具执行 关'}
+          </button>
         </div>
         <div className="chat-input-row">
           <textarea

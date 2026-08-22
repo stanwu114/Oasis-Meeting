@@ -269,9 +269,46 @@ kbd {
   cursor: default;
 }
 
+/* 全局 AI 切换按钮(分栏关闭时悬浮显示) */
+.ai-toggle-fab {
+  position: fixed;
+  top: 14px;
+  right: 18px;
+  z-index: 80;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  border-radius: 999px;
+  background: var(--accent);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  box-shadow: var(--shadow-lg);
+  transition: transform 0.15s, filter 0.15s;
+}
+
+.ai-toggle-fab:hover {
+  transform: scale(1.05);
+  filter: brightness(1.07);
+}
+
+/* 分栏拖宽手柄 */
+.chat-resize-handle {
+  width: 5px;
+  flex-shrink: 0;
+  cursor: col-resize;
+  background: transparent;
+  transition: background 0.15s;
+  z-index: 10;
+}
+
+.chat-resize-handle:hover {
+  background: var(--accent-soft);
+}
+
 /* ============ AI 对话抽屉 ============ */
 .chat-drawer {
-  width: 400px;
   flex-shrink: 0;
   border-left: 1px solid var(--border);
   background: var(--bg-subtle);
@@ -549,6 +586,35 @@ kbd {
   border-top: 1px solid var(--border);
   padding: 10px 12px 12px;
   background: var(--bg-subtle);
+}
+
+/* 快捷动作条(Notion 式) */
+.chat-quick-row {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+}
+
+.chat-quick-btn {
+  font-size: 12px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--fg-muted);
+  transition: color 0.12s, border-color 0.12s;
+  white-space: nowrap;
+}
+
+.chat-quick-btn:hover:not(:disabled) {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+.chat-quick-btn:disabled {
+  opacity: 0.45;
+  cursor: default;
 }
 
 .chat-context-row {
