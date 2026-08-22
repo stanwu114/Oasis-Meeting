@@ -124,7 +124,7 @@ export function Sidebar() {
 
           <div className="sidebar-pages">
             <div className="sidebar-pages-head">
-              页面
+              Meeting
               <span className="sidebar-pages-count">{pagesCount}</span>
             </div>
             <PageTree />
