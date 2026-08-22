@@ -20,6 +20,7 @@ export const IPC = {
   recordingsReadAudio: 'recordings:read-audio',
   recordingsUpdateBlock: 'recordings:update-block',
   recordingsTranscribe: 'recordings:transcribe',
+  recordingsSummarize: 'recordings:summarize',
 
   modelsStatus: 'models:status',
   modelsEnsure: 'models:ensure',
@@ -64,6 +65,8 @@ export type TranscribeStatus =
   | 'done'
   | 'error'
 
+export type SummaryStatus = 'pending' | 'summarizing' | 'done' | 'error'
+
 export interface RecordingInfo {
   id: string
   pageId: string
@@ -72,6 +75,9 @@ export interface RecordingInfo {
   mimeType: string
   durationMs: number
   transcript: string | null
+  summary: string | null
+  summaryStatus: SummaryStatus
+  summaryError: string | null
   language: string
   engine: string
   status: TranscribeStatus
@@ -157,6 +163,8 @@ export interface OasisApi {
     readAudio(id: string): Promise<ArrayBuffer | null>
     updateBlock(id: string, blockId: string | null): Promise<void>
     transcribe(id: string, pcm: Int16Array, sampleRate: number, language: string): Promise<void>
+    /** (重新)生成 AI 总结;进度经 recordingsChanged 事件回流 */
+    summarize(id: string): Promise<void>
   }
   models: {
     status(): Promise<ModelStatus>

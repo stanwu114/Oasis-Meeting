@@ -70,6 +70,14 @@ function migrate(): void {
     `)
     db.pragma('user_version = 1')
   }
+  if (version < 2) {
+    db.exec(`
+      ALTER TABLE recordings ADD COLUMN summary TEXT;
+      ALTER TABLE recordings ADD COLUMN summary_status TEXT NOT NULL DEFAULT 'pending';
+      ALTER TABLE recordings ADD COLUMN summary_error TEXT;
+    `)
+    db.pragma('user_version = 2')
+  }
 }
 
 /* ---------- 行映射 ---------- */
@@ -113,6 +121,9 @@ interface RecRow {
   mime_type: string
   duration_ms: number
   transcript: string | null
+  summary: string | null
+  summary_status: string
+  summary_error: string | null
   language: string
   engine: string
   status: string
@@ -129,6 +140,9 @@ function toRecording(r: RecRow): RecordingInfo {
     mimeType: r.mime_type,
     durationMs: r.duration_ms,
     transcript: r.transcript,
+    summary: r.summary,
+    summaryStatus: r.summary_status as RecordingInfo['summaryStatus'],
+    summaryError: r.summary_error,
     language: r.language,
     engine: r.engine,
     status: r.status as TranscribeStatus,
@@ -360,11 +374,17 @@ export function setRecordingStatus(id: string, status: TranscribeStatus, error: 
 }
 
 export function setRecordingTranscript(id: string, transcript: string, language: string): void {
-  db.prepare(`UPDATE recordings SET transcript = ?, language = ?, status = 'done', error = NULL WHERE id = ?`).run(
-    transcript,
-    language,
-    id
-  )
+  db.prepare(
+    `UPDATE recordings SET transcript = ?, language = ?, status = 'done', error = NULL, summary_status = 'pending', summary = NULL WHERE id = ?`
+  ).run(transcript, language, id)
+}
+
+export function setSummaryStatus(id: string, status: 'pending' | 'summarizing' | 'done' | 'error', error: string | null = null): void {
+  db.prepare(`UPDATE recordings SET summary_status = ?, summary_error = ? WHERE id = ?`).run(status, error, id)
+}
+
+export function setSummaryText(id: string, summary: string): void {
+  db.prepare(`UPDATE recordings SET summary = ?, summary_status = 'done', summary_error = NULL WHERE id = ?`).run(summary, id)
 }
 
 export function getSetting(key: string): string | undefined {

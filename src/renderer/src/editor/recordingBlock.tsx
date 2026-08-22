@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { createReactBlockSpec } from '@blocknote/react'
 import { AudioPlayer } from './AudioPlayer'
 import { useRecordingsStore } from '../stores/recordingsStore'
-import { insertTranscriptAsParagraphs } from './bridge'
+import { insertMeetingNotesAsBody, insertTranscriptAsParagraphs } from './bridge'
 import { retranscribe } from '../audio/pipeline'
 import { useUiStore } from '../stores/uiStore'
 import { formatDuration } from '../audio/pcm'
@@ -29,6 +29,24 @@ function parseTranscript(raw: string): TranscriptLine[] {
     .map((line) => {
       const m = /^\[(\d{1,2}:\d{2}(?::\d{2})?)\]\s*/.exec(line)
       return m ? { stamp: m[1], text: line.slice(m[0].length) } : { stamp: '', text: line }
+    })
+}
+
+interface SummaryLine {
+  kind: 'h' | 'bullet' | 'p'
+  text: string
+}
+
+function parseSummary(raw: string): SummaryLine[] {
+  return raw
+    .split('\n')
+    .map((l) => l.trim())
+    .filter(Boolean)
+    .map((line): SummaryLine => {
+      if (line.startsWith('## ')) return { kind: 'h', text: line.slice(3) }
+      if (line.startsWith('# ')) return { kind: 'h', text: line.slice(2) }
+      if (/^[-*]\s+/.test(line)) return { kind: 'bullet', text: line.replace(/^[-*]\s+/, '') }
+      return { kind: 'p', text: line }
     })
 }
 
@@ -79,6 +97,13 @@ function RecordingBlockView({ block }: { block: { id: string; props: Record<stri
   const lines = parseTranscript(transcript)
   const working = status === 'transcribing' || status === 'pending' || status === 'downloading-model'
 
+  const summary = rec?.summary ?? null
+  const summaryStatus = rec?.summaryStatus ?? 'pending'
+  const summaryLines = summary ? parseSummary(summary) : []
+  const summarizing = summaryStatus === 'summarizing'
+  const showSummarySection =
+    transcript.length > 0 && (summarizing || summaryStatus === 'done' || summaryStatus === 'error' || (summaryStatus === 'pending' && !!rec))
+
   const handleRetranscribe = async (): Promise<void> => {
     if (!rec || busy) return
     setBusy(true)
@@ -91,10 +116,10 @@ function RecordingBlockView({ block }: { block: { id: string; props: Record<stri
     }
   }
 
-  const handleInsert = (): void => {
-    // 插入正文时去掉时间戳前缀
-    const plain = lines.map((l) => l.text).join('\n\n')
-    insertTranscriptAsParagraphs(block.id, plain)
+  const handleConfirmSummary = (): void => {
+    if (!summary) return
+    insertMeetingNotesAsBody(block.id, summary, transcript)
+    showToast('已将 AI 总结与转写文稿插入正文')
   }
 
   return (
@@ -127,12 +152,83 @@ function RecordingBlockView({ block }: { block: { id: string; props: Record<stri
             重新转写
           </button>
         ) : null}
-        {lines.length > 0 ? (
-          <button type="button" className="link-btn" onClick={handleInsert}>
-            转为正文
-          </button>
-        ) : null}
       </div>
+
+      {showSummarySection ? (
+        <div className="meeting-summary">
+          <div className="meeting-summary-head">
+            <span className="meeting-summary-badge">✨ AI 总结</span>
+            {summaryStatus === 'done' ? (
+              <>
+                <button type="button" className="btn primary small" onClick={handleConfirmSummary}>
+                  ✓ 确认并转为正文
+                </button>
+                <button
+                  type="button"
+                  className="link-btn"
+                  disabled={summarizing}
+                  onClick={() => recId && void window.oasis.recordings.summarize(recId)}
+                >
+                  重新总结
+                </button>
+              </>
+            ) : null}
+            {summaryStatus === 'error' ? (
+              <button
+                type="button"
+                className="btn ghost small"
+                onClick={() => recId && void window.oasis.recordings.summarize(recId)}
+              >
+                重试总结
+              </button>
+            ) : null}
+            {summaryStatus === 'pending' ? (
+              <button
+                type="button"
+                className="btn ghost small"
+                disabled={summarizing}
+                onClick={() => recId && void window.oasis.recordings.summarize(recId)}
+              >
+                生成 AI 总结
+              </button>
+            ) : null}
+          </div>
+
+          {summarizing ? (
+            <div className="meeting-transcript-loading">
+              <div className="shimmer-line" style={{ width: '60%' }} />
+              <div className="shimmer-line" style={{ width: '84%' }} />
+              <div className="shimmer-line" style={{ width: '48%' }} />
+            </div>
+          ) : summaryStatus === 'done' && summaryLines.length > 0 ? (
+            <div className="meeting-summary-body">
+              {summaryLines.map((line, i) =>
+                line.kind === 'h' ? (
+                  <div key={i} className="meeting-summary-h">
+                    {line.text}
+                  </div>
+                ) : line.kind === 'bullet' ? (
+                  <div key={i} className="meeting-summary-bullet">
+                    <span className="meeting-summary-dot" />
+                    <span>{line.text}</span>
+                  </div>
+                ) : (
+                  <p key={i} className="meeting-summary-p">
+                    {line.text}
+                  </p>
+                )
+              )}
+            </div>
+          ) : summaryStatus === 'error' ? (
+            <div className="meeting-summary-error">
+              {rec?.summaryError ?? '总结失败'}
+              <span className="meeting-summary-error-hint">
+                (总结需要 DeepSeek API:读取 ~/.dsh/.credentials.yaml 中的 DEEPSEEK_API_KEY)
+              </span>
+            </div>
+          ) : null}
+        </div>
+      ) : null}
 
       {working ? (
         <div className="meeting-transcript-loading">
@@ -142,6 +238,12 @@ function RecordingBlockView({ block }: { block: { id: string; props: Record<stri
         </div>
       ) : lines.length > 0 ? (
         <div className="meeting-transcript">
+          <div className="meeting-transcript-head">
+            <span>转写文稿</span>
+            <button type="button" className="link-btn" onClick={() => insertTranscriptAsParagraphs(block.id, transcript)}>
+              仅转文稿
+            </button>
+          </div>
           {lines.map((line, i) => (
             <p key={i} className="meeting-line">
               {line.stamp ? <span className="meeting-stamp">{line.stamp}</span> : null}

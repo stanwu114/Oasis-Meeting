@@ -74,6 +74,12 @@ export function SettingsModal() {
               ))}
             </select>
           </div>
+          <div className="settings-row">
+            <span>AI 总结</span>
+            <span className="settings-value muted">
+              转写完成后自动调用 DeepSeek 生成纪要(密钥取自 ~/.dsh/.credentials.yaml)
+            </span>
+          </div>
 
           <div className="settings-model">
             <div className="settings-row">

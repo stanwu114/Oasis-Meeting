@@ -6,6 +6,7 @@ import * as media from './media'
 import { getModelStatus, ensureModelDownloaded } from './modelManager'
 import { enqueueTranscription } from './transcriber'
 import { startDsh, stopDsh, getDshState } from './dshRunner'
+import { enqueueSummary } from './summarizer'
 
 /** 包装 handler:统一异常日志与向渲染进程抛错 */
 function handle<T extends unknown[]>(channel: string, fn: (...args: T) => unknown): void {
@@ -60,6 +61,9 @@ export function registerIpc(): void {
   handle(IPC.recordingsUpdateBlock, (id: string, blockId: string | null) => db.setRecordingBlock(id, blockId))
   handle(IPC.recordingsTranscribe, (id: string, pcm: Int16Array, sampleRate: number, language: string) => {
     enqueueTranscription({ recordingId: id, pcm, sampleRate, language })
+  })
+  handle(IPC.recordingsSummarize, (id: string) => {
+    enqueueSummary(id)
   })
 
   /* ---------- 模型 ---------- */

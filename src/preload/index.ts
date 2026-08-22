@@ -24,7 +24,8 @@ const api: OasisApi = {
     readAudio: (id) => ipcRenderer.invoke(IPC.recordingsReadAudio, id),
     updateBlock: (id, blockId) => ipcRenderer.invoke(IPC.recordingsUpdateBlock, id, blockId),
     transcribe: (id, pcm, sampleRate, language) =>
-      ipcRenderer.invoke(IPC.recordingsTranscribe, id, pcm, sampleRate, language)
+      ipcRenderer.invoke(IPC.recordingsTranscribe, id, pcm, sampleRate, language),
+    summarize: (id) => ipcRenderer.invoke(IPC.recordingsSummarize, id)
   },
   models: {
     status: () => ipcRenderer.invoke(IPC.modelsStatus),
