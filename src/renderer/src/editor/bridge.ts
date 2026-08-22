@@ -79,6 +79,58 @@ export function insertTranscriptAsParagraphs(recordingBlockId: string, transcrip
   )
 }
 
+/** 划词 AI 结果:插入当前光标块之后(条目行转列表) */
+export function insertParagraphsAfterSelection(text: string): boolean {
+  const editor = currentEditor
+  if (!editor) return false
+  try {
+    const anchor = editor.getTextCursorPosition().block
+    const blocks: Record<string, unknown>[] = []
+    for (const line of text.split('\n')) {
+      const t = line.trim()
+      if (!t) continue
+      if (/^[-*]\s+/.test(t)) {
+        blocks.push({ type: 'bulletListItem', content: mkText(t.replace(/^[-*]\s+/, '')) })
+      } else {
+        blocks.push({ type: 'paragraph', content: mkText(t) })
+      }
+    }
+    if (blocks.length === 0) return false
+    editor.insertBlocks(blocks as never, anchor, 'after')
+    return true
+  } catch (e) {
+    console.error('[bridge] 插入失败:', e)
+    return false
+  }
+}
+
+/** 页面摘要:插入到文档最顶部 */
+export function insertSummaryAtDocStart(summary: string): boolean {
+  const editor = currentEditor
+  if (!editor || editor.document.length === 0) return false
+  try {
+    const blocks: Record<string, unknown>[] = []
+    for (const raw of summary.split('\n')) {
+      const line = raw.trim()
+      if (!line) continue
+      if (line.startsWith('## ')) blocks.push({ type: 'heading', props: { level: 3 }, content: mkText(line.slice(3)) })
+      else if (line.startsWith('# ')) blocks.push({ type: 'heading', props: { level: 2 }, content: mkText(line.slice(2)) })
+      else if (/^[-*]\s+/.test(line)) blocks.push({ type: 'bulletListItem', content: mkText(line.replace(/^[-*]\s+/, '')) })
+      else blocks.push({ type: 'paragraph', content: mkText(line) })
+    }
+    if (blocks.length === 0) return false
+    editor.insertBlocks(blocks as never, editor.document[0] as never, 'before')
+    return true
+  } catch (e) {
+    console.error('[bridge] 页首插入失败:', e)
+    return false
+  }
+}
+
+function mkText(s: string): never {
+  return [{ type: 'text', text: s, styles: {} }] as never
+}
+
 /**
  * 「确认总结并转为正文」:AI 总结(## 标题 / - 条目 / 段落)+ 分隔线 + 完整转写文稿,
  * 依次插入录音块之后,形成一篇完整会议纪要。

@@ -6,6 +6,7 @@ import { SettingsModal } from './components/SettingsModal'
 import { TrashView } from './components/TrashView'
 import { RecordingsView } from './components/RecordingsView'
 import { AiPanel } from './components/AiPanel'
+import { AiSelectionBar } from './components/AiSelectionBar'
 import OasisEditor from './editor/OasisEditor'
 import { useAppStore } from './stores/appStore'
 import { useUiStore } from './stores/uiStore'
@@ -76,6 +77,7 @@ export default function App() {
       </main>
 
       <RecorderOverlay />
+      <AiSelectionBar />
       <SearchModal />
       <SettingsModal />
       {toast ? <div className={`toast ${toastKind === 'error' ? 'error' : ''}`}>{toast}</div> : null}

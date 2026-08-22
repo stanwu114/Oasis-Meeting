@@ -4,7 +4,7 @@ import { zh } from '@blocknote/core/locales'
 import { SuggestionMenuController, getDefaultReactSlashMenuItems, useCreateBlockNote } from '@blocknote/react'
 import { BlockNoteView } from '@blocknote/mantine'
 import { RecordingBlock } from './recordingBlock'
-import { setEditor } from './bridge'
+import { setEditor, insertSummaryAtDocStart } from './bridge'
 import { useAppStore } from '../stores/appStore'
 import { useRecordingsStore } from '../stores/recordingsStore'
 import { useUiStore } from '../stores/uiStore'
@@ -24,6 +24,7 @@ export default function OasisEditor({ pageId }: { pageId: string }) {
   const theme = useUiStore((s) => s.theme)
   const recorderBusy = useRecorderStore((s) => s.phase !== 'idle')
   const [docEmpty, setDocEmpty] = useState(!(initialContent && initialContent.length > 0))
+  const [summarizing, setSummarizing] = useState(false)
 
   const editor = useCreateBlockNote({
     schema,
@@ -101,8 +102,30 @@ export default function OasisEditor({ pageId }: { pageId: string }) {
     }, 500)
   }
 
+  const summarizePage = async (): Promise<void> => {
+    if (summarizing) return
+    setSummarizing(true)
+    try {
+      const summary = await window.oasis.ai.summarizePage(pageId)
+      if (insertSummaryAtDocStart(summary)) useUiStore.getState().showToast('已在本页顶部插入 AI 摘要')
+    } catch (e) {
+      useUiStore.getState().showToast(`总结失败:${e instanceof Error ? e.message : String(e)}`, 'error')
+    } finally {
+      setSummarizing(false)
+    }
+  }
+
   return (
     <div className="editor-page">
+      <button
+        type="button"
+        className="page-ai-btn"
+        disabled={summarizing || docEmpty}
+        title="对本页内容生成 AI 摘要,插入到页首"
+        onClick={() => void summarizePage()}
+      >
+        {summarizing ? <span className="spin" /> : '⚡'} AI 总结本页
+      </button>
       <textarea
         className="page-title"
         value={title}

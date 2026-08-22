@@ -34,6 +34,8 @@ export const IPC = {
   aiStart: 'ai:start',
   aiStop: 'ai:stop',
   aiStatus: 'ai:status',
+  aiEditorAction: 'ai:editor-action',
+  aiSummarizePage: 'ai:summarize-page',
 
   evtRecordingsChanged: 'evt:recordings-changed',
   evtModelProgress: 'evt:model-progress',
@@ -182,6 +184,10 @@ export interface OasisApi {
     start(): Promise<AiPanelState>
     stop(): Promise<void>
     status(): Promise<AiPanelState>
+    /** 划词动作:总结/润色/翻译/续写/自由提问 */
+    editorAction(action: 'summarize' | 'polish' | 'translate' | 'continue' | 'ask', text: string, question?: string): Promise<string>
+    /** 对整页正文生成结构化摘要 */
+    summarizePage(pageId: string): Promise<string>
   }
   on: {
     recordingsChanged(cb: (r: RecordingInfo) => void): () => void

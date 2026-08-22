@@ -7,6 +7,8 @@ import { getModelStatus, ensureModelDownloaded } from './modelManager'
 import { enqueueTranscription } from './transcriber'
 import { startDsh, stopDsh, getDshState } from './dshRunner'
 import { enqueueSummary } from './summarizer'
+import { chat, runEditorAction } from './llm'
+import { extractDocText } from '../shared/extract'
 
 /** 包装 handler:统一异常日志与向渲染进程抛错 */
 function handle<T extends unknown[]>(channel: string, fn: (...args: T) => unknown): void {
@@ -76,6 +78,33 @@ export function registerIpc(): void {
     stopDsh()
   })
   handle(IPC.aiStatus, () => getDshState())
+  handle(IPC.aiEditorAction, (action: 'summarize' | 'polish' | 'translate' | 'continue' | 'ask', text: string, question?: string) =>
+    runEditorAction(action, text, question)
+  )
+  handle(IPC.aiSummarizePage, async (pageId: string) => {
+    const page = db.getPage(pageId)
+    if (!page) throw new Error('页面不存在')
+    const body = (page.content ? extractDocText(page.content) : '').trim()
+    if (!body) throw new Error('本页还没有内容')
+    return chat(
+      [
+        {
+          role: 'system',
+          content: `你是笔记助手。把用户提供的笔记总结为中文摘要,严格按以下 Markdown 结构输出:
+
+## 摘要
+(2~3 句话概括)
+
+## 要点
+- (3~6 条要点,保留关键信息)
+
+只输出摘要本身,不要前言或解释。`
+        },
+        { role: 'user', content: body.slice(0, 24_000) }
+      ],
+      { temperature: 0.3 }
+    )
+  })
 
   /* ---------- 搜索 ---------- */
   handle(IPC.searchQuery, (q: string) => db.searchPages(q.trim()))

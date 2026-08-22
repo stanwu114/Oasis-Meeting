@@ -42,7 +42,9 @@ const api: OasisApi = {
   ai: {
     start: () => ipcRenderer.invoke(IPC.aiStart),
     stop: () => ipcRenderer.invoke(IPC.aiStop),
-    status: () => ipcRenderer.invoke(IPC.aiStatus)
+    status: () => ipcRenderer.invoke(IPC.aiStatus),
+    editorAction: (action, text, question) => ipcRenderer.invoke(IPC.aiEditorAction, action, text, question),
+    summarizePage: (pageId) => ipcRenderer.invoke(IPC.aiSummarizePage, pageId)
   },
   on: {
     recordingsChanged: (cb) => subscribe(IPC.evtRecordingsChanged, cb),
