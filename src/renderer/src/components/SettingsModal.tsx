@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useUiStore } from '../stores/uiStore'
 import { useHarnessStore } from '../stores/harnessStore'
+import { BrandMark } from './BrandMark'
 import { TRANSCRIBE_LANGUAGES, type HarnessSettings, type HarnessSkill } from '../../../shared/ipc'
 
 const HARNESS_MODELS = ['deepseek-v4-pro', 'deepseek-v4-flash', 'deepseek-chat']
@@ -305,8 +306,13 @@ export function SettingsModal() {
 
         <section className="settings-section">
           <h3>关于</h3>
+          <div className="about-brand">
+            <BrandMark variant="meeting" size={22} />
+            <span className="about-brand-name">Oasis <em>Meeting</em></span>
+            <span className="about-brand-ver">v0.1.0</span>
+          </div>
           <p className="settings-about">
-            Oasis Meeting v0.1.0 — 本地优先的会议记录与录音转写。所有数据保存在本机
+            本地优先的会议记录与录音转写。所有数据保存在本机
             (数据库、音频与模型均在应用数据目录),除首次下载模型外不联网。
           </p>
         </section>

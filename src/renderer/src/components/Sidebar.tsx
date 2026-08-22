@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useAppStore } from '../stores/appStore'
 import { useUiStore } from '../stores/uiStore'
 import { useRecorderStore } from '../stores/recorderStore'
+import { BrandMark } from './BrandMark'
 import { Icon } from './Icon'
 import { PageTree } from './PageTree'
 
@@ -33,6 +34,7 @@ export function Sidebar() {
     <aside className="sidebar">
       <div className="sidebar-top" />
       <div className="sidebar-brand">
+        <BrandMark variant="meeting" size={26} />
         <span className="brand-word">Oasis</span>
         <span className="brand-sub">Meeting</span>
       </div>

@@ -6,6 +6,7 @@ import { SettingsModal } from './components/SettingsModal'
 import { TrashView } from './components/TrashView'
 import { RecordingsView } from './components/RecordingsView'
 import { AiSelectionBar } from './components/AiSelectionBar'
+import { BrandMark } from './components/BrandMark'
 import { HarnessView } from './components/HarnessView'
 import OasisEditor from './editor/OasisEditor'
 import { useAppStore } from './stores/appStore'
@@ -88,6 +89,9 @@ export default function App() {
 function EmptyState(): React.ReactNode {
   return (
     <div className="empty-state">
+      <div className="empty-logo">
+        <BrandMark variant="meeting" size={72} />
+      </div>
       <div className="empty-wordmark">Oasis <span className="note">Meeting</span></div>
       <p>本地优先的会议记录空间 · 录音在本机转写,数据不出电脑</p>
       <div className="empty-actions">
