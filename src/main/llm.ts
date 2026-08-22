@@ -81,3 +81,19 @@ export async function runEditorAction(action: EditorAction, text: string, questi
     { role: 'user', content: text.slice(0, 12_000) }
   ])
 }
+
+/** 依据录音转写为会议起一个简短名称 */
+export async function meetingName(transcript: string): Promise<string> {
+  const name = await chat(
+    [
+      {
+        role: 'system',
+        content:
+          '根据会议录音转写文稿,为这场会议起一个简短的中文名称,不超过 10 个字,不要书名号和引号,不要以「会议」结尾(标题会自动补「会议」后缀),只输出名称本身。'
+      },
+      { role: 'user', content: transcript.slice(0, 6_000) }
+    ],
+    { temperature: 0.4, maxTokens: 60 }
+  )
+  return name.replace(/["「」《》\s]/g, '').slice(0, 10)
+}

@@ -6,7 +6,7 @@ import * as media from './media'
 import { getModelStatus, ensureModelDownloaded } from './modelManager'
 import { enqueueTranscription } from './transcriber'
 import { enqueueSummary } from './summarizer'
-import { chat, runEditorAction } from './llm'
+import { chat, runEditorAction, meetingName } from './llm'
 import { startHarness, stopHarness, getHarnessState } from './dshRunner'
 import {
   getHarnessSettings,
@@ -84,6 +84,7 @@ export function registerIpc(): void {
   handle(IPC.modelsEnsure, () => ensureModelDownloaded())
 
   /* ---------- AI 编辑器动作 ---------- */
+  handle(IPC.aiMeetingName, (transcript: string) => meetingName(transcript))
   handle(
     IPC.aiEditorAction,
     (
@@ -162,6 +163,17 @@ export function registerIpc(): void {
   })
   handle(IPC.systemOpenExternal, async (url: string) => {
     if (/^https?:\/\//.test(url)) await shell.openExternal(url)
+  })
+  handle(IPC.systemCityLocation, async () => {
+    try {
+      const res = await fetch('https://ipapi.co/json/', { signal: AbortSignal.timeout(5000) })
+      if (!res.ok) return null
+      const data = (await res.json()) as { city?: string; region?: string; country_name?: string }
+      if (!data.city && !data.region) return null
+      return { city: data.city ?? '', region: data.region ?? '', country: data.country_name ?? '' }
+    } catch {
+      return null
+    }
   })
   handle(IPC.systemImportAudio, async (): Promise<ImportedAudio | null> => {
     const { canceled, filePaths } = await dialog.showOpenDialog({

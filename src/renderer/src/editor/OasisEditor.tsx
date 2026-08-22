@@ -4,17 +4,20 @@ import { zh } from '@blocknote/core/locales'
 import { SuggestionMenuController, getDefaultReactSlashMenuItems, useCreateBlockNote } from '@blocknote/react'
 import { BlockNoteView } from '@blocknote/mantine'
 import { RecordingBlock } from './recordingBlock'
+import { MeetingMetaBlock } from './meetingMetaBlock'
 import { setEditor, insertSummaryAtDocStart } from './bridge'
 import { useAppStore } from '../stores/appStore'
 import { useRecordingsStore } from '../stores/recordingsStore'
 import { useUiStore } from '../stores/uiStore'
+import { beijingStamp } from '../../../shared/ipc'
 import { useRecorderStore } from '../stores/recorderStore'
 import { importAudioAndTranscribe } from '../audio/pipeline'
 
 export const schema = BlockNoteSchema.create({
   blockSpecs: {
     ...defaultBlockSpecs,
-    recording: RecordingBlock()
+    recording: RecordingBlock(),
+    meetingMeta: MeetingMetaBlock()
   }
 })
 
@@ -66,6 +69,63 @@ export default function OasisEditor({ pageId }: { pageId: string }) {
       unsubscribe()
       if (saveTimer.current) window.clearTimeout(saveTimer.current)
     }
+  }, [editor, pageId])
+
+  /* 会议信息卡:地点为空时自动 IP 定位(仅补空,不覆盖用户输入) */
+  useEffect(() => {
+    const meta = editor.document.find((b) => b.type === 'meetingMeta')
+    if (!meta) return
+    if ((meta.props as Record<string, string>).location) return
+    let cancelled = false
+    void window.oasis.system.getCityLocation().then((loc) => {
+      if (cancelled || !loc) return
+      const fresh = editor.document.find((b) => b.type === 'meetingMeta')
+      if (!fresh || (fresh.props as Record<string, string>).location) return
+      const place = [loc.country, loc.region, loc.city]
+        .filter((x, i, arr) => x && arr.indexOf(x) === i)
+        .join(' ')
+      try {
+        editor.updateBlock(fresh as never, { props: { location: place } } as never)
+      } catch {
+        /* noop */
+      }
+    })
+    return () => {
+      cancelled = true
+    }
+  }, [editor, pageId])
+
+  /* 录音转写完成 → AI 自动命名会议并更新标题(名称为空时,每页仅一次) */
+  const namedRef = useRef(false)
+  useEffect(() => {
+    return useRecordingsStore.subscribe((state, prev) => {
+      if (namedRef.current) return
+      const meta = editor.document.find((b) => b.type === 'meetingMeta') as
+        | { id: string; props: Record<string, string> }
+        | undefined
+      if (!meta || meta.props.name?.trim()) return
+      for (const rec of Object.values(state.byId)) {
+        if (rec.pageId !== pageId || !rec.transcript) continue
+        if (prev.byId[rec.id]?.transcript === rec.transcript) continue
+        namedRef.current = true
+        void window.oasis.ai
+          .meetingName(rec.transcript)
+          .then((name) => {
+            if (!name) return
+            try {
+              editor.updateBlock(meta.id as never, { props: { name } } as never)
+            } catch {
+              /* noop */
+            }
+            const timePart = meta.props.time || beijingStamp()
+            void useAppStore.getState().renamePage(pageId, `${name}会议@${timePart}`)
+          })
+          .catch(() => {
+            namedRef.current = false
+          })
+        break
+      }
+    })
   }, [editor, pageId])
 
   /* 转写完成 → 同步 transcript 到块属性(保证文档自包含、导出可见) */

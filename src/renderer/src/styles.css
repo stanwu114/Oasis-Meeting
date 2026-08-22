@@ -1877,3 +1877,71 @@ kbd {
   white-space: nowrap;
   text-overflow: ellipsis;
 }
+
+/* ============ 会议信息卡 ============ */
+.meeting-meta {
+  margin: 6px 0 18px;
+  border: 1px solid var(--border);
+  border-radius: 11px;
+  background: var(--bg-subtle);
+  padding: 6px 16px;
+}
+
+.meeting-meta-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 8px 0;
+  border-bottom: 1px dashed var(--border);
+}
+
+.meeting-meta-row:last-child {
+  border-bottom: none;
+}
+
+.meeting-meta-label {
+  flex-shrink: 0;
+  width: 76px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--fg-muted);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.meeting-meta-hint {
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--accent);
+  background: var(--accent-soft);
+  border-radius: 4px;
+  padding: 1px 5px;
+}
+
+.meeting-meta-input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: var(--fg);
+  font: inherit;
+  font-size: 14px;
+  padding: 2px 0;
+}
+
+.meeting-meta-input::placeholder {
+  color: var(--fg-faint);
+}
+
+.meeting-meta-input:focus {
+  border-bottom: 1.5px solid var(--accent);
+  margin-bottom: -1.5px;
+}
+
+.meeting-meta-time {
+  font-size: 14px;
+  color: var(--fg);
+  font-variant-numeric: tabular-nums;
+}

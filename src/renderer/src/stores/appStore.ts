@@ -1,4 +1,5 @@
 import { create } from 'zustand'
+import { beijingStamp } from '../../../shared/ipc'
 import type { BlockDoc, PageDetail, PageSummary } from '../../../shared/ipc'
 
 interface AppState {
@@ -117,7 +118,16 @@ export const useAppStore = create<AppState>((set, get) => ({
   },
 
   createPage: async (parentId, title, opts) => {
-    const detail = await api.pages.create(parentId, title)
+    // Meeting 模板:不指定标题的新页面 → 「未命名会议@北京时间」+ 会议信息卡
+    const useTemplate = !title
+    const stamp = title ? '' : beijingStamp()
+    const detail = await api.pages.create(parentId, title ?? `未命名会议@${stamp}`)
+    if (useTemplate) {
+      await api.pages.updateContent(detail.id, [
+        { type: 'meetingMeta', props: { time: stamp } },
+        { type: 'paragraph', content: [], children: [] }
+      ])
+    }
     await get().refresh()
     if (parentId) set((s) => ({ expanded: { ...s.expanded, [parentId]: true } }))
     if (opts?.select !== false) await get().openPage(detail.id)

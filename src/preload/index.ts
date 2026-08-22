@@ -37,11 +37,13 @@ const api: OasisApi = {
   system: {
     askMicPermission: () => ipcRenderer.invoke(IPC.systemAskMic),
     importAudioFile: () => ipcRenderer.invoke(IPC.systemImportAudio),
-    openExternal: (url) => ipcRenderer.invoke(IPC.systemOpenExternal, url)
+    openExternal: (url) => ipcRenderer.invoke(IPC.systemOpenExternal, url),
+    getCityLocation: () => ipcRenderer.invoke(IPC.systemCityLocation)
   },
   ai: {
     editorAction: (action, text, question) => ipcRenderer.invoke(IPC.aiEditorAction, action, text, question),
-    summarizePage: (pageId) => ipcRenderer.invoke(IPC.aiSummarizePage, pageId)
+    summarizePage: (pageId) => ipcRenderer.invoke(IPC.aiSummarizePage, pageId),
+    meetingName: (transcript) => ipcRenderer.invoke(IPC.aiMeetingName, transcript)
   },
   harness: {
     start: () => ipcRenderer.invoke(IPC.harnessStart),

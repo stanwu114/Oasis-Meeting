@@ -30,6 +30,9 @@ export const IPC = {
   systemAskMic: 'system:ask-mic',
   systemImportAudio: 'system:import-audio',
   systemOpenExternal: 'system:open-external',
+  systemCityLocation: 'system:city-location',
+
+  aiMeetingName: 'ai:meeting-name',
 
   aiEditorAction: 'ai:editor-action',
   aiSummarizePage: 'ai:summarize-page',
@@ -152,6 +155,20 @@ export function mediaUrlFor(fileName: string): string {
   return `oasis-media://local/${encodeURIComponent(fileName)}`
 }
 
+/** 北京时间戳:yyyy/MM/dd HH:mm */
+export function beijingStamp(date: Date = new Date()): string {
+  const fmt = new Intl.DateTimeFormat('zh-CN', {
+    timeZone: 'Asia/Shanghai',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false
+  })
+  return fmt.format(date).replace(',', ' ').replace(/\//g, '/')
+}
+
 export interface OasisApi {
   pages: {
     list(): Promise<PageSummary[]>
@@ -189,6 +206,8 @@ export interface OasisApi {
     askMicPermission(): Promise<MicPermissionResult>
     importAudioFile(): Promise<ImportedAudio | null>
     openExternal(url: string): Promise<void>
+    /** IP 粗定位(城市级),用于会议地点;失败返回 null */
+    getCityLocation(): Promise<{ city: string; region: string; country: string } | null>
   }
   ai: {
     /** 划词动作:总结/润色/校对/解释/翻译/续写/自由提问 */
@@ -199,6 +218,8 @@ export interface OasisApi {
     ): Promise<string>
     /** 对整页正文生成结构化摘要 */
     summarizePage(pageId: string): Promise<string>
+    /** 依据录音转写为会议起名(≤10 字) */
+    meetingName(transcript: string): Promise<string>
   }
   harness: {
     start(): Promise<HarnessState>
