@@ -24,13 +24,19 @@ export function HarnessView() {
   const attachWebview = (el: HTMLElement | null): void => {
     const wv = el as WebviewTagLike | null
     if (!wv) return
-    setHarnessWebview(wv)
+    // webview 未就绪时调用其方法会同步抛错,必须等 dom-ready
     const inject = (): void => {
-      void wv.insertCSS(HIDE_DSH_SIDEBAR_CSS).catch(() => undefined)
+      try {
+        void wv.insertCSS(HIDE_DSH_SIDEBAR_CSS).catch(() => undefined)
+      } catch {
+        /* 尚未就绪,忽略 */
+      }
     }
-    wv.addEventListener('dom-ready', inject)
+    wv.addEventListener('dom-ready', () => {
+      setHarnessWebview(wv)
+      inject()
+    })
     wv.addEventListener('did-navigate', inject)
-    inject()
   }
 
   return (

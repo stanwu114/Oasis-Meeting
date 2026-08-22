@@ -98,12 +98,20 @@ export const useHarnessStore = create<HarnessStore>((set, get) => ({
   openSession: (session) => {
     set({ activeSessionTitle: session.title })
     if (!webview) return
-    void webview.executeJavaScript(OPEN_SESSION_JS(session.title)).catch(() => undefined)
+    try {
+      void webview.executeJavaScript(OPEN_SESSION_JS(session.title)).catch(() => undefined)
+    } catch {
+      /* webview 未就绪 */
+    }
   },
 
   newSession: () => {
     set({ activeSessionTitle: null })
     if (!webview) return
-    void webview.executeJavaScript(NEW_SESSION_JS).catch(() => undefined)
+    try {
+      void webview.executeJavaScript(NEW_SESSION_JS).catch(() => undefined)
+    } catch {
+      /* webview 未就绪 */
+    }
   }
 }))
