@@ -1976,7 +1976,7 @@ kbd {
   font-family: 'BrandDisplay', Inter, -apple-system, sans-serif;
   font-weight: 900;
   font-size: 28px;
-  color: var(--fg);
+  color: var(--fg-muted);
   margin-left: 7px;
   letter-spacing: -0.025em;
   line-height: 1;
@@ -1996,7 +1996,7 @@ kbd {
 .empty-wordmark .note {
   font-weight: 900;
   font-size: 42px;
-  color: var(--fg);
+  color: var(--fg-muted);
 }
 
 /* 焦点可见性(键盘可达) */
