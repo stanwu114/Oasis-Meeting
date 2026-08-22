@@ -188,8 +188,12 @@ export interface OasisApi {
     openExternal(url: string): Promise<void>
   }
   ai: {
-    /** 划词动作:总结/润色/翻译/续写/自由提问 */
-    editorAction(action: 'summarize' | 'polish' | 'translate' | 'continue' | 'ask', text: string, question?: string): Promise<string>
+    /** 划词动作:总结/润色/校对/解释/翻译/续写/自由提问 */
+    editorAction(
+      action: 'summarize' | 'polish' | 'proofread' | 'explain' | 'translate' | 'continue' | 'ask',
+      text: string,
+      question?: string
+    ): Promise<string>
     /** 对整页正文生成结构化摘要 */
     summarizePage(pageId: string): Promise<string>
   }

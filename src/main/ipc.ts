@@ -87,8 +87,13 @@ export function registerIpc(): void {
   })
 
   /* ---------- AI 编辑器动作 ---------- */
-  handle(IPC.aiEditorAction, (action: 'summarize' | 'polish' | 'translate' | 'continue' | 'ask', text: string, question?: string) =>
-    runEditorAction(action, text, question)
+  handle(
+    IPC.aiEditorAction,
+    (
+      action: 'summarize' | 'polish' | 'proofread' | 'explain' | 'translate' | 'continue' | 'ask',
+      text: string,
+      question?: string
+    ) => runEditorAction(action, text, question)
   )
   handle(IPC.aiSummarizePage, async (pageId: string) => {
     const page = db.getPage(pageId)

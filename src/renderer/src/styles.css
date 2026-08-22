@@ -269,28 +269,57 @@ kbd {
   cursor: default;
 }
 
-/* 全局 AI 切换按钮(分栏关闭时悬浮显示) */
+/* 全局 AI 切换按钮(Notion 式:页面右下角圆形) */
 .ai-toggle-fab {
   position: fixed;
-  top: 14px;
-  right: 18px;
+  right: 34px;
+  bottom: 34px;
   z-index: 80;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 7px 14px;
-  border-radius: 999px;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
   background: var(--accent);
   color: #fff;
-  font-size: 13px;
-  font-weight: 600;
+  font-size: 21px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   box-shadow: var(--shadow-lg);
   transition: transform 0.15s, filter 0.15s;
 }
 
 .ai-toggle-fab:hover {
-  transform: scale(1.05);
+  transform: scale(1.07);
   filter: brightness(1.07);
+}
+
+/* 面板顶部 ⋯ 菜单 */
+.chat-menu {
+  position: absolute;
+  top: 40px;
+  right: 12px;
+  z-index: 50;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  box-shadow: var(--shadow-lg);
+  padding: 5px;
+  display: flex;
+  flex-direction: column;
+  min-width: 150px;
+  animation: popIn 0.14s ease-out;
+}
+
+.chat-menu button {
+  padding: 7px 12px;
+  border-radius: 7px;
+  font-size: 13px;
+  text-align: left;
+  color: var(--fg);
+}
+
+.chat-menu button:hover {
+  background: var(--bg-hover);
 }
 
 /* 分栏拖宽手柄 */

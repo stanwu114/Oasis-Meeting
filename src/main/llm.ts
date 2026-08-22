@@ -58,11 +58,13 @@ export async function chat(messages: ChatMessage[], opts?: { temperature?: numbe
 
 /* ---------- 编辑器划词动作 ---------- */
 
-export type EditorAction = 'summarize' | 'polish' | 'translate' | 'continue' | 'ask'
+export type EditorAction = 'summarize' | 'polish' | 'proofread' | 'explain' | 'translate' | 'continue' | 'ask'
 
 const ACTION_PROMPTS: Record<Exclude<EditorAction, 'ask'>, string> = {
   summarize: '用简洁的中文总结以下内容,输出 3~6 条要点,每条以「- 」开头,不要任何前后缀和标题。',
-  polish: '润色以下文本:修正错别字、标点和语病,理顺语句,保持原意与语气,直接输出润色后的文本,不要解释。',
+  polish: '润色改写以下文本:优化表达与结构、修正错别字标点和语病,保持原意与语气,直接输出改写后的文本,不要解释。',
+  proofread: '校对以下文本:只修正错别字、标点和明显语病,尽量保持原文措辞不变,直接输出校对后的文本,不要解释。',
+  explain: '解释以下内容:它讲了什么、为什么重要、有什么注意点。用简洁的中文分点说明。',
   translate: '判断以下内容语言:中文则翻译成地道英文,其他语言则翻译成中文。直接输出译文,不要解释。',
   continue: '根据以下内容自然续写一段,衔接风格与原内容一致,直接输出续写的文字,不要重复原文。'
 }

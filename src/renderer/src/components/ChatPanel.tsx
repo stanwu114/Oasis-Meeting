@@ -12,7 +12,7 @@ const QUICK_ACTIONS = [
   { label: '✅ 提取待办', text: '从当前笔记里提取所有待办事项与行动项。' }
 ]
 
-/** 原生 AI 分栏:Notion 式操作——快捷动作、页面上下文、一键回写 */
+/** 原生 AI 分栏:按 Notion AI 面板设计——顶部 ⋯ 菜单(历史/新对话)、快捷动作、插入下方 */
 export function ChatPanel() {
   const mode = useChatStore((s) => s.mode)
   const conversations = useChatStore((s) => s.conversations)
@@ -23,6 +23,7 @@ export function ChatPanel() {
   const sending = useChatStore((s) => s.sending)
   const contextPageOn = useChatStore((s) => s.contextPageOn)
   const historyOpen = useChatStore((s) => s.historyOpen)
+  const [menuOpen, setMenuOpen] = useState(false)
   const pageTitle = useAppStore((s) => s.currentTitle)
   const pageId = useAppStore((s) => s.currentId)
 
@@ -59,17 +60,37 @@ export function ChatPanel() {
   return (
     <div className="chat-panel">
       <div className="chat-header">
-        <button type="button" className="chat-title" onClick={() => useChatStore.getState().setHistoryOpen(!historyOpen)}>
-          ✨ {title} <span className="chat-caret">{historyOpen ? '▾' : '▸'}</span>
-        </button>
+        <span className="chat-title">✨ {title}</span>
         <div className="chat-header-actions">
-          <button type="button" className="icon-btn" title="新对话" onClick={() => useChatStore.getState().newChat()}>
-            ＋
+          <button type="button" className="icon-btn" title="菜单" onClick={() => setMenuOpen((v) => !v)}>
+            ⋯
           </button>
-          <button type="button" className="icon-btn" title="关闭 (⌘L)" onClick={() => useUiStore.getState().setChatOpen(false)}>
+          <button type="button" className="icon-btn" title="收起 (⇧⌘J)" onClick={() => useUiStore.getState().setChatOpen(false)}>
             ✕
           </button>
         </div>
+        {menuOpen ? (
+          <div className="chat-menu" onClick={() => setMenuOpen(false)}>
+            <button
+              type="button"
+              onClick={() => {
+                setMenuOpen(false)
+                useChatStore.getState().setHistoryOpen(true)
+              }}
+            >
+              🕘 查看历史
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setMenuOpen(false)
+                useChatStore.getState().newChat()
+              }}
+            >
+              ✚ 新对话
+            </button>
+          </div>
+        ) : null}
       </div>
 
       {historyOpen ? (
@@ -114,10 +135,10 @@ export function ChatPanel() {
                   type="button"
                   className="link-btn"
                   onClick={() => {
-                    if (insertParagraphsAfterSelection(m.content)) useUiStore.getState().showToast('已插入当前笔记')
+                    if (insertParagraphsAfterSelection(m.content)) useUiStore.getState().showToast('已插入下方')
                   }}
                 >
-                  插入笔记
+                  ↓ 插入下方
                 </button>
                 <button
                   type="button"

@@ -2,13 +2,14 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { insertParagraphsAfterSelection } from '../editor/bridge'
 import { useUiStore } from '../stores/uiStore'
 
-type Action = 'summarize' | 'polish' | 'translate' | 'continue' | 'ask'
+type Action = 'summarize' | 'polish' | 'proofread' | 'explain' | 'translate' | 'continue' | 'ask'
 
 const ACTIONS: { key: Action; label: string }[] = [
-  { key: 'summarize', label: '✨ 总结' },
-  { key: 'polish', label: '润色' },
+  { key: 'polish', label: '✨ 润色写作' },
+  { key: 'proofread', label: '校对' },
+  { key: 'explain', label: '解释' },
   { key: 'translate', label: '翻译' },
-  { key: 'continue', label: '续写' },
+  { key: 'summarize', label: '总结' },
   { key: 'ask', label: '问AI' }
 ]
 

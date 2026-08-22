@@ -94,6 +94,10 @@ export default function App() {
         e.preventDefault()
         useUiStore.getState().setChatOpen(!useUiStore.getState().chatOpen)
       }
+      if (mod && e.shiftKey && e.key.toLowerCase() === 'j') {
+        e.preventDefault()
+        useUiStore.getState().setChatOpen(!useUiStore.getState().chatOpen)
+      }
       if (mod && e.shiftKey && e.key.toLowerCase() === 'r') {
         e.preventDefault()
         const phase = useRecorderStore.getState().phase
@@ -131,10 +135,11 @@ export default function App() {
         <button
           type="button"
           className="ai-toggle-fab"
-          title="打开 AI 分栏 (⌘L)"
+          style={{ bottom: view === 'editor' && loaded && currentId ? 104 : 34 }}
+          title="打开 AI (⇧⌘J)"
           onClick={() => useUiStore.getState().setChatOpen(true)}
         >
-          ✨ AI
+          ✨
         </button>
       ) : null}
 
