@@ -232,16 +232,6 @@ export default function OasisEditor({ pageId }: { pageId: string }) {
         >
         <SuggestionMenuController triggerCharacter="/" getItems={getSlashItems} />
       </BlockNoteView>
-      {!recorderBusy ? (
-        <button
-          type="button"
-          className="record-fab"
-          title="在当前笔记中录音转写"
-          onClick={() => void useRecorderStore.getState().start()}
-        >
-          <Icon name="mic" size={21} />
-        </button>
-      ) : null}
     </div>
   )
 }
