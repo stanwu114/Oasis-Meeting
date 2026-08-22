@@ -39,6 +39,13 @@ export const IPC = {
   harnessStatus: 'harness:status',
   harnessGetSettings: 'harness:get-settings',
   harnessSetSettings: 'harness:set-settings',
+  harnessSessions: 'harness:sessions',
+  harnessApiKeyGet: 'harness:apikey-get',
+  harnessApiKeySet: 'harness:apikey-set',
+  harnessSkillsList: 'harness:skills-list',
+  harnessSkillsDelete: 'harness:skills-delete',
+  harnessSkillsInstall: 'harness:skills-install',
+  harnessSkillsReveal: 'harness:skills-reveal',
 
   evtRecordingsChanged: 'evt:recordings-changed',
   evtModelProgress: 'evt:model-progress',
@@ -199,6 +206,14 @@ export interface OasisApi {
     status(): Promise<HarnessState>
     getSettings(): Promise<HarnessSettings | null>
     setSettings(patch: { model?: string; reasoningEffort?: string }): Promise<HarnessSettings>
+    /** 历史会话(读 ~/.dsh 会话存储) */
+    sessions(): Promise<HarnessSession[]>
+    getApiKey(): Promise<HarnessApiKeyState>
+    setApiKey(key: string | null): Promise<HarnessApiKeyState>
+    listSkills(): Promise<HarnessSkill[]>
+    deleteSkill(id: string): Promise<void>
+    installSkillFromDir(): Promise<{ name: string } | null>
+    revealSkillsDir(): Promise<void>
   }
   on: {
     recordingsChanged(cb: (r: RecordingInfo) => void): () => void
@@ -220,6 +235,27 @@ export interface HarnessSettings {
   provider: string
   model: string
   reasoningEffort: string
+}
+
+/** dsh 历史会话条目 */
+export interface HarnessSession {
+  id: string
+  title: string
+  timeMs: number
+  workspace: string
+}
+
+/** 已安装的 dsh 技能 */
+export interface HarnessSkill {
+  id: string
+  name: string
+  description: string
+}
+
+/** API Key 状态(不回传完整密钥) */
+export interface HarnessApiKeyState {
+  hasKey: boolean
+  masked: string | null
 }
 
 /** 录音转写支持的语言 */

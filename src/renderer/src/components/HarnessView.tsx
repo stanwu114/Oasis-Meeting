@@ -1,7 +1,16 @@
 import { useEffect } from 'react'
-import { useHarnessStore } from '../stores/harnessStore'
+import { setHarnessWebview, useHarnessStore } from '../stores/harnessStore'
 
-/** Harness 模式:主区域整体为 dsh web 界面,无附加工具栏;启动中/失败显示覆盖层 */
+/** 隐藏 dsh 自带的会话侧栏与拖拽手柄 */
+const HIDE_DSH_SIDEBAR_CSS =
+  '[class*="sidebarCol"] { display: none !important; } [class*="_handle"] { display: none !important; }'
+
+interface WebviewTagLike extends HTMLElement {
+  executeJavaScript(code: string): Promise<unknown>
+  insertCSS(css: string): Promise<string>
+}
+
+/** Harness 模式:主区域整体为 dsh 会话界面(dsh 自带侧栏已隐藏);启动中/失败显示覆盖层 */
 export function HarnessView() {
   const state = useHarnessStore((s) => s.state)
 
@@ -12,10 +21,28 @@ export function HarnessView() {
     return window.oasis.on.harnessStateChanged((s) => useHarnessStore.getState().setState(s))
   }, [])
 
+  const attachWebview = (el: HTMLElement | null): void => {
+    const wv = el as WebviewTagLike | null
+    if (!wv) return
+    setHarnessWebview(wv)
+    const inject = (): void => {
+      void wv.insertCSS(HIDE_DSH_SIDEBAR_CSS).catch(() => undefined)
+    }
+    wv.addEventListener('dom-ready', inject)
+    wv.addEventListener('did-navigate', inject)
+    inject()
+  }
+
   return (
     <div className="harness-view">
       {state.status === 'ready' && state.url ? (
-        <webview src={state.url} className="harness-webview" partition="persist:dsh" allowpopups />
+        <webview
+          ref={attachWebview}
+          src={state.url}
+          className="harness-webview"
+          partition="persist:dsh"
+          allowpopups={true as never}
+        />
       ) : (
         <div className="harness-placeholder">
           <div className="ai-placeholder-icon">🧩</div>

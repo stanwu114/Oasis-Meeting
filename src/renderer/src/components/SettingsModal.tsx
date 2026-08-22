@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useUiStore } from '../stores/uiStore'
 import { useHarnessStore } from '../stores/harnessStore'
-import { TRANSCRIBE_LANGUAGES, type HarnessSettings } from '../../../shared/ipc'
+import { TRANSCRIBE_LANGUAGES, type HarnessSettings, type HarnessSkill } from '../../../shared/ipc'
 
 const HARNESS_MODELS = ['deepseek-v4-pro', 'deepseek-v4-flash', 'deepseek-chat']
 const HARNESS_EFFORTS: { value: string; label: string }[] = [
@@ -24,11 +24,16 @@ export function SettingsModal() {
   const modelStatus = useUiStore((s) => s.modelStatus)
   const harnessState = useHarnessStore((s) => s.state)
   const [harnessSettings, setHarnessSettings] = useState<HarnessSettings | null>(null)
+  const [apiKeyState, setApiKeyState] = useState<{ hasKey: boolean; masked: string | null }>({ hasKey: false, masked: null })
+  const [apiKeyInput, setApiKeyInput] = useState('')
+  const [skills, setSkills] = useState<HarnessSkill[]>([])
 
   useEffect(() => {
     if (open) {
       void useUiStore.getState().initModel()
       void window.oasis.harness.getSettings().then(setHarnessSettings)
+      void window.oasis.harness.getApiKey().then(setApiKeyState)
+      void window.oasis.harness.listSkills().then(setSkills)
       void useHarnessStore.getState().init()
     }
   }, [open])
@@ -201,9 +206,100 @@ export function SettingsModal() {
             {harnessState.status === 'error' && harnessState.error ? (
               <div className="settings-error">{harnessState.error}</div>
             ) : null}
+            <div className="settings-row">
+              <span>API Key</span>
+              <span className="settings-value">
+                {apiKeyState.hasKey ? `已配置(${apiKeyState.masked})` : '未配置'}
+              </span>
+            </div>
+            <div className="settings-row">
+              <input
+                className="settings-input"
+                type="password"
+                placeholder={apiKeyState.hasKey ? '输入新 Key 覆盖' : 'sk-…'}
+                value={apiKeyInput}
+                onChange={(e) => setApiKeyInput(e.target.value)}
+              />
+              <button
+                type="button"
+                className="btn primary small"
+                disabled={!apiKeyInput.trim()}
+                onClick={() => {
+                  void window.oasis.harness.setApiKey(apiKeyInput.trim()).then((s) => {
+                    setApiKeyState(s)
+                    setApiKeyInput('')
+                    useUiStore.getState().showToast('API Key 已保存')
+                  })
+                }}
+              >
+                保存
+              </button>
+              {apiKeyState.hasKey ? (
+                <button
+                  type="button"
+                  className="btn danger-ghost small"
+                  onClick={() => {
+                    void window.oasis.harness.setApiKey(null).then((s) => {
+                      setApiKeyState(s)
+                      useUiStore.getState().showToast('已清除 API Key')
+                    })
+                  }}
+                >
+                  清除
+                </button>
+              ) : null}
+            </div>
+          </div>
+
+          <h3 style={{ marginTop: 16 }}>技能管理</h3>
+          <div className="settings-model">
+            <div className="settings-row">
+              <span>已安装技能</span>
+              <span className="settings-value muted">{skills.length} 个 · ~/.dsh/skills</span>
+            </div>
+            {skills.map((sk) => (
+              <div key={sk.id} className="skill-row">
+                <span className="skill-body">
+                  <span className="skill-name">{sk.name}</span>
+                  {sk.description ? <span className="skill-desc">{sk.description}</span> : null}
+                </span>
+                <button
+                  type="button"
+                  className="btn danger-ghost small"
+                  onClick={() => {
+                    void window.oasis.harness.deleteSkill(sk.id).then(() => {
+                      void window.oasis.harness.listSkills().then(setSkills)
+                      useUiStore.getState().showToast(`已删除技能 ${sk.name}`)
+                    })
+                  }}
+                >
+                  删除
+                </button>
+              </div>
+            ))}
+            {skills.length === 0 ? <div className="settings-value muted">暂无技能</div> : null}
+            <div className="settings-row" style={{ marginTop: 6 }}>
+              <button
+                type="button"
+                className="btn ghost small"
+                onClick={() => {
+                  void window.oasis.harness.installSkillFromDir().then((r) => {
+                    if (r) {
+                      void window.oasis.harness.listSkills().then(setSkills)
+                      useUiStore.getState().showToast(`已安装技能 ${r.name}`)
+                    }
+                  })
+                }}
+              >
+                📁 从文件夹安装
+              </button>
+              <button type="button" className="btn ghost small" onClick={() => void window.oasis.harness.revealSkillsDir()}>
+                ↗ 打开技能目录
+              </button>
+            </div>
           </div>
           <p className="settings-about" style={{ marginTop: 8 }}>
-            设置写入 ~/.dsh/settings.yaml,与 dsh 各界面共用;会话与凭据均在本机。
+            Harness 配置写入 ~/.dsh(settings.yaml / .credentials.yaml / skills/),与 dsh 各界面共用。
           </p>
         </section>
 

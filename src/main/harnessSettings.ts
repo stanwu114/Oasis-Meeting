@@ -1,10 +1,13 @@
 import { readFileSync, writeFileSync } from 'node:fs'
-import { join } from 'node:path'
+import { readdir, readFile, rm, cp, mkdir } from 'node:fs/promises'
+import { join, basename } from 'node:path'
 import { homedir } from 'node:os'
 
 /**
- * Harness 设置:读写 ~/.dsh/settings.yaml 的 agent-default-model 块
- * (provider/model/reasoningEffort),其余内容原样保留。
+ * Harness 设置:读写 ~/.dsh 的配置,统一收进应用设置面板。
+ * - settings.yaml 的 agent-default-model(默认模型/推理强度)
+ * - .credentials.yaml 的 DEEPSEEK_API_KEY
+ * - skills/ 目录的技能管理
  */
 
 export interface HarnessSettings {
@@ -13,11 +16,22 @@ export interface HarnessSettings {
   reasoningEffort: string
 }
 
-export const HARNESS_MODELS = ['deepseek-v4-pro', 'deepseek-v4-flash', 'deepseek-chat']
-export const HARNESS_EFFORTS = ['high', 'medium', 'low']
+export interface HarnessSkill {
+  id: string
+  name: string
+  description: string
+}
 
 function settingsPath(): string {
   return join(homedir(), '.dsh', 'settings.yaml')
+}
+
+function credentialsPath(): string {
+  return join(homedir(), '.dsh', '.credentials.yaml')
+}
+
+function skillsDir(): string {
+  return join(homedir(), '.dsh', 'skills')
 }
 
 export function getHarnessSettings(): HarnessSettings | null {
@@ -57,4 +71,107 @@ export function setHarnessSettings(patch: { model?: string; reasoningEffort?: st
   }
   writeFileSync(path, text, 'utf8')
   return next
+}
+
+/* ---------- API Key ---------- */
+
+export function getHarnessApiKey(): { hasKey: boolean; masked: string | null } {
+  try {
+    const text = readFileSync(credentialsPath(), 'utf8')
+    const key = /^\s*DEEPSEEK_API_KEY:\s*["']?([\w-]+)["']?\s*$/m.exec(text)?.[1]
+    if (!key) return { hasKey: false, masked: null }
+    return { hasKey: true, masked: `${key.slice(0, 5)}…${key.slice(-4)}` }
+  } catch {
+    return { hasKey: false, masked: null }
+  }
+}
+
+export function setHarnessApiKey(key: string | null): { hasKey: boolean; masked: string | null } {
+  const path = credentialsPath()
+  if (key === null) {
+    // 清除
+    try {
+      const text = readFileSync(path, 'utf8')
+      writeFileSync(path, text.replace(/^\s*DEEPSEEK_API_KEY:.*\n?/m, ''), 'utf8')
+    } catch {
+      /* 文件不存在即已清除 */
+    }
+    return { hasKey: false, masked: null }
+  }
+  const trimmed = key.trim()
+  if (!/^[\w-]{8,}$/.test(trimmed)) throw new Error('API Key 格式不正确')
+  let text = ''
+  try {
+    text = readFileSync(path, 'utf8')
+  } catch {
+    text = ''
+  }
+  const line = `DEEPSEEK_API_KEY: ${trimmed}\n`
+  if (/^\s*DEEPSEEK_API_KEY:.*$/m.test(text)) {
+    text = text.replace(/^\s*DEEPSEEK_API_KEY:.*$/m, line.trimEnd())
+  } else {
+    text = `${text.trimEnd()}\n${line}`
+  }
+  writeFileSync(path, text, 'utf8')
+  return { hasKey: true, masked: `${trimmed.slice(0, 5)}…${trimmed.slice(-4)}` }
+}
+
+/* ---------- 技能管理 ---------- */
+
+function parseSkillDoc(text: string): { name?: string; description?: string } {
+  const fm = /^---\n([\s\S]*?)\n---/.exec(text)?.[1] ?? ''
+  const name = /^name:\s*(.+)$/m.exec(fm)?.[1]?.trim()
+  const descMatch = /^description:\s*>-?\n((?:\s{2,}.*\n?)+)|^description:\s*(.+)$/m.exec(fm)
+  let description = ''
+  if (descMatch) {
+    description = (descMatch[1] ?? descMatch[2] ?? '')
+      .split('\n')
+      .map((l) => l.trim())
+      .join(' ')
+      .trim()
+  }
+  return { name, description }
+}
+
+export async function listHarnessSkills(): Promise<HarnessSkill[]> {
+  let dirs: string[]
+  try {
+    dirs = await readdir(skillsDir())
+  } catch {
+    return []
+  }
+  const skills: HarnessSkill[] = []
+  for (const d of dirs) {
+    try {
+      const text = await readFile(join(skillsDir(), d, 'SKILL.md'), 'utf8')
+      const doc = parseSkillDoc(text)
+      skills.push({
+        id: d,
+        name: doc.name ?? d,
+        description: (doc.description ?? '').slice(0, 120)
+      })
+    } catch {
+      /* 无 SKILL.md 的目录跳过 */
+    }
+  }
+  skills.sort((a, b) => a.name.localeCompare(b.name))
+  return skills
+}
+
+export async function deleteHarnessSkill(id: string): Promise<void> {
+  if (!/^[\w][\w.-]*$/.test(id)) throw new Error('非法的技能目录名')
+  await rm(join(skillsDir(), id), { recursive: true, force: true })
+}
+
+export async function installHarnessSkillFromDir(src: string): Promise<string> {
+  const name = basename(src)
+  if (!/^[\w][\w.-]*$/.test(name)) throw new Error('目录名不适合作为技能名')
+  await mkdir(skillsDir(), { recursive: true })
+  await rm(join(skillsDir(), name), { recursive: true, force: true })
+  await cp(src, join(skillsDir(), name), { recursive: true })
+  return name
+}
+
+export function harnessSkillsDir(): string {
+  return skillsDir()
 }

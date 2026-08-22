@@ -48,7 +48,14 @@ const api: OasisApi = {
     stop: () => ipcRenderer.invoke(IPC.harnessStop),
     status: () => ipcRenderer.invoke(IPC.harnessStatus),
     getSettings: () => ipcRenderer.invoke(IPC.harnessGetSettings),
-    setSettings: (patch) => ipcRenderer.invoke(IPC.harnessSetSettings, patch)
+    setSettings: (patch) => ipcRenderer.invoke(IPC.harnessSetSettings, patch),
+    sessions: () => ipcRenderer.invoke(IPC.harnessSessions),
+    getApiKey: () => ipcRenderer.invoke(IPC.harnessApiKeyGet),
+    setApiKey: (key) => ipcRenderer.invoke(IPC.harnessApiKeySet, key),
+    listSkills: () => ipcRenderer.invoke(IPC.harnessSkillsList),
+    deleteSkill: (id) => ipcRenderer.invoke(IPC.harnessSkillsDelete, id),
+    installSkillFromDir: () => ipcRenderer.invoke(IPC.harnessSkillsInstall),
+    revealSkillsDir: () => ipcRenderer.invoke(IPC.harnessSkillsReveal)
   },
   on: {
     recordingsChanged: (cb) => subscribe(IPC.evtRecordingsChanged, cb),

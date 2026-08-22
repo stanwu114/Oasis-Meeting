@@ -8,7 +8,17 @@ import { enqueueTranscription } from './transcriber'
 import { enqueueSummary } from './summarizer'
 import { chat, runEditorAction } from './llm'
 import { startHarness, stopHarness, getHarnessState } from './dshRunner'
-import { getHarnessSettings, setHarnessSettings } from './harnessSettings'
+import {
+  getHarnessSettings,
+  setHarnessSettings,
+  getHarnessApiKey,
+  setHarnessApiKey,
+  listHarnessSkills,
+  deleteHarnessSkill,
+  installHarnessSkillFromDir,
+  harnessSkillsDir
+} from './harnessSettings'
+import { listHarnessSessions } from './dshHistory'
 import { extractDocText } from '../shared/extract'
 
 /** 包装 handler:统一异常日志与向渲染进程抛错 */
@@ -115,6 +125,25 @@ export function registerIpc(): void {
   handle(IPC.harnessStatus, () => getHarnessState())
   handle(IPC.harnessGetSettings, () => getHarnessSettings())
   handle(IPC.harnessSetSettings, (patch: { model?: string; reasoningEffort?: string }) => setHarnessSettings(patch))
+  handle(IPC.harnessSessions, () => listHarnessSessions())
+  handle(IPC.harnessApiKeyGet, () => getHarnessApiKey())
+  handle(IPC.harnessApiKeySet, (key: string | null) => setHarnessApiKey(key))
+  handle(IPC.harnessSkillsList, () => listHarnessSkills())
+  handle(IPC.harnessSkillsDelete, (id: string) => {
+    void deleteHarnessSkill(id)
+  })
+  handle(IPC.harnessSkillsInstall, async (): Promise<{ name: string } | null> => {
+    const { canceled, filePaths } = await dialog.showOpenDialog({
+      title: '选择技能文件夹(需含 SKILL.md)',
+      properties: ['openDirectory']
+    })
+    if (canceled || filePaths.length === 0) return null
+    const name = await installHarnessSkillFromDir(filePaths[0])
+    return { name }
+  })
+  handle(IPC.harnessSkillsReveal, () => {
+    void shell.openPath(harnessSkillsDir())
+  })
 
   /* ---------- 搜索 ---------- */
   handle(IPC.searchQuery, (q: string) => db.searchPages(q.trim()))
