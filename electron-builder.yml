@@ -20,5 +20,6 @@ mac:
     - target: zip
       arch: [arm64]
   extendInfo:
+    NSLocationWhenInUseUsageDescription: 会议地点需要访问您的位置。所有定位均在本机完成,不会上传位置数据。
     NSMicrophoneUsageDescription: 录音转写需要访问您的麦克风。所有音频与转写均在本机完成,不会上传。
     NSHighResolutionCapable: true

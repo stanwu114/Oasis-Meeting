@@ -241,15 +241,67 @@ export default function MeetingPage({ pageId }: { pageId: string }) {
     })
   }, [pageId])
 
-  /* ---------- 自动定位 ---------- */
+  /* ---------- 自动定位:macOS CoreLocation(系统定位) + 反向地理编码 ---------- */
   useEffect(() => {
     if (meta.location) return
     let cancelled = false
-    void window.oasis.system.getCityLocation().then((loc) => {
+
+    // 1. 用系统定位获取经纬度(触发 macOS 定位权限弹窗)
+    const getCoords = (): Promise<{ lat: number; lng: number } | null> =>
+      new Promise((resolve) => {
+        if (!navigator.geolocation) {
+          resolve(null)
+          return
+        }
+        navigator.geolocation.getCurrentPosition(
+          (pos) => resolve({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
+          () => resolve(null), // 定位被拒绝或失败
+          { timeout: 8000, enableHighAccuracy: true }
+        )
+      })
+
+    // 2. 反向地理编码:经纬度 → 中文地址
+    const reverseGeocode = async (lat: number, lng: number): Promise<string> => {
+      try {
+        const res = await fetch(
+          `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lng}&localityLanguage=zh`,
+          { signal: AbortSignal.timeout(5000) }
+        )
+        const data = (await res.json()) as {
+          locality?: string
+          city?: string
+          principalSubdivision?: string
+          countryName?: string
+        }
+        const parts = [data.countryName, data.principalSubdivision, data.city || data.locality]
+          .filter((x, i, a) => x && a.indexOf(x) === i)
+        return parts.join(' ')
+      } catch {
+        return ''
+      }
+    }
+
+    // 3. 优先系统定位,失败则回退 IP 定位
+    void (async () => {
+      const coords = await getCoords()
+      if (cancelled) return
+
+      if (coords) {
+        const address = await reverseGeocode(coords.lat, coords.lng)
+        if (cancelled) return
+        if (address) {
+          updateMeta({ location: address })
+          return
+        }
+      }
+
+      // 回退:IP 粗定位
+      const loc = await window.oasis.system.getCityLocation()
       if (cancelled || !loc) return
       const place = [loc.country, loc.region, loc.city].filter((x, i, a) => x && a.indexOf(x) === i).join(' ')
       updateMeta({ location: place })
-    })
+    })()
+
     return () => { cancelled = true }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pageId])
