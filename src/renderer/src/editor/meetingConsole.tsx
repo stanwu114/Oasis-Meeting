@@ -290,7 +290,7 @@ function MeetingConsoleView({ block }: { block: { id: string; props: Record<stri
       } else {
         updateProps({ status: 'error' })
         setRecStatus('error')
-        setErrorMsg('转写失败')
+        setErrorMsg(transcript === '' ? '转写结果为空(可能录音太短或引擎出错)' : '转写失败')
       }
     } catch (e) {
       recorderRef.current?.cancel()
@@ -332,6 +332,7 @@ function MeetingConsoleView({ block }: { block: { id: string; props: Record<stri
       setActiveTab('transcript')
       const lang = localStorage.getItem('oasis.language') || 'auto'
       const transcript = await new Promise<string>((resolve) => {
+        let errorMsg = ''
         const unsub = window.oasis.on.recordingsChanged((r) => {
           if (r.id === recInfo.id && r.status === 'done') {
             unsub()
@@ -339,10 +340,13 @@ function MeetingConsoleView({ block }: { block: { id: string; props: Record<stri
           }
           if (r.id === recInfo.id && r.status === 'error') {
             unsub()
+            errorMsg = r.error || '未知错误'
             resolve('')
           }
         })
         void window.oasis.recordings.transcribe(recInfo.id, pcm, 16000, lang)
+        // 90 秒超时
+        setTimeout(() => { unsub(); resolve('') }, 90_000)
       })
 
       if (transcript) {
@@ -355,7 +359,7 @@ function MeetingConsoleView({ block }: { block: { id: string; props: Record<stri
       } else {
         updateProps({ status: 'error' })
         setRecStatus('error')
-        setErrorMsg('转写失败')
+        setErrorMsg(transcript === '' ? '转写结果为空(可能录音太短或引擎出错)' : '转写失败')
       }
     } catch (e) {
       setErrorMsg(e instanceof Error ? e.message : String(e))
