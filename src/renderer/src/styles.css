@@ -2755,3 +2755,15 @@ svg {
   min-width: 0;
   line-height: 1.75;
 }
+
+.console-stamp.clickable {
+  cursor: pointer;
+  transition: background 0.12s, color 0.12s;
+  border: none;
+  font: inherit;
+}
+
+.console-stamp.clickable:hover {
+  background: var(--accent-soft);
+  color: var(--accent);
+}

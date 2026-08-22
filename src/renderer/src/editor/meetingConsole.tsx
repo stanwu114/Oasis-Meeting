@@ -70,7 +70,7 @@ function WaveCanvas({ recorder, active }: { recorder: MicRecorder | null; active
 }
 
 /* ---------- 回放播放器(wavesurfer) ---------- */
-function PlaybackPlayer({ recordingId }: { recordingId: string }): React.ReactNode {
+function PlaybackPlayer({ recordingId, onReady }: { recordingId: string; onReady?: (ws: WaveSurfer) => void }): React.ReactNode {
   const containerRef = useRef<HTMLDivElement>(null)
   const wsRef = useRef<WaveSurfer | null>(null)
   const [playing, setPlaying] = useState(false)
@@ -101,6 +101,7 @@ function PlaybackPlayer({ recordingId }: { recordingId: string }): React.ReactNo
       ws.on('ready', () => {
         setReady(true)
         setDuration(ws.getDuration())
+        onReady?.(ws)
       })
       ws.on('timeupdate', (t: number) => setCurrent(t))
       ws.on('play', () => setPlaying(true))
@@ -142,6 +143,7 @@ function MeetingConsoleView({ block }: { block: { id: string; props: Record<stri
   const [notes, setNotes] = useState(block.props.notes || '')
   const [errorMsg, setErrorMsg] = useState('')
   const recorderRef = useRef<MicRecorder | null>(null)
+  const wsPlayRef = useRef<WaveSurfer | null>(null)
   const timerRef = useRef<number | null>(null)
   const notesTimer = useRef<number | null>(null)
 
@@ -173,6 +175,18 @@ function MeetingConsoleView({ block }: { block: { id: string; props: Record<stri
       clearInterval(timerRef.current)
       timerRef.current = null
     }
+  }
+
+  /* 点击时间戳跳转播放 */
+  const seekToStamp = (stamp: string): void => {
+    const ws = wsPlayRef.current
+    if (!ws) return
+    const parts = stamp.split(':').map(Number)
+    let seconds = 0
+    if (parts.length === 3) seconds = parts[0] * 3600 + parts[1] * 60 + parts[2]
+    else if (parts.length === 2) seconds = parts[0] * 60 + parts[1]
+    ws.setTime(seconds)
+    ws.play()
   }
 
   /* AI 总结:通过 IPC */
@@ -375,7 +389,7 @@ function MeetingConsoleView({ block }: { block: { id: string; props: Record<stri
       <div className="console-bar">
         {/* 已有录音:显示回放播放器 */}
         {recStatus === 'done' && block.props.recordingId ? (
-          <PlaybackPlayer recordingId={block.props.recordingId} />
+          <PlaybackPlayer recordingId={block.props.recordingId} onReady={(ws) => { wsPlayRef.current = ws }} />
         ) : null}
 
         <div className="console-controls">
@@ -465,7 +479,11 @@ function MeetingConsoleView({ block }: { block: { id: string; props: Record<stri
                   const text = m ? p.slice(m[0].length) : p
                   return (
                     <div key={i} className="console-para-row">
-                      {stamp ? <span className="console-stamp">{stamp}</span> : null}
+                      {stamp ? (
+                      <button type="button" className="console-stamp clickable" onClick={() => seekToStamp(stamp)} title="点击跳转播放">
+                        {stamp}
+                      </button>
+                    ) : null}
                       <span className="console-para-text">{text}</span>
                     </div>
                   )
