@@ -88,7 +88,7 @@ export default function App() {
 function EmptyState(): React.ReactNode {
   return (
     <div className="empty-state">
-      <div className="empty-wordmark">Oasis <span className="note">Notebook</span></div>
+      <div className="empty-wordmark">Oasis <span className="note">Meeting</span></div>
       <p>本地优先的会议记录空间 · 录音在本机转写,数据不出电脑</p>
       <div className="empty-actions">
         <button type="button" className="btn primary" onClick={() => void useAppStore.getState().createPage(null)}>

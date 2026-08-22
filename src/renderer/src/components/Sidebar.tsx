@@ -41,7 +41,7 @@ export function Sidebar() {
       <div className="sidebar-top" />
       <div className="sidebar-brand">
         <span className="brand-word">Oasis</span>
-        <span className="brand-sub">Notebook</span>
+        <span className="brand-sub">Meeting</span>
       </div>
 
       {/* 界面切换:Meeting ↔ Harness */}
