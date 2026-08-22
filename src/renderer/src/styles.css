@@ -282,7 +282,7 @@ kbd {
   border-right: 1px solid var(--border);
   display: flex;
   flex-direction: column;
-  padding: 52px 10px 10px;
+  padding: 50px 10px 10px;
   gap: 4px;
   user-select: none;
   position: relative;
@@ -1962,19 +1962,22 @@ kbd {
 }
 
 .brand-logo {
-  height: 34px;
+  height: 30px;
   width: auto;
   display: block;
-  border-radius: 5px;
+  border-radius: 4px;
 }
 
 .brand-sub {
-  font-size: 46px;
-  font-weight: 700;
+  font-family: 'OasisWordmark', 'Helvetica Neue', sans-serif;
+  font-style: italic;
+  font-weight: 900;
+  font-size: 24px;
   color: var(--fg);
-  margin-left: 3px;
-  letter-spacing: -0.03em;
+  margin-left: 6px;
+  letter-spacing: -0.015em;
   line-height: 1;
+  transform: translateY(1px);
 }
 
 .empty-wordmark {
@@ -2044,10 +2047,10 @@ svg {
 
 /* 侧栏品牌与模式切换 */
 .sidebar-brand {
-  gap: 8px;
-  color: var(--fg);
-  font-size: 13.5px;
-  letter-spacing: -0.01em;
+  display: flex;
+  align-items: center;
+  gap: 0;
+  padding: 6px 8px 10px;
 }
 
 .sidebar-brand svg {
