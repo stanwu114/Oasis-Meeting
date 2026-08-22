@@ -33,6 +33,7 @@ export const IPC = {
   systemCityLocation: 'system:city-location',
 
   aiMeetingName: 'ai:meeting-name',
+  meetingExport: 'meeting:export',
 
   aiEditorAction: 'ai:editor-action',
   aiSummarizePage: 'ai:summarize-page',
@@ -220,6 +221,16 @@ export interface OasisApi {
     summarizePage(pageId: string): Promise<string>
     /** 依据录音转写生成会议名称(≤10 字)与主题(一句话) */
     meetingName(transcript: string): Promise<{ name: string; topic: string }>
+    /** 导出 Meeting 为 Word 文档 */
+    exportMeeting(data: {
+      title: string
+      meetingName: string
+      time: string
+      location: string
+      topic: string
+      participants: string
+      summary: string
+    }): Promise<string | null>
   }
   harness: {
     start(): Promise<HarnessState>
@@ -277,6 +288,16 @@ export interface HarnessSkill {
 export interface HarnessApiKeyState {
   hasKey: boolean
   masked: string | null
+}
+
+export interface ExportMeetingData {
+  title: string
+  meetingName: string
+  time: string
+  location: string
+  topic: string
+  participants: string
+  summary: string
 }
 
 /** 录音转写支持的语言 */

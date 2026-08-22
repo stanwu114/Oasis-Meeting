@@ -30,7 +30,6 @@ export default function OasisEditor({ pageId }: { pageId: string }) {
   const theme = useUiStore((s) => s.theme)
   const recorderBusy = useRecorderStore((s) => s.phase !== 'idle')
   const [docEmpty, setDocEmpty] = useState(!(initialContent && initialContent.length > 0))
-  const [summarizing, setSummarizing] = useState(false)
 
   const editor = useCreateBlockNote({
     schema,
@@ -172,16 +171,30 @@ export default function OasisEditor({ pageId }: { pageId: string }) {
     }
   }
 
-  const summarizePage = async (): Promise<void> => {
-    if (summarizing) return
-    setSummarizing(true)
+
+  /* 导出 Meeting 为 Word */
+  const exportMeeting = async (): Promise<void> => {
+    const meta = editor.document.find((b) => b.type === 'meetingMeta') as
+      | { props: Record<string, string> }
+      | undefined
+    const console_ = editor.document.find((b) => b.type === 'meetingConsole') as
+      | { props: Record<string, string> }
+      | undefined
+    const props = meta?.props ?? {}
+    const cProps = console_?.props ?? {}
     try {
-      const summary = await window.oasis.ai.summarizePage(pageId)
-      if (insertSummaryAtDocStart(summary)) useUiStore.getState().showToast('已在本页顶部插入 AI 摘要')
+      const path = await window.oasis.ai.exportMeeting({
+        title: useAppStore.getState().currentTitle || '未命名会议',
+        meetingName: props.name || useAppStore.getState().currentTitle || '未命名会议',
+        time: props.time || '',
+        location: props.location || '',
+        topic: props.topic || '',
+        participants: props.participants || '',
+        summary: cProps.summary || ''
+      })
+      if (path) useUiStore.getState().showToast(`已导出到 ${path}`)
     } catch (e) {
-      useUiStore.getState().showToast(`总结失败:${e instanceof Error ? e.message : String(e)}`, 'error')
-    } finally {
-      setSummarizing(false)
+      useUiStore.getState().showToast(`导出失败:${e instanceof Error ? e.message : String(e)}`, 'error')
     }
   }
 
@@ -191,11 +204,10 @@ export default function OasisEditor({ pageId }: { pageId: string }) {
         <button
           type="button"
           className="page-ai-btn"
-          disabled={summarizing || docEmpty}
-          title="对本页内容生成 AI 摘要,插入到页首"
-          onClick={() => void summarizePage()}
+          title="将会议信息与 AI 纪要导出为 Word 文档"
+          onClick={() => void exportMeeting()}
         >
-          {summarizing ? <span className="spin" /> : <Icon name="zap" size={13} />} 总结本页
+          导出 Meeting
         </button>
       </div>
       <textarea

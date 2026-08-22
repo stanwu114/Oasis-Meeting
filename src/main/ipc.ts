@@ -20,6 +20,7 @@ import {
 } from './harnessSettings'
 import { listHarnessSessions } from './dshHistory'
 import { extractDocText } from '../shared/extract'
+import { exportMeetingToWord } from './exportMeeting'
 
 /** 包装 handler:统一异常日志与向渲染进程抛错 */
 function handle<T extends unknown[]>(channel: string, fn: (...args: T) => unknown): void {
@@ -84,6 +85,9 @@ export function registerIpc(): void {
   handle(IPC.modelsEnsure, () => ensureModelDownloaded())
 
   /* ---------- AI 编辑器动作 ---------- */
+  handle(IPC.meetingExport, async (data: import('../shared/ipc').ExportMeetingData) => {
+    return exportMeetingToWord(data)
+  })
   handle(IPC.aiMeetingName, (transcript: string) => meetingName(transcript))
   handle(
     IPC.aiEditorAction,

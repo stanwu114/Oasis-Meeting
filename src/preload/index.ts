@@ -43,7 +43,8 @@ const api: OasisApi = {
   ai: {
     editorAction: (action, text, question) => ipcRenderer.invoke(IPC.aiEditorAction, action, text, question),
     summarizePage: (pageId) => ipcRenderer.invoke(IPC.aiSummarizePage, pageId),
-    meetingName: (transcript) => ipcRenderer.invoke(IPC.aiMeetingName, transcript)
+    meetingName: (transcript) => ipcRenderer.invoke(IPC.aiMeetingName, transcript),
+    exportMeeting: (data) => ipcRenderer.invoke(IPC.meetingExport, data)
   },
   harness: {
     start: () => ipcRenderer.invoke(IPC.harnessStart),
