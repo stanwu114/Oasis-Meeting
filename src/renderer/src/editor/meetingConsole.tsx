@@ -238,8 +238,63 @@ function MeetingConsoleView({ block }: { block: { id: string; props: Record<stri
     }
   }, [])
 
+  /* 导入音频文件 → 走同一管线 */
+  const importAudio = async (): Promise<void> => {
+    setRecStatus('transcribing')
+    try {
+      const imported = await window.oasis.system.importAudioFile()
+      if (!imported) {
+        setRecStatus('idle')
+        return
+      }
+      const blob = new Blob([imported.buffer], { type: imported.mimeType })
+      const { pcm, durationMs } = await decodeToPcm16kMono(blob)
+      const recInfo = await window.oasis.recordings.save({
+        pageId: block.props.pageId || '',
+        mimeType: imported.mimeType,
+        durationMs,
+        buffer: imported.buffer
+      })
+      updateProps({ status: 'transcribing', durationMs: String(durationMs), recordingId: recInfo.id })
+
+      // 转写
+      setActiveTab('transcript')
+      const lang = localStorage.getItem('oasis.language') || 'auto'
+      const transcript = await new Promise<string>((resolve) => {
+        const unsub = window.oasis.on.recordingsChanged((r) => {
+          if (r.id === recInfo.id && r.status === 'done') {
+            unsub()
+            resolve(r.transcript || '')
+          }
+          if (r.id === recInfo.id && r.status === 'error') {
+            unsub()
+            resolve('')
+          }
+        })
+        void window.oasis.recordings.transcribe(recInfo.id, pcm, 16000, lang)
+      })
+
+      if (transcript) {
+        updateProps({ transcript, status: 'summarizing' })
+        setRecStatus('summarizing')
+        const summary = await summarizeViaIpc(recInfo.id)
+        updateProps({ summary, status: 'done' })
+        setRecStatus('done')
+        setActiveTab('summary')
+      } else {
+        updateProps({ status: 'error' })
+        setRecStatus('error')
+        setErrorMsg('转写失败')
+      }
+    } catch (e) {
+      setErrorMsg(e instanceof Error ? e.message : String(e))
+      setRecStatus('error')
+    }
+  }
+
   const isRecording = recStatus === 'recording' || recStatus === 'paused'
   const busy = recStatus === 'transcribing' || recStatus === 'summarizing'
+  const hasResult = !!(block.props.transcript || block.props.summary)
 
   return (
     <div className="meeting-console">
@@ -247,9 +302,14 @@ function MeetingConsoleView({ block }: { block: { id: string; props: Record<stri
       <div className="console-bar">
         <div className="console-controls">
           {recStatus === 'idle' || recStatus === 'done' || recStatus === 'error' ? (
-            <button type="button" className="console-btn start" onClick={() => void startRec()}>
-              <Icon name="mic" size={16} /> 开始录音
-            </button>
+            <>
+              <button type="button" className="console-btn start" onClick={() => void startRec()}>
+                <Icon name="mic" size={16} /> 开始录音
+              </button>
+              <button type="button" className="console-btn ghost" onClick={() => void importAudio()} title="导入音频文件(mp3/m4a/wav 等),自动转写并生成纪要">
+                <Icon name="upload" size={14} /> 导入音频
+              </button>
+            </>
           ) : null}
           {isRecording ? (
             <>
@@ -276,9 +336,9 @@ function MeetingConsoleView({ block }: { block: { id: string; props: Record<stri
         ) : null}
       </div>
 
-      {/* ─── 三标签页 ─── */}
+      {/* ─── 标签页(录音前仅笔记;有结果后显示三标签) ─── */}
       <div className="console-tabs">
-        {TAB_LABELS.map((t) => (
+        {(hasResult ? TAB_LABELS : TAB_LABELS.filter((t) => t.key === 'notes')).map((t) => (
           <button
             key={t.key}
             type="button"

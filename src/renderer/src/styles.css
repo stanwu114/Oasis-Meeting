@@ -2434,3 +2434,13 @@ svg {
   color: var(--fg-faint);
   font-size: 13.5px;
 }
+
+.console-btn.ghost {
+  background: var(--bg-active);
+  color: var(--fg-muted);
+}
+
+.console-btn.ghost:hover {
+  background: var(--bg-hover);
+  color: var(--fg);
+}
