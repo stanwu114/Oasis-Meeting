@@ -53,7 +53,7 @@ function WaveCanvas({ recorder, active }: { recorder: MicRecorder | null; active
           const spacing = w / barCount
           const barW = Math.max(2, Math.min(5, spacing * 0.7))
           for (let i = 0; i < view.length; i++) {
-            const v = Math.max(0.06, Math.min(1, view[i]))
+            const v = Math.max(0.06, Math.min(1, view[view.length - 1 - i]))
             const barH = v * h * 0.95
             const x = w - (i + 1) * spacing + (spacing - barW) / 2
             ctx.fillRect(x, (h - barH) / 2, barW, barH)
