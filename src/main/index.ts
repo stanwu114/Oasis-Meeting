@@ -105,7 +105,7 @@ function sendAction(action: string): void {
 app.whenReady().then(() => {
   // 允许渲染进程使用系统定位(Geolocation API)
   const { session } = require('electron')
-  session.defaultSession.setPermissionRequestHandler((_wc, permission, callback) => {
+  session.defaultSession.setPermissionRequestHandler((_wc: Electron.WebContents, permission: string, callback: (allowed: boolean) => void) => {
     if (permission === 'geolocation') {
       callback(true) // 允许定位,macOS 会弹系统权限框
     } else {
