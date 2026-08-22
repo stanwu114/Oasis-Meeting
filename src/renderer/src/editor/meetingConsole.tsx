@@ -142,6 +142,7 @@ function MeetingConsoleView({ block }: { block: { id: string; props: Record<stri
   const [elapsed, setElapsed] = useState(0)
   const [notes, setNotes] = useState(block.props.notes || '')
   const [errorMsg, setErrorMsg] = useState('')
+  const [searchQuery, setSearchQuery] = useState('')
   const recorderRef = useRef<MicRecorder | null>(null)
   const wsPlayRef = useRef<WaveSurfer | null>(null)
   const timerRef = useRef<number | null>(null)
@@ -379,6 +380,22 @@ function MeetingConsoleView({ block }: { block: { id: string; props: Record<stri
     }
   }
 
+  /* 转写稿搜索过滤 */
+  const transcriptMatches = (() => {
+    if (!block.props.transcript) return []
+    const q = searchQuery.trim().toLowerCase()
+    return block.props.transcript.split(/\n{2,}/)
+      .map((p) => {
+        const m = /^\[(\d{1,2}:\d{2}(?::\d{2})?)\]\s*/.exec(p)
+        return {
+          stamp: m ? m[1] : '',
+          text: m ? p.slice(m[0].length) : p,
+          highlight: !!q && (m ? p.slice(m[0].length) : p).toLowerCase().includes(q)
+        }
+      })
+      .filter((item) => !q || item.highlight)
+  })()
+
   const isRecording = recStatus === 'recording' || recStatus === 'paused'
   const busy = recStatus === 'importing' || recStatus === 'transcribing' || recStatus === 'summarizing'
   const hasResult = !!(block.props.transcript || block.props.summary)
@@ -471,26 +488,48 @@ function MeetingConsoleView({ block }: { block: { id: string; props: Record<stri
           </div>
         ) : null}
         {activeTab === 'transcript' ? (
+          <>
+          <div className="console-search">
+            <Icon name="search" size={14} />
+            <input
+              className="console-search-input"
+              type="text"
+              placeholder="搜索关键字…"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+            {searchQuery ? (
+              <span className="console-search-count">
+                {transcriptMatches.length} 处匹配
+              </span>
+            ) : null}
+          </div>
           <div className="console-text">
             {block.props.transcript
-              ? block.props.transcript.split(/\n{2,}/).map((p, i) => {
-                  const m = /^\[(\d{1,2}:\d{2}(?::\d{2})?)\]\s*/.exec(p)
-                  const stamp = m ? m[1] : ''
-                  const text = m ? p.slice(m[0].length) : p
-                  return (
-                    <div key={i} className="console-para-row">
-                      {stamp ? (
+              ? transcriptMatches.map(({ stamp, text, highlight }, i) => (
+                  <div key={i} className="console-para-row">
+                    {stamp ? (
                       <button type="button" className="console-stamp clickable" onClick={() => seekToStamp(stamp)} title="点击跳转播放">
                         {stamp}
                       </button>
                     ) : null}
-                      <span className="console-para-text">{text}</span>
+                      <span
+                      className="console-para-text"
+                      dangerouslySetInnerHTML={{
+                        __html: highlight
+                          ? text.replace(
+                              new RegExp(`(${searchQuery.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi'),
+                              '<mark class="console-highlight">$1</mark>'
+                            )
+                          : text
+                      }}
+                    />
                     </div>
-                  )
-                })
+                  ))
               : busy ? <div className="console-loading"><div className="shimmer-line" style={{ width: '80%' }} /><div className="shimmer-line" style={{ width: '60%' }} /><div className="shimmer-line" style={{ width: '40%' }} /></div>
               : <span className="console-empty">录音完成后转写文稿会显示在这里</span>}
           </div>
+          </>
         ) : null}
         {activeTab === 'summary' ? (
           <div className="console-text">

@@ -2767,3 +2767,50 @@ svg {
   background: var(--accent-soft);
   color: var(--accent);
 }
+
+/* 转写稿搜索栏 */
+.console-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  background: var(--bg-subtle);
+  margin-bottom: 14px;
+}
+
+.console-search svg {
+  color: var(--fg-faint);
+  flex-shrink: 0;
+}
+
+.console-search-input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: var(--fg);
+  font: inherit;
+  font-size: 13.5px;
+}
+
+.console-search-input::placeholder {
+  color: var(--fg-faint);
+}
+
+.console-search-count {
+  font-size: 12px;
+  color: var(--accent);
+  flex-shrink: 0;
+  font-weight: 500;
+}
+
+/* 搜索高亮 */
+.console-highlight {
+  background: var(--accent-soft);
+  color: var(--accent);
+  border-radius: 3px;
+  padding: 0 2px;
+}
