@@ -40,7 +40,7 @@ export function Sidebar() {
     <aside className="sidebar">
       <div className="sidebar-top" />
       <div className="sidebar-brand">
-        <span className="brand-word">IcyS</span>
+        <span className="brand-word">Oasis</span>
         <span className="brand-sub">Notebook</span>
       </div>
 
