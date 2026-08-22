@@ -6,7 +6,7 @@ import fixWebmDuration from 'fix-webm-duration'
 import WaveSurfer from 'wavesurfer.js'
 import { useAppStore } from '../stores/appStore'
 import { useUiStore } from '../stores/uiStore'
-import { beijingStamp } from '../../shared/ipc'
+import { beijingStamp } from '../../../shared/ipc'
 
 /**
  * Meeting 页面:纯表单结构(无 BlockNote)
@@ -188,7 +188,6 @@ function PlaybackPlayer({ recordingId, onReady }: { recordingId: string; onReady
 /* ---------- 主组件 ---------- */
 export default function MeetingPage({ pageId }: { pageId: string }) {
   const title = useAppStore((s) => s.currentTitle)
-  const theme = useUiStore((s) => s.theme)
 
   const [meta, setMeta] = useState<MetaData>(emptyMeta)
   const [consoleData, setConsoleData] = useState<ConsoleData>(emptyConsole)

@@ -125,7 +125,7 @@ export const useAppStore = create<AppState>((set, get) => ({
       await api.pages.updateContent(detail.id, {
         meta: { name: '', location: '', topic: '', time: stamp, participants: '' },
         console: { notes: '', transcript: '', summary: '', status: 'idle', recordingId: '', durationMs: 0, activeTab: 'notes' }
-      })
+      } as never)
     }
     await get().refresh()
     if (parentId) set((s) => ({ expanded: { ...s.expanded, [parentId]: true } }))
