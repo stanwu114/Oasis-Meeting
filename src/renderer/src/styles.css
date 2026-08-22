@@ -1967,7 +1967,7 @@ kbd {
 
 .brand-sub {
   font-family: 'OasisWordmark', 'Helvetica Neue', sans-serif;
-  font-style: italic;
+  font-style: normal;
   font-weight: 900;
   font-size: 24px;
   color: var(--fg);
