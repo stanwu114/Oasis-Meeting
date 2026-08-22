@@ -1,9 +1,12 @@
 import { useEffect } from 'react'
 import { setHarnessWebview, useHarnessStore } from '../stores/harnessStore'
 
-/** 隐藏 dsh 自带的会话侧栏与拖拽手柄 */
-const HIDE_DSH_SIDEBAR_CSS =
-  '[class*="sidebarCol"] { display: none !important; } [class*="_handle"] { display: none !important; }'
+/** 隐藏 dsh 自带的会话侧栏、详情栏与拖拽手柄——只保留会话主界面 */
+const HIDE_DSH_SIDEBAR_CSS = `
+[class*="sidebarCol"] { display: none !important; }
+[class*="detailsCol"] { display: none !important; }
+[class*="_handle"] { display: none !important; }
+`
 
 interface WebviewTagLike extends HTMLElement {
   executeJavaScript(code: string): Promise<unknown>
