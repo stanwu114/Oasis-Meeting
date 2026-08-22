@@ -92,14 +92,21 @@ export default function OasisEditor({ pageId }: { pageId: string }) {
     })
   }, [editor])
 
-  /* 标题防抖改名 */
+  /* 标题防抖改名:输入过程允许为空,失焦时才兜底为「无标题」 */
   const titleTimer = useRef<number | null>(null)
   const onTitleInput = (value: string): void => {
     useAppStore.getState().setCurrentTitleLocal(value)
     if (titleTimer.current) window.clearTimeout(titleTimer.current)
     titleTimer.current = window.setTimeout(() => {
-      void useAppStore.getState().renamePage(pageId, value.trim() || '无标题')
+      void useAppStore.getState().renamePage(pageId, value.trim())
     }, 500)
+  }
+  const onTitleBlur = (): void => {
+    if (titleTimer.current) window.clearTimeout(titleTimer.current)
+    if (!useAppStore.getState().currentTitle.trim()) {
+      useAppStore.getState().setCurrentTitleLocal('无标题')
+      void useAppStore.getState().renamePage(pageId, '无标题')
+    }
   }
 
   const summarizePage = async (): Promise<void> => {
@@ -134,6 +141,7 @@ export default function OasisEditor({ pageId }: { pageId: string }) {
         placeholder="无标题"
         rows={1}
         onChange={(e) => onTitleInput(e.target.value)}
+        onBlur={onTitleBlur}
         onKeyDown={(e) => {
           if (e.key === 'Enter') {
             e.preventDefault()
