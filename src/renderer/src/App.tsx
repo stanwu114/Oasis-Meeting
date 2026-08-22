@@ -9,6 +9,7 @@ import { AiSelectionBar } from './components/AiSelectionBar'
 import { BrandMark } from './components/BrandMark'
 import { HarnessView } from './components/HarnessView'
 import OasisEditor from './editor/OasisEditor'
+import { ProjectView } from './components/ProjectView'
 import { useAppStore } from './stores/appStore'
 import { useUiStore } from './stores/uiStore'
 import { useRecordingsStore } from './stores/recordingsStore'
@@ -17,6 +18,7 @@ import { useRecorderStore } from './stores/recorderStore'
 export default function App() {
   const view = useUiStore((s) => s.view)
   const currentId = useAppStore((s) => s.currentId)
+  const currentIcon = useAppStore((s) => s.currentIcon)
   const loaded = useAppStore((s) => s.loaded)
   const toast = useUiStore((s) => s.toast)
   const toastKind = useUiStore((s) => s.toastKind)
@@ -70,6 +72,8 @@ export default function App() {
           <RecordingsView />
         ) : view === 'harness' ? (
           <HarnessView />
+        ) : loaded && currentId && currentIcon === 'project' ? (
+          <ProjectView key={currentId} pageId={currentId} />
         ) : loaded && currentId ? (
           <OasisEditor key={currentId} pageId={currentId} />
         ) : (
