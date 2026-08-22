@@ -90,13 +90,13 @@ function EmptyState(): React.ReactNode {
     <div className="empty-state">
       <div className="empty-logo">🏝</div>
       <h1>Notion Oasis</h1>
-      <p>本地优先的笔记空间 · 录音在本机转写,数据不出电脑</p>
+      <p>本地优先的会议记录空间 · 录音在本机转写,数据不出电脑</p>
       <div className="empty-actions">
         <button type="button" className="btn primary" onClick={() => void useAppStore.getState().createPage(null)}>
-          ＋ 新建笔记
+          ＋ 新建 Meeting
         </button>
         <button type="button" className="btn ghost" onClick={() => void useRecorderStore.getState().start()}>
-          🎙 快速录音(自动建笔记)
+          🎙 快速录音(自动建 Meeting)
         </button>
       </div>
     </div>

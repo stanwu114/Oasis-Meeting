@@ -54,7 +54,7 @@ export function Sidebar() {
             if (id) void useAppStore.getState().openPage(id)
           }}
         >
-          🏝 笔记
+          🏝 Meeting
         </button>
         <button
           type="button"
@@ -123,7 +123,7 @@ export function Sidebar() {
               disabled={recording}
               onClick={() => void useAppStore.getState().createPage(null)}
             >
-              ＋ 新建笔记
+              ＋ 新建 Meeting
             </button>
           </div>
 
@@ -137,7 +137,7 @@ export function Sidebar() {
                 if (id) void useAppStore.getState().openPage(id)
               }}
             >
-              📝 笔记
+              📝 Meeting
             </button>
             <button
               type="button"
