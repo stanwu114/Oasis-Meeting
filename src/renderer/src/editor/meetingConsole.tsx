@@ -14,7 +14,7 @@ import { useAppStore } from '../stores/appStore'
  */
 
 type Tab = 'notes' | 'transcript' | 'summary'
-type RecStatus = 'idle' | 'recording' | 'paused' | 'transcribing' | 'summarizing' | 'done' | 'error'
+type RecStatus = 'idle' | 'recording' | 'paused' | 'importing' | 'transcribing' | 'summarizing' | 'done' | 'error'
 
 const TAB_LABELS: { key: Tab; label: string }[] = [
   { key: 'notes', label: '会议笔记' },
@@ -241,13 +241,14 @@ function MeetingConsoleView({ block }: { block: { id: string; props: Record<stri
 
   /* 导入音频文件 → 走同一管线 */
   const importAudio = async (): Promise<void> => {
-    setRecStatus('transcribing')
+    setRecStatus('importing')
     try {
       const imported = await window.oasis.system.importAudioFile()
       if (!imported) {
         setRecStatus('idle')
         return
       }
+      setRecStatus('transcribing')
       const blob = new Blob([imported.buffer], { type: imported.mimeType })
       const { pcm, durationMs } = await decodeToPcm16kMono(blob)
       const recInfo = await window.oasis.recordings.save({
@@ -294,7 +295,7 @@ function MeetingConsoleView({ block }: { block: { id: string; props: Record<stri
   }
 
   const isRecording = recStatus === 'recording' || recStatus === 'paused'
-  const busy = recStatus === 'transcribing' || recStatus === 'summarizing'
+  const busy = recStatus === 'importing' || recStatus === 'transcribing' || recStatus === 'summarizing'
   const hasResult = !!(block.props.transcript || block.props.summary)
 
   return (
@@ -324,7 +325,7 @@ function MeetingConsoleView({ block }: { block: { id: string; props: Record<stri
           ) : null}
           {busy ? (
             <span className="console-status">
-              <span className="spin" /> {recStatus === 'transcribing' ? '转写中…' : '生成纪要…'}
+              <span className="spin" /> {recStatus === 'importing' ? '正在打开本地文件…' : recStatus === 'transcribing' ? '转写中…' : '生成纪要…'}
             </span>
           ) : null}
           {recStatus === 'error' ? <span className="console-error">{errorMsg}</span> : null}
