@@ -1,6 +1,14 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useUiStore } from '../stores/uiStore'
-import { TRANSCRIBE_LANGUAGES } from '../../../shared/ipc'
+import { useHarnessStore } from '../stores/harnessStore'
+import { TRANSCRIBE_LANGUAGES, type HarnessSettings } from '../../../shared/ipc'
+
+const HARNESS_MODELS = ['deepseek-v4-pro', 'deepseek-v4-flash', 'deepseek-chat']
+const HARNESS_EFFORTS: { value: string; label: string }[] = [
+  { value: 'high', label: '高(最强推理)' },
+  { value: 'medium', label: '中(均衡)' },
+  { value: 'low', label: '低(最快)' }
+]
 
 function formatBytes(bytes: number): string {
   if (bytes >= 1024 * 1024 * 1024) return `${(bytes / 1024 / 1024 / 1024).toFixed(2)} GB`
@@ -14,9 +22,15 @@ export function SettingsModal() {
   const theme = useUiStore((s) => s.theme)
   const language = useUiStore((s) => s.language)
   const modelStatus = useUiStore((s) => s.modelStatus)
+  const harnessState = useHarnessStore((s) => s.state)
+  const [harnessSettings, setHarnessSettings] = useState<HarnessSettings | null>(null)
 
   useEffect(() => {
-    if (open) void useUiStore.getState().initModel()
+    if (open) {
+      void useUiStore.getState().initModel()
+      void window.oasis.harness.getSettings().then(setHarnessSettings)
+      void useHarnessStore.getState().init()
+    }
   }, [open])
 
   if (!open) return null
@@ -116,6 +130,81 @@ export function SettingsModal() {
               </button>
             ) : null}
           </div>
+        </section>
+
+        <section className="settings-section">
+          <h3>Harness(智能体)</h3>
+          <div className="settings-model">
+            <div className="settings-row">
+              <span>运行状态</span>
+              <span className="settings-value">
+                {harnessState.status === 'ready'
+                  ? '✅ 运行中'
+                  : harnessState.status === 'starting'
+                    ? '启动中…'
+                    : harnessState.status === 'error'
+                      ? '❌ 启动失败'
+                      : harnessState.status === 'unavailable'
+                        ? '未找到 dsh 检出'
+                        : '未运行'}
+              </span>
+            </div>
+            <div className="settings-row">
+              <span>服务</span>
+              <span className="settings-value">
+                {harnessState.status === 'ready' || harnessState.status === 'starting' ? (
+                  <button type="button" className="btn ghost small" onClick={() => void useHarnessStore.getState().stop()}>
+                    ⏹ 停止
+                  </button>
+                ) : (
+                  <button type="button" className="btn primary small" onClick={() => void useHarnessStore.getState().start()}>
+                    ▶ 启动
+                  </button>
+                )}
+              </span>
+            </div>
+            <div className="settings-row">
+              <span>默认模型</span>
+              <select
+                className="settings-select"
+                value={harnessSettings?.model ?? ''}
+                onChange={(e) => {
+                  void window.oasis.harness.setSettings({ model: e.target.value }).then(setHarnessSettings)
+                }}
+              >
+                {(harnessSettings && !HARNESS_MODELS.includes(harnessSettings.model)
+                  ? [harnessSettings.model, ...HARNESS_MODELS]
+                  : HARNESS_MODELS
+                ).map((m) => (
+                  <option key={m} value={m}>
+                    {m}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="settings-row">
+              <span>推理强度</span>
+              <select
+                className="settings-select"
+                value={harnessSettings?.reasoningEffort ?? 'high'}
+                onChange={(e) => {
+                  void window.oasis.harness.setSettings({ reasoningEffort: e.target.value }).then(setHarnessSettings)
+                }}
+              >
+                {HARNESS_EFFORTS.map((x) => (
+                  <option key={x.value} value={x.value}>
+                    {x.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+            {harnessState.status === 'error' && harnessState.error ? (
+              <div className="settings-error">{harnessState.error}</div>
+            ) : null}
+          </div>
+          <p className="settings-about" style={{ marginTop: 8 }}>
+            设置写入 ~/.dsh/settings.yaml,与 dsh 各界面共用;会话与凭据均在本机。
+          </p>
         </section>
 
         <section className="settings-section">

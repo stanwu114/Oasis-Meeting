@@ -47,7 +47,8 @@ const api: OasisApi = {
     start: () => ipcRenderer.invoke(IPC.harnessStart),
     stop: () => ipcRenderer.invoke(IPC.harnessStop),
     status: () => ipcRenderer.invoke(IPC.harnessStatus),
-    sessions: () => ipcRenderer.invoke(IPC.harnessSessions)
+    getSettings: () => ipcRenderer.invoke(IPC.harnessGetSettings),
+    setSettings: (patch) => ipcRenderer.invoke(IPC.harnessSetSettings, patch)
   },
   on: {
     recordingsChanged: (cb) => subscribe(IPC.evtRecordingsChanged, cb),

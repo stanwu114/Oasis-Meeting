@@ -37,7 +37,8 @@ export const IPC = {
   harnessStart: 'harness:start',
   harnessStop: 'harness:stop',
   harnessStatus: 'harness:status',
-  harnessSessions: 'harness:sessions',
+  harnessGetSettings: 'harness:get-settings',
+  harnessSetSettings: 'harness:set-settings',
 
   evtRecordingsChanged: 'evt:recordings-changed',
   evtModelProgress: 'evt:model-progress',
@@ -196,8 +197,8 @@ export interface OasisApi {
     start(): Promise<HarnessState>
     stop(): Promise<void>
     status(): Promise<HarnessState>
-    /** 读取 ~/.dsh 里的历史会话列表 */
-    sessions(): Promise<HarnessSession[]>
+    getSettings(): Promise<HarnessSettings | null>
+    setSettings(patch: { model?: string; reasoningEffort?: string }): Promise<HarnessSettings>
   }
   on: {
     recordingsChanged(cb: (r: RecordingInfo) => void): () => void
@@ -214,12 +215,11 @@ export interface HarnessState {
   error: string | null
 }
 
-/** dsh 历史会话条目 */
-export interface HarnessSession {
-  id: string
-  title: string
-  timeMs: number
-  workspace: string
+/** Harness 设置(~/.dsh/settings.yaml 的 agent-default-model) */
+export interface HarnessSettings {
+  provider: string
+  model: string
+  reasoningEffort: string
 }
 
 /** 录音转写支持的语言 */

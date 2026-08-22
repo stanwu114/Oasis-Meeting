@@ -8,7 +8,7 @@ import { enqueueTranscription } from './transcriber'
 import { enqueueSummary } from './summarizer'
 import { chat, runEditorAction } from './llm'
 import { startHarness, stopHarness, getHarnessState } from './dshRunner'
-import { listHarnessSessions } from './dshHistory'
+import { getHarnessSettings, setHarnessSettings } from './harnessSettings'
 import { extractDocText } from '../shared/extract'
 
 /** 包装 handler:统一异常日志与向渲染进程抛错 */
@@ -113,7 +113,8 @@ export function registerIpc(): void {
     stopHarness()
   })
   handle(IPC.harnessStatus, () => getHarnessState())
-  handle(IPC.harnessSessions, () => listHarnessSessions())
+  handle(IPC.harnessGetSettings, () => getHarnessSettings())
+  handle(IPC.harnessSetSettings, (patch: { model?: string; reasoningEffort?: string }) => setHarnessSettings(patch))
 
   /* ---------- 搜索 ---------- */
   handle(IPC.searchQuery, (q: string) => db.searchPages(q.trim()))
