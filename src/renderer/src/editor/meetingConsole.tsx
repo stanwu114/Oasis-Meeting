@@ -46,16 +46,15 @@ function WaveCanvas({ recorder, active }: { recorder: MicRecorder | null; active
           ctx.clearRect(0, 0, w, h)
           const style = getComputedStyle(document.documentElement)
           ctx.fillStyle = style.getPropertyValue('--accent').trim() || '#b45306'
-          // 自适应柱宽:柱子始终铺满整条宽度(从计时器旁到右边缘)
-          const count = Math.max(2, Math.floor(w / 3))
+          const barW = 4
+          const gap = 2
+          const count = Math.max(1, Math.floor(w / (barW + gap)))
           const view = levels.slice(-count)
-          const barCount = Math.max(2, view.length)
-          const spacing = w / barCount
-          const barW = Math.max(2, Math.min(5, spacing * 0.7))
           for (let i = 0; i < view.length; i++) {
-            const v = Math.max(0.06, Math.min(1, view[view.length - 1 - i]))
+            // 固定柱宽,右对齐:最新在右边缘,旧的往左推;刚开始空白就空白
+            const v = Math.max(0.04, Math.min(1, view[view.length - 1 - i]))
             const barH = v * h * 0.95
-            const x = w - (i + 1) * spacing + (spacing - barW) / 2
+            const x = w - (i + 1) * (barW + gap)
             ctx.fillRect(x, (h - barH) / 2, barW, barH)
           }
         }
