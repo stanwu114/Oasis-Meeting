@@ -11,6 +11,7 @@ import { useRecordingsStore } from '../stores/recordingsStore'
 import { useUiStore } from '../stores/uiStore'
 import { beijingStamp } from '../../../shared/ipc'
 import { useRecorderStore } from '../stores/recorderStore'
+import { Icon } from '../components/Icon'
 import { importAudioAndTranscribe } from '../audio/pipeline'
 
 export const schema = BlockNoteSchema.create({
@@ -192,7 +193,7 @@ export default function OasisEditor({ pageId }: { pageId: string }) {
           title="对本页内容生成 AI 摘要,插入到页首"
           onClick={() => void summarizePage()}
         >
-          {summarizing ? <span className="spin" /> : '⚡'} 总结本页
+          {summarizing ? <span className="spin" /> : <Icon name="zap" size={13} />} 总结本页
         </button>
       </div>
       <textarea
@@ -212,10 +213,10 @@ export default function OasisEditor({ pageId }: { pageId: string }) {
       {docEmpty ? (
         <div className="empty-doc-hints">
           <button type="button" className="hint-chip record" disabled={recorderBusy} onClick={() => void useRecorderStore.getState().start()}>
-            🎙 开始录音转写
+            <Icon name="mic" size={15} /> 开始录音转写
           </button>
           <button type="button" className="hint-chip" disabled={recorderBusy} onClick={() => void importAudioAndTranscribe()}>
-            ⬆ 导入音频转写
+            <Icon name="upload" size={15} /> 导入音频转写
           </button>
           <span className="hint-text">输入 / 查看全部块类型</span>
         </div>
@@ -230,7 +231,7 @@ export default function OasisEditor({ pageId }: { pageId: string }) {
           title="在当前笔记中录音转写"
           onClick={() => void useRecorderStore.getState().start()}
         >
-          🎙
+          <Icon name="mic" size={21} />
         </button>
       ) : null}
     </div>
@@ -242,7 +243,7 @@ const recordSlashItem = {
   subtext: '录制一段音频,停止后本地转写',
   aliases: ['录音', '转写', 'record', 'audio', 'meeting', '会议'],
   group: 'Media' as const,
-  icon: <span style={{ fontSize: 17 }}>🎙</span>,
+  icon: <Icon name="mic" size={16} />,
   onItemClick: () => void useRecorderStore.getState().start()
 }
 
@@ -251,6 +252,6 @@ const importSlashItem = {
   subtext: '选择本地音频文件,本地转写',
   aliases: ['导入', '音频', 'import', 'mp3', 'wav'],
   group: 'Media' as const,
-  icon: <span style={{ fontSize: 17 }}>⬆</span>,
+  icon: <Icon name="upload" size={16} />,
   onItemClick: () => void importAudioAndTranscribe()
 }

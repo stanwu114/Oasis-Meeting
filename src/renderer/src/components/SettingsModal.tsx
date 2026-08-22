@@ -131,7 +131,7 @@ export function SettingsModal() {
                   void window.oasis.models.ensure()
                 }}
               >
-                ⬇ 下载模型
+                下载模型
               </button>
             ) : null}
           </div>
@@ -159,11 +159,11 @@ export function SettingsModal() {
               <span className="settings-value">
                 {harnessState.status === 'ready' || harnessState.status === 'starting' ? (
                   <button type="button" className="btn ghost small" onClick={() => void useHarnessStore.getState().stop()}>
-                    ⏹ 停止
+                    停止
                   </button>
                 ) : (
                   <button type="button" className="btn primary small" onClick={() => void useHarnessStore.getState().start()}>
-                    ▶ 启动
+                    启动
                   </button>
                 )}
               </span>
@@ -291,10 +291,10 @@ export function SettingsModal() {
                   })
                 }}
               >
-                📁 从文件夹安装
+                从文件夹安装
               </button>
               <button type="button" className="btn ghost small" onClick={() => void window.oasis.harness.revealSkillsDir()}>
-                ↗ 打开技能目录
+                打开技能目录
               </button>
             </div>
           </div>

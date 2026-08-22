@@ -5,7 +5,7 @@ import { useUiStore } from '../stores/uiStore'
 type Action = 'summarize' | 'polish' | 'proofread' | 'explain' | 'translate' | 'continue' | 'ask'
 
 const ACTIONS: { key: Action; label: string }[] = [
-  { key: 'polish', label: '✨ 润色写作' },
+  { key: 'polish', label: '润色写作' },
   { key: 'proofread', label: '校对' },
   { key: 'explain', label: '解释' },
   { key: 'translate', label: '翻译' },

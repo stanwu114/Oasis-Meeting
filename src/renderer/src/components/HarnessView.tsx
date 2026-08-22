@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
 import { setHarnessWebview, useHarnessStore } from '../stores/harnessStore'
+import { Icon } from './Icon'
 
 /** dsh 外层是 grid(内联 grid-template-columns: 280px 1fr 0px)。
  *  隐藏侧/详情栏后轨道仍在、会话区会被塞进 280px 轨道——
@@ -57,7 +58,7 @@ export function HarnessView() {
         />
       ) : (
         <div className="harness-placeholder">
-          <div className="ai-placeholder-icon">🧩</div>
+          <div className="ai-placeholder-icon"><Icon name="blocks" size={42} /></div>
           {state.status === 'starting' ? (
             <>
               <h2>正在启动 DeepSeek Harness…</h2>

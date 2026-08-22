@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useRecorderStore, activeRecorder, getElapsed } from '../stores/recorderStore'
 import { formatDuration } from '../audio/pcm'
+import { Icon } from './Icon'
 
 /** 录音悬浮 HUD:置顶胶囊(红点 + 计时 + 实时波形 + 停止) */
 export function RecorderOverlay() {
@@ -100,7 +101,7 @@ export function RecorderOverlay() {
           取消
         </button>
         <button type="button" className="hud-btn stop" onClick={() => void useRecorderStore.getState().stop()}>
-          ⏹ 停止并转写
+          <Icon name="stop" size={13} /> 停止并转写
         </button>
       </div>
     </div>

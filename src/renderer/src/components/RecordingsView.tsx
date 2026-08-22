@@ -5,6 +5,7 @@ import { useAppStore } from '../stores/appStore'
 import { useRecordingsStore } from '../stores/recordingsStore'
 import { formatDuration } from '../audio/pcm'
 import { useRecorderStore } from '../stores/recorderStore'
+import { Icon } from './Icon'
 
 const STATUS_LABEL: Record<string, string> = {
   pending: '排队中',
@@ -38,7 +39,7 @@ export function RecordingsView() {
       <div className="recordings-head">
         <h1 className="recordings-title">录音</h1>
         <button type="button" className="btn primary" onClick={() => void useRecorderStore.getState().start()}>
-          🎙 开始录音
+          开始录音
         </button>
       </div>
       <p className="recordings-sub">所有录音与导入的音频都在这里,点击打开所在的笔记页面。转写完全在本地进行。</p>
@@ -46,13 +47,13 @@ export function RecordingsView() {
       <div className="recordings-list">
         {items.length === 0 ? (
           <div className="recordings-empty">
-            <div className="recordings-empty-icon">🎙</div>
+            <div className="recordings-empty-icon"><Icon name="mic" size={36} /></div>
             <p>还没有录音。点击右上角「开始录音」,或直接把音频文件拖进笔记。</p>
           </div>
         ) : null}
         {items.map((r) => (
           <button type="button" key={r.id} className="recording-row" onClick={() => openPage(r.pageId)}>
-            <span className="recording-row-icon">🎙</span>
+            <span className="recording-row-icon"><Icon name="mic" size={17} /></span>
             <span className="recording-row-body">
               <span className="recording-row-title">{r.transcriptPreview || '未转写'}</span>
               <span className="recording-row-meta">

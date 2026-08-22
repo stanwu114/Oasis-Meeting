@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import WaveSurfer from 'wavesurfer.js'
 import { formatDuration } from '../audio/pcm'
+import { Icon } from '../components/Icon'
 
 /** 基于 wavesurfer.js 的音频播放器(只读波形 + 播放/暂停) */
 export function AudioPlayer({ url }: { url: string }) {
@@ -54,7 +55,7 @@ export function AudioPlayer({ url }: { url: string }) {
         onClick={() => wsRef.current?.playPause()}
         aria-label={playing ? '暂停' : '播放'}
       >
-        {playing ? '❚❚' : '▶'}
+        <Icon name={playing ? 'stop' : 'play'} size={12} />
       </button>
       <div className="audio-wave" ref={containerRef} />
       <span className="audio-time">

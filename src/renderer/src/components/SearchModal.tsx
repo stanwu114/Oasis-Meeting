@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useUiStore } from '../stores/uiStore'
 import { useAppStore } from '../stores/appStore'
+import { Icon } from './Icon'
 import type { SearchResult } from '../../../shared/ipc'
 
 /** ⌘K 全文搜索弹窗 */
@@ -78,7 +79,7 @@ export function SearchModal() {
               onMouseEnter={() => setActive(i)}
               onClick={() => openResult(r.pageId)}
             >
-              <span className="search-result-icon">{r.icon ?? '📄'}</span>
+              <span className="search-result-icon">{r.icon ? <span>{r.icon}</span> : <Icon name="file" size={15} />}</span>
               <span className="search-result-body">
                 <span className="search-result-title">{r.title}</span>
                 {r.snippet ? <span className="search-result-snippet">{r.snippet}</span> : null}

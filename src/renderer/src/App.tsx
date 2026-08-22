@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
 import { Sidebar } from './components/Sidebar'
+import { Icon } from './components/Icon'
 import { RecorderOverlay } from './components/RecorderOverlay'
 import { SearchModal } from './components/SearchModal'
 import { SettingsModal } from './components/SettingsModal'
@@ -88,7 +89,7 @@ export default function App() {
 function EmptyState(): React.ReactNode {
   return (
     <div className="empty-state">
-      <div className="empty-logo">🏝</div>
+      <div className="empty-logo"><Icon name="palm" size={46} /></div>
       <h1>Notion Oasis</h1>
       <p>本地优先的会议记录空间 · 录音在本机转写,数据不出电脑</p>
       <div className="empty-actions">
@@ -96,7 +97,7 @@ function EmptyState(): React.ReactNode {
           ＋ 新建 Meeting
         </button>
         <button type="button" className="btn ghost" onClick={() => void useRecorderStore.getState().start()}>
-          🎙 快速录音(自动建 Meeting)
+          快速录音(自动建 Meeting)
         </button>
       </div>
     </div>

@@ -45,7 +45,7 @@ function welcomeDoc(): BlockDoc {
       content: [
         {
           type: 'text',
-          text: '点击左侧 🎙 开始录音,停止后自动调用本地 SenseVoice 引擎转写(首次使用需下载约 240MB 模型);也可以 ⬆ 导入 mp3/m4a/wav 等音频文件转写。',
+          text: '点击左下角麦克风开始录音,停止后自动调用本地 SenseVoice 引擎转写(首次使用需下载约 240MB 模型);也可以导入 mp3/m4a/wav 等音频文件转写。',
           styles: {}
         }
       ],

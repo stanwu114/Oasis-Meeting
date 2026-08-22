@@ -1,53 +1,57 @@
 /* ============ 设计变量 ============ */
 :root {
-  --bg: #ffffff;
-  --bg-sidebar: #f7f7f5;
-  --bg-subtle: #fbfbfa;
-  --bg-hover: rgba(55, 53, 47, 0.055);
-  --bg-active: rgba(55, 53, 47, 0.09);
-  --fg: #37352f;
-  --fg-muted: #787774;
-  --fg-faint: #9b9a97;
-  --border: #ececeb;
-  --border-strong: #dfdfdc;
-  --accent: #2f80ed;
-  --accent-soft: rgba(47, 128, 237, 0.12);
-  --danger: #eb5757;
-  --danger-soft: rgba(235, 87, 87, 0.1);
-  --ok: #0f9960;
-  --ok-soft: rgba(15, 153, 96, 0.1);
-  --wave: #d4d4d2;
-  --wave-progress: #2f80ed;
+  /* 暖纸墨 + 琥珀 — Editorial Warm(浅色) */
+  --bg: #fbfaf7;
+  --bg-sidebar: #f4f1eb;
+  --bg-subtle: #f7f5f1;
+  --bg-hover: rgba(41, 34, 27, 0.055);
+  --bg-active: rgba(41, 34, 27, 0.09);
+  --fg: #1f1a14;
+  --fg-muted: #5c554c;
+  --fg-faint: #a39c92;
+  --border: #e8e4dc;
+  --border-strong: #d8d2c7;
+  --accent: #b45306;
+  --on-accent: #ffffff;
+  --accent-soft: rgba(180, 83, 6, 0.11);
+  --danger: #dc2626;
+  --danger-soft: rgba(220, 38, 38, 0.1);
+  --ok: #167a3e;
+  --ok-soft: rgba(22, 122, 62, 0.1);
+  --wave: #e3ded4;
+  --wave-progress: #b45306;
   --card: #ffffff;
-  --shadow-sm: 0 1px 2px rgba(15, 15, 15, 0.04), 0 2px 6px rgba(15, 15, 15, 0.04);
-  --shadow-lg: 0 12px 44px rgba(15, 15, 15, 0.14), 0 3px 10px rgba(15, 15, 15, 0.06);
+  --shadow-sm: 0 1px 2px rgba(41, 34, 27, 0.05), 0 2px 8px rgba(41, 34, 27, 0.04);
+  --shadow-lg: 0 16px 48px rgba(41, 34, 27, 0.16), 0 4px 12px rgba(41, 34, 27, 0.06);
   --radius: 10px;
-  font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei',
+  font-family: Inter, -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei',
     'Helvetica Neue', sans-serif;
 }
 
 html.dark {
-  --bg: #191919;
-  --bg-sidebar: #202020;
-  --bg-subtle: #1e1e1e;
-  --bg-hover: rgba(255, 255, 255, 0.05);
-  --bg-active: rgba(255, 255, 255, 0.085);
-  --fg: #e9e9e7;
-  --fg-muted: #9b9b98;
-  --fg-faint: #6f6f6c;
-  --border: #2e2e2e;
-  --border-strong: #3a3a3a;
-  --accent: #529cca;
-  --accent-soft: rgba(82, 156, 202, 0.16);
-  --danger: #eb5757;
-  --danger-soft: rgba(235, 87, 87, 0.14);
-  --ok: #3fae7c;
-  --ok-soft: rgba(63, 174, 124, 0.13);
-  --wave: #3a3a3a;
-  --wave-progress: #529cca;
-  --card: #242424;
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.25), 0 2px 6px rgba(0, 0, 0, 0.2);
-  --shadow-lg: 0 12px 44px rgba(0, 0, 0, 0.5), 0 3px 10px rgba(0, 0, 0, 0.35);
+  /* 暖炭 + 琥珀(深色) */
+  --bg: #1a1815;
+  --bg-sidebar: #201d19;
+  --bg-subtle: #1e1b18;
+  --bg-hover: rgba(235, 226, 214, 0.055);
+  --bg-active: rgba(235, 226, 214, 0.095);
+  --fg: #ece7de;
+  --fg-muted: #b0a89c;
+  --fg-faint: #7c756b;
+  --border: #2c2823;
+  --border-strong: #3a352e;
+  --accent: #e8901e;
+  --on-accent: #231a0c;
+  --accent-soft: rgba(232, 144, 30, 0.15);
+  --danger: #f06666;
+  --danger-soft: rgba(240, 102, 102, 0.13);
+  --ok: #4cba7d;
+  --ok-soft: rgba(76, 186, 125, 0.12);
+  --wave: #35302a;
+  --wave-progress: #e8901e;
+  --card: #242019;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.28), 0 2px 8px rgba(0, 0, 0, 0.2);
+  --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.55), 0 4px 12px rgba(0, 0, 0, 0.35);
 }
 
 * {
@@ -1944,4 +1948,168 @@ kbd {
   font-size: 14px;
   color: var(--fg);
   font-variant-numeric: tabular-nums;
+}
+
+/* ============ 设计打磨层(暖纸墨体系) ============ */
+
+/* 焦点可见性(键盘可达) */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+button {
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: default;
+}
+
+/* 图标与文字的间距由组件 flex gap 控制;统一 svg 垂直对齐 */
+svg {
+  flex-shrink: 0;
+  vertical-align: -0.15em;
+}
+
+/* 主按钮文字颜色跟随主题令牌 */
+.btn.primary,
+.sidebar-btn.record,
+.chat-send,
+.audio-play-btn,
+.hud-btn.stop,
+.record-fab,
+.chat-tab.on {
+  color: var(--on-accent);
+}
+
+/* 标题排印 */
+.page-title {
+  font-size: 38px;
+  font-weight: 700;
+  letter-spacing: -0.022em;
+  line-height: 1.22;
+}
+
+/* 侧栏品牌与模式切换 */
+.sidebar-brand {
+  gap: 8px;
+  color: var(--fg);
+  font-size: 13.5px;
+  letter-spacing: -0.01em;
+}
+
+.sidebar-brand svg {
+  color: var(--accent);
+}
+
+.mode-switch {
+  background: var(--bg-active);
+  border-radius: 10px;
+  padding: 3px;
+}
+
+.mode-btn {
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.mode-btn.on {
+  background: var(--card);
+  color: var(--fg);
+  box-shadow: var(--shadow-sm);
+  font-weight: 600;
+}
+
+.sidebar-btn {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.sidebar-btn svg {
+  color: var(--fg-faint);
+  transition: color 0.12s;
+}
+
+.sidebar-btn:hover svg,
+.sidebar-btn.active svg {
+  color: var(--accent);
+}
+
+.sidebar-btn.record {
+  color: var(--accent);
+}
+
+.sidebar-btn.record svg {
+  color: var(--accent);
+}
+
+/* 页面树 */
+.page-icon {
+  color: var(--fg-faint);
+  display: inline-flex;
+}
+
+.page-row:hover .page-icon {
+  color: var(--accent);
+}
+
+/* 会议信息卡:更纸感 */
+.meeting-meta {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  box-shadow: var(--shadow-sm);
+}
+
+.meeting-meta-label {
+  color: var(--fg-faint);
+  letter-spacing: 0.02em;
+}
+
+/* 录音块头部图标 */
+.meeting-block-icon,
+.recording-row-icon,
+.chat-welcome-icon,
+.harness-placeholder .ai-placeholder-icon,
+.empty-logo {
+  color: var(--accent);
+}
+
+/* 计时/数字统一等宽 */
+.meeting-duration,
+.audio-time,
+.hud-timer,
+.meeting-stamp,
+.recording-row-duration {
+  font-variant-numeric: tabular-nums;
+}
+
+/* 空状态 */
+.empty-logo svg {
+  filter: drop-shadow(0 6px 16px rgba(180, 83, 6, 0.25));
+}
+
+.empty-state h1 {
+  letter-spacing: -0.02em;
+}
+
+/* 滚动条暖色 */
+::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+  background-clip: content-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--fg-faint);
+  background-clip: content-box;
+}
+
+::selection {
+  background: var(--accent-soft);
 }

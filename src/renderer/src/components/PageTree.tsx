@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useAppStore } from '../stores/appStore'
 import { useUiStore } from '../stores/uiStore'
+import { Icon } from './Icon'
 import type { PageSummary } from '../../../shared/ipc'
 
 type DropZone = 'before' | 'after' | 'inside'
@@ -72,9 +73,9 @@ export function PageTree() {
               useAppStore.getState().toggleExpand(page.id)
             }}
           >
-            {children.length > 0 ? (isExpanded ? '▾' : '▸') : ''}
+            {children.length > 0 ? <Icon name="chevron" size={13} className={isExpanded ? 'chev expanded' : 'chev'} /> : null}
           </button>
-          <span className="page-icon">{page.icon ?? '📄'}</span>
+          <span className="page-icon">{page.icon ? <span>{page.icon}</span> : <Icon name="file" size={14} />}</span>
           {editingId === page.id ? (
             <input
               className="rename-input"
@@ -101,7 +102,7 @@ export function PageTree() {
               setMenuId(menuId === page.id ? null : page.id)
             }}
           >
-            ⋯
+            <Icon name="dots" size={14} />
           </button>
           {menuId === page.id ? (
             <div className="row-menu" onClick={(e) => e.stopPropagation()}>
@@ -112,7 +113,7 @@ export function PageTree() {
                   void useAppStore.getState().createPage(page.id)
                 }}
               >
-                ＋ 添加子页面
+                添加子页面
               </button>
               <button
                 type="button"
@@ -121,7 +122,7 @@ export function PageTree() {
                   setEditingId(page.id)
                 }}
               >
-                ✏️ 重命名
+                重命名
               </button>
               <button
                 type="button"
@@ -131,7 +132,7 @@ export function PageTree() {
                   void useAppStore.getState().trashPage(page.id)
                 }}
               >
-                🗑 移到回收站
+                移到回收站
               </button>
             </div>
           ) : null}

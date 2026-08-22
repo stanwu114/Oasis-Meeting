@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import type { PageSummary } from '../../../shared/ipc'
 import { useUiStore } from '../stores/uiStore'
 import { useAppStore } from '../stores/appStore'
+import { Icon } from './Icon'
 
 export function TrashView() {
   const [items, setItems] = useState<PageSummary[]>([])
@@ -20,7 +21,7 @@ export function TrashView() {
         {items.length === 0 ? <div className="trash-empty">回收站是空的</div> : null}
         {items.map((p) => (
           <div key={p.id} className="trash-item">
-            <span className="trash-icon">{p.icon ?? '📄'}</span>
+            <span className="trash-icon">{p.icon ? <span>{p.icon}</span> : <Icon name="file" size={15} />}</span>
             <span className="trash-name">{p.title}</span>
             <span className="trash-time">删除于 {new Date(p.deletedAt ?? p.updatedAt).toLocaleString('zh-CN')}</span>
             <div className="trash-actions">

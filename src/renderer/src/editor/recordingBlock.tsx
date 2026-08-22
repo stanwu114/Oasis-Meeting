@@ -6,6 +6,7 @@ import { insertMeetingNotesAsBody, insertTranscriptAsParagraphs } from './bridge
 import { retranscribe } from '../audio/pipeline'
 import { useUiStore } from '../stores/uiStore'
 import { formatDuration } from '../audio/pcm'
+import { Icon } from '../components/Icon'
 import type { TranscribeStatus } from '../../../shared/ipc'
 
 const STATUS_LABEL: Record<TranscribeStatus, string> = {
@@ -125,7 +126,7 @@ function RecordingBlockView({ block }: { block: { id: string; props: Record<stri
   return (
     <div className="meeting-block">
       <div className="meeting-head">
-        <span className="meeting-icon">🎙</span>
+        <span className="meeting-icon"><Icon name="mic" size={16} /></span>
         <span className="meeting-title">会议记录</span>
         <span className="meeting-date">{rec ? formatDate(rec.createdAt) : ''}</span>
         <span className="meeting-duration">{formatDuration(durationMs)}</span>
@@ -157,7 +158,7 @@ function RecordingBlockView({ block }: { block: { id: string; props: Record<stri
       {showSummarySection ? (
         <div className="meeting-summary">
           <div className="meeting-summary-head">
-            <span className="meeting-summary-badge">✨ AI 总结</span>
+            <span className="meeting-summary-badge"><Icon name="sparkles" size={12} /> AI 总结</span>
             {summaryStatus === 'done' ? (
               <>
                 <button type="button" className="btn primary small" onClick={handleConfirmSummary}>

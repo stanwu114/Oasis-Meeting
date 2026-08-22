@@ -2,6 +2,7 @@ import { useAppStore } from '../stores/appStore'
 import { useUiStore } from '../stores/uiStore'
 import { useRecorderStore } from '../stores/recorderStore'
 import { useHarnessStore } from '../stores/harnessStore'
+import { Icon } from './Icon'
 import { PageTree } from './PageTree'
 
 function formatBytes(bytes: number): string {
@@ -39,11 +40,11 @@ export function Sidebar() {
     <aside className="sidebar">
       <div className="sidebar-top" />
       <div className="sidebar-brand">
-        <span className="brand-mark">🏝</span>
+        <Icon name="palm" size={17} />
         <span className="brand-name">Notion Oasis</span>
       </div>
 
-      {/* 界面切换:笔记 ↔ Harness */}
+      {/* 界面切换:Meeting ↔ Harness */}
       <div className="mode-switch">
         <button
           type="button"
@@ -54,14 +55,14 @@ export function Sidebar() {
             if (id) void useAppStore.getState().openPage(id)
           }}
         >
-          🏝 Meeting
+          <Icon name="calendar" size={14} /> Meeting
         </button>
         <button
           type="button"
           className={`mode-btn${harnessMode ? ' on' : ''}`}
           onClick={() => useUiStore.getState().setView('harness')}
         >
-          🧩 Harness
+          <Icon name="blocks" size={14} /> Harness
         </button>
       </div>
 
@@ -69,7 +70,7 @@ export function Sidebar() {
         <>
           <div className="sidebar-actions">
             <button type="button" className="sidebar-btn primary record" onClick={() => useHarnessStore.getState().newSession()}>
-              ✚ 新会话
+              <Icon name="plus" size={15} /> 新会话
             </button>
           </div>
           <div className="sidebar-pages">
@@ -81,8 +82,9 @@ export function Sidebar() {
                 className="link-btn"
                 onClick={() => void useHarnessStore.getState().refreshSessions()}
                 disabled={sessionsLoading}
+                title="刷新会话列表"
               >
-                {sessionsLoading ? '加载中…' : '↻'}
+                <Icon name="refresh" size={13} />
               </button>
             </div>
             <div className="harness-sessions">
@@ -105,14 +107,6 @@ export function Sidebar() {
               ) : null}
             </div>
           </div>
-          <div className="sidebar-bottom">
-            <button type="button" className={btn(false)} onClick={() => useUiStore.getState().setSettingsOpen(true)}>
-              ⚙️ 设置
-            </button>
-            <button type="button" className="theme-toggle" onClick={() => useUiStore.getState().toggleTheme()}>
-              {theme === 'dark' ? '☀️ 浅色' : '🌙 深色'}
-            </button>
-          </div>
         </>
       ) : (
         <>
@@ -123,7 +117,7 @@ export function Sidebar() {
               disabled={recording}
               onClick={() => void useAppStore.getState().createPage(null)}
             >
-              ＋ 新建 Meeting
+              <Icon name="plus" size={15} /> 新建 Meeting
             </button>
           </div>
 
@@ -134,30 +128,34 @@ export function Sidebar() {
             </div>
             <PageTree />
           </div>
-
-          <div className="sidebar-bottom">
-            <button type="button" className={btn(view === 'trash')} onClick={() => useUiStore.getState().setView('trash')}>
-              🗑 回收站
-            </button>
-            <button type="button" className={btn(false)} onClick={() => useUiStore.getState().setSettingsOpen(true)}>
-              ⚙️ 设置
-            </button>
-            {modelStatus && !modelStatus.downloaded ? (
-              <button
-                type="button"
-                className="model-hint"
-                onClick={() => useUiStore.getState().setSettingsOpen(true)}
-                title="转写引擎模型未下载,点击前往设置"
-              >
-                {modelStatus.downloading ? `模型下载中 ${formatBytes(totalDownloaded)}` : '⬇ 下载转写模型(约 240MB)'}
-              </button>
-            ) : null}
-            <button type="button" className="theme-toggle" onClick={() => useUiStore.getState().toggleTheme()}>
-              {theme === 'dark' ? '☀️ 浅色' : '🌙 深色'}
-            </button>
-          </div>
         </>
       )}
+
+      <div className="sidebar-bottom">
+        {!harnessMode ? (
+          <button type="button" className={btn(view === 'trash')} onClick={() => useUiStore.getState().setView('trash')}>
+            <Icon name="trash" size={15} /> 回收站
+          </button>
+        ) : null}
+        <button type="button" className={btn(false)} onClick={() => useUiStore.getState().setSettingsOpen(true)}>
+          <Icon name="settings" size={15} /> 设置
+        </button>
+        {modelStatus && !modelStatus.downloaded ? (
+          <button
+            type="button"
+            className="model-hint"
+            onClick={() => useUiStore.getState().setSettingsOpen(true)}
+            title="转写引擎模型未下载,点击前往设置"
+          >
+            <Icon name="download" size={13} />
+            {modelStatus.downloading ? `模型下载中 ${formatBytes(totalDownloaded)}` : '下载转写模型(约 240MB)'}
+          </button>
+        ) : null}
+        <button type="button" className="theme-toggle" onClick={() => useUiStore.getState().toggleTheme()}>
+          <Icon name={theme === 'dark' ? 'sun' : 'moon'} size={14} />
+          {theme === 'dark' ? '浅色' : '深色'}
+        </button>
+      </div>
     </aside>
   )
 }
