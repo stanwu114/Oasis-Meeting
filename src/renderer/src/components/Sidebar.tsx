@@ -100,12 +100,7 @@ export function Sidebar() {
       </div>
         </>
       ) : (
-        <div className="sidebar-pages">
-          <div className="sidebar-pages-head">Harness</div>
-          <div className="tree-empty" style={{ paddingTop: 20, textAlign: 'center' }}>
-            点击上方 Harness 标签页进入
-          </div>
-        </div>
+        <HarnessSidebar />
       )}
 
       <div className="sidebar-bottom">
