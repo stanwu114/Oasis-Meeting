@@ -7,8 +7,6 @@ import { getModelStatus, ensureModelDownloaded } from './modelManager'
 import { enqueueTranscription } from './transcriber'
 import { enqueueSummary } from './summarizer'
 import { chat, runEditorAction } from './llm'
-import { sendChat, stopChat } from './chatService'
-import { sendAgent } from './agentService'
 import { extractDocText } from '../shared/extract'
 
 /** 包装 handler:统一异常日志与向渲染进程抛错 */
@@ -72,19 +70,6 @@ export function registerIpc(): void {
   /* ---------- 模型 ---------- */
   handle(IPC.modelsStatus, () => getModelStatus())
   handle(IPC.modelsEnsure, () => ensureModelDownloaded())
-
-  /* ---------- AI 对话 ---------- */
-  handle(IPC.aiChatSend, (input: import('../shared/ipc').SendChatInput) =>
-    input.mode === 'agent' ? sendAgent(input) : sendChat(input)
-  )
-  handle(IPC.aiChatStop, () => {
-    stopChat()
-  })
-  handle(IPC.aiChatConversations, (kind?: 'chat' | 'agent') => db.listAiConversations(kind))
-  handle(IPC.aiChatMessages, (conversationId: string) => db.listAiMessages(conversationId))
-  handle(IPC.aiChatDelete, (conversationId: string) => {
-    db.deleteAiConversation(conversationId)
-  })
 
   /* ---------- AI 编辑器动作 ---------- */
   handle(

@@ -34,17 +34,6 @@ export const IPC = {
   aiEditorAction: 'ai:editor-action',
   aiSummarizePage: 'ai:summarize-page',
 
-  aiChatSend: 'ai-chat:send',
-  aiChatStop: 'ai-chat:stop',
-  aiChatConversations: 'ai-chat:conversations',
-  aiChatMessages: 'ai-chat:messages',
-  aiChatDelete: 'ai-chat:delete',
-
-  evtAiChatDelta: 'evt:ai-chat-delta',
-  evtAiChatDone: 'evt:ai-chat-done',
-  evtAiChatError: 'evt:ai-chat-error',
-  evtAiChatStatus: 'evt:ai-chat-status',
-
   evtRecordingsChanged: 'evt:recordings-changed',
   evtModelProgress: 'evt:model-progress'
 } as const
@@ -197,60 +186,11 @@ export interface OasisApi {
     /** 对整页正文生成结构化摘要 */
     summarizePage(pageId: string): Promise<string>
   }
-  chat: {
-    /** 发送消息,立即返回会话 id;回复经 aiChatDelta/Done/Error/Status 事件流回 */
-    send(input: SendChatInput): Promise<{ conversationId: string }>
-    stop(): Promise<void>
-    conversations(kind?: 'chat' | 'agent'): Promise<AiConversation[]>
-    messages(conversationId: string): Promise<AiChatMessage[]>
-    delete(conversationId: string): Promise<void>
-  }
   on: {
     recordingsChanged(cb: (r: RecordingInfo) => void): () => void
     modelProgress(cb: (m: ModelStatus) => void): () => void
-    aiChatDelta(cb: (d: AiChatDelta) => void): () => void
-    aiChatDone(cb: (d: AiChatDone) => void): () => void
-    aiChatError(cb: (e: { conversationId: string; error: string }) => void): () => void
-    aiChatStatus(cb: (s: { conversationId: string; status: string }) => void): () => void
     appAction(cb: (action: string) => void): () => void
   }
-}
-
-export interface AiConversation {
-  id: string
-  title: string
-  kind: 'chat' | 'agent'
-  createdAt: string
-  updatedAt: string
-}
-
-export interface AiChatMessage {
-  id: string
-  conversationId: string
-  role: 'user' | 'assistant'
-  content: string
-  createdAt: string
-}
-
-export interface SendChatInput {
-  conversationId: string | null
-  text: string
-  /** chat = 直连 DeepSeek 对话;agent = 经 SDK 驱动的完整智能体(带工具) */
-  mode: 'chat' | 'agent'
-  /** 附带的笔记上下文:页面正文与选中文本 */
-  contextPageId: string | null
-  contextSelection: string | null
-}
-
-export interface AiChatDelta {
-  conversationId: string
-  delta: string
-}
-
-export interface AiChatDone {
-  conversationId: string
-  messageId: string
-  content: string
 }
 
 /** 录音转写支持的语言 */

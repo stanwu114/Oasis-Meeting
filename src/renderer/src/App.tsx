@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect } from 'react'
 import { Sidebar } from './components/Sidebar'
 import { RecorderOverlay } from './components/RecorderOverlay'
 import { SearchModal } from './components/SearchModal'
@@ -6,9 +6,6 @@ import { SettingsModal } from './components/SettingsModal'
 import { TrashView } from './components/TrashView'
 import { RecordingsView } from './components/RecordingsView'
 import { AiSelectionBar } from './components/AiSelectionBar'
-import { ChatPanel } from './components/ChatPanel'
-import { ChatWorkspace } from './components/ChatWorkspace'
-import { useChatStore } from './stores/chatStore'
 import OasisEditor from './editor/OasisEditor'
 import { useAppStore } from './stores/appStore'
 import { useUiStore } from './stores/uiStore'
@@ -17,34 +14,10 @@ import { useRecorderStore } from './stores/recorderStore'
 
 export default function App() {
   const view = useUiStore((s) => s.view)
-  const chatOpen = useUiStore((s) => s.chatOpen)
   const currentId = useAppStore((s) => s.currentId)
   const loaded = useAppStore((s) => s.loaded)
   const toast = useUiStore((s) => s.toast)
   const toastKind = useUiStore((s) => s.toastKind)
-  const [chatWidth, setChatWidth] = useState(() => {
-    const saved = Number(localStorage.getItem('oasis.chatWidth'))
-    return saved >= 320 && saved <= 640 ? saved : 400
-  })
-  const chatWidthRef = useRef(chatWidth)
-  chatWidthRef.current = chatWidth
-
-  /* 拖拽调整 AI 分栏宽度 */
-  const startResize = (e: React.MouseEvent): void => {
-    e.preventDefault()
-    const startX = e.clientX
-    const startWidth = chatWidthRef.current
-    const onMove = (ev: MouseEvent): void => {
-      setChatWidth(Math.max(320, Math.min(640, startWidth + (startX - ev.clientX))))
-    }
-    const onUp = (): void => {
-      localStorage.setItem('oasis.chatWidth', String(chatWidthRef.current))
-      window.removeEventListener('mousemove', onMove)
-      window.removeEventListener('mouseup', onUp)
-    }
-    window.addEventListener('mousemove', onMove)
-    window.addEventListener('mouseup', onUp)
-  }
 
   /* 初始化 + 事件订阅 */
   useEffect(() => {
@@ -60,26 +33,10 @@ export default function App() {
     const offAction = window.oasis.on.appAction((action) => {
       if (action === 'new-page') void useAppStore.getState().createPage(null)
     })
-    const offDelta = window.oasis.on.aiChatDelta((d) => {
-      useChatStore.getState().onDelta(d.conversationId, d.delta)
-    })
-    const offDone = window.oasis.on.aiChatDone((d) => {
-      useChatStore.getState().onDone(d.conversationId, d.content)
-    })
-    const offErr = window.oasis.on.aiChatError((e) => {
-      useChatStore.getState().onError(e.conversationId, e.error)
-    })
-    const offStatus = window.oasis.on.aiChatStatus((s) => {
-      useChatStore.getState().onStatus(s.conversationId, s.status)
-    })
     return () => {
       offRec()
       offModel()
       offAction()
-      offDelta()
-      offDone()
-      offErr()
-      offStatus()
     }
   }, [])
 
@@ -90,20 +47,6 @@ export default function App() {
       if (mod && e.key.toLowerCase() === 'k') {
         e.preventDefault()
         useUiStore.getState().setSearchOpen(true)
-      }
-      if (mod && e.key.toLowerCase() === 'l') {
-        e.preventDefault()
-        useUiStore.getState().setChatOpen(!useUiStore.getState().chatOpen)
-      }
-      if (mod && e.shiftKey && e.key.toLowerCase() === 'j') {
-        e.preventDefault()
-        const ui = useUiStore.getState()
-        if (ui.view === 'ai') {
-          ui.setView('editor')
-        } else {
-          ui.setView('ai')
-          ui.setChatOpen(false)
-        }
       }
       if (mod && e.shiftKey && e.key.toLowerCase() === 'r') {
         e.preventDefault()
@@ -123,34 +66,12 @@ export default function App() {
           <TrashView />
         ) : view === 'recordings' ? (
           <RecordingsView />
-        ) : view === 'ai' ? (
-          <ChatWorkspace />
         ) : loaded && currentId ? (
           <OasisEditor key={currentId} pageId={currentId} />
         ) : (
           <EmptyState />
         )}
       </main>
-      {chatOpen ? (
-        <>
-          <div className="chat-resize-handle" onMouseDown={startResize} />
-          <aside className="chat-drawer" style={{ width: chatWidth }}>
-            <ChatPanel />
-          </aside>
-        </>
-      ) : null}
-
-      {!chatOpen && view !== 'ai' ? (
-        <button
-          type="button"
-          className="ai-toggle-fab"
-          style={{ bottom: view === 'editor' && loaded && currentId ? 104 : 34 }}
-          title="打开 AI 面板 (⌘L);⇧⌘J 切换完整 AI 界面"
-          onClick={() => useUiStore.getState().setChatOpen(true)}
-        >
-          ✨
-        </button>
-      ) : null}
 
       <RecorderOverlay />
       <AiSelectionBar />

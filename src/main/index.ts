@@ -5,7 +5,6 @@ import { initMedia, registerMediaProtocol, registerMediaScheme } from './media'
 import { registerIpc } from './ipc'
 import { onModelStatus } from './modelManager'
 import { broadcastModelStatus } from './events'
-import { closeAgentRuntime } from './agentService'
 
 // 单实例
 const gotLock = app.requestSingleInstanceLock()
@@ -120,6 +119,5 @@ app.on('window-all-closed', () => {
 })
 
 app.on('before-quit', () => {
-  void closeAgentRuntime()
   closeDb()
 })
