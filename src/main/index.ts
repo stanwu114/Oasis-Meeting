@@ -112,6 +112,28 @@ app.whenReady().then(() => {
   setupMenu()
   createWindow()
 
+  // 崩溃诊断日志
+  app.on('child-process-gone', (_e, details) => {
+    console.error(`[crash] 子进程退出 type=${details.type} reason=${details.reason} code=${details.exitCode}`)
+  })
+  for (const win of BrowserWindow.getAllWindows()) {
+    win.webContents.on('render-process-gone', (_e, details) => {
+      console.error(`[crash] 渲染进程崩溃 reason=${details.reason} code=${details.exitCode}`)
+    })
+    win.webContents.on('unresponsive', () => console.error('[crash] 页面无响应'))
+    win.webContents.on('console-message', (_e, level, message) => {
+      if (level >= 2) console.error('[renderer]', String(message).slice(0, 300))
+    })
+    win.webContents.on('did-attach-webview', (_e, contents) => {
+      contents.on('render-process-gone', (_e2, details) => {
+        console.error(`[crash] webview 渲染崩溃 reason=${details.reason} code=${details.exitCode}`)
+      })
+      contents.on('console-message', (_e2, level, message) => {
+        if (level >= 2) console.error('[dsh-webview]', String(message).slice(0, 300))
+      })
+    })
+  }
+
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow()
   })
