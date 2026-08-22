@@ -7,15 +7,44 @@ import { Icon } from './Icon'
 export function TrashView() {
   const [items, setItems] = useState<PageSummary[]>([])
   const [confirmId, setConfirmId] = useState<string | null>(null)
+  const [confirmAll, setConfirmAll] = useState(false)
 
   const reload = (): void => {
     void window.oasis.pages.trashList().then(setItems)
   }
   useEffect(reload, [])
 
+  const deleteAll = (): void => {
+    setConfirmAll(false)
+    Promise.all(items.map((p) => window.oasis.pages.deletePermanent(p.id))).then(() => {
+      reload()
+      void useAppStore.getState().refresh()
+      useUiStore.getState().showToast('回收站已清空')
+    })
+  }
+
   return (
     <div className="trash-view">
-      <h1 className="trash-title">回收站</h1>
+      <div className="trash-head-row">
+        <h1 className="trash-title">回收站</h1>
+        {items.length > 0 ? (
+          confirmAll ? (
+            <div className="trash-confirm-all">
+              <span className="trash-confirm-text">确定清空全部 {items.length} 项?</span>
+              <button type="button" className="btn danger small" onClick={deleteAll}>
+                确认清空
+              </button>
+              <button type="button" className="btn ghost small" onClick={() => setConfirmAll(false)}>
+                取消
+              </button>
+            </div>
+          ) : (
+            <button type="button" className="btn danger-ghost small" onClick={() => setConfirmAll(true)}>
+              全部删除
+            </button>
+          )
+        ) : null}
+      </div>
       <p className="trash-sub">移入回收站的页面可在彻底删除前恢复。彻底删除会连同其中的录音文件一起清除。</p>
       <div className="trash-list">
         {items.length === 0 ? <div className="trash-empty">回收站是空的</div> : null}

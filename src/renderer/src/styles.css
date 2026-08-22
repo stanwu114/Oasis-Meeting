@@ -2845,3 +2845,22 @@ svg {
   font-weight: 700;
   color: var(--fg);
 }
+
+.trash-head-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.trash-confirm-all {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.trash-confirm-text {
+  font-size: 13px;
+  color: var(--danger);
+  font-weight: 500;
+}
