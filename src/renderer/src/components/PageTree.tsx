@@ -9,6 +9,7 @@ type DropZone = 'before' | 'after' | 'inside'
 export function PageTree() {
   const pages = useAppStore((s) => s.pages)
   const expanded = useAppStore((s) => s.expanded)
+  const currentId = useAppStore((s) => s.currentId)
   const [editingId, setEditingId] = useState<string | null>(null)
   const [dragId, setDragId] = useState<string | null>(null)
   const [dropTarget, setDropTarget] = useState<{ id: string; zone: DropZone } | null>(null)
@@ -30,7 +31,7 @@ export function PageTree() {
     return (
       <div key={page.id}>
         <div
-          className={`page-row${drop ? ` drop-${drop}` : ''}`}
+          className={`page-row${page.id === currentId ? ' active' : ''}${drop ? ` drop-${drop}` : ''}`}
           style={{ paddingLeft: 8 + depth * 14 }}
           draggable
           onDragStart={(e) => {

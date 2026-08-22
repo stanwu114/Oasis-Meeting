@@ -453,6 +453,19 @@ kbd {
   color: var(--fg);
 }
 
+.page-row.active {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+.page-row.active .page-icon svg {
+  color: var(--accent);
+}
+
+.page-row.active .page-title-text {
+  font-weight: 600;
+}
+
 .page-row.drop-before {
   box-shadow: inset 0 2px 0 0 var(--accent);
 }
