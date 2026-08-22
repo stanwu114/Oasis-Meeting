@@ -3,7 +3,6 @@ import { createReactBlockSpec } from '@blocknote/react'
 import { AudioPlayer } from './AudioPlayer'
 import { useRecordingsStore } from '../stores/recordingsStore'
 import { insertMeetingNotesAsBody, insertTranscriptAsParagraphs } from './bridge'
-import { retranscribe } from '../audio/pipeline'
 import { useUiStore } from '../stores/uiStore'
 import { formatDuration } from '../audio/pcm'
 import { Icon } from '../components/Icon'
@@ -109,7 +108,7 @@ function RecordingBlockView({ block }: { block: { id: string; props: Record<stri
     if (!rec || busy) return
     setBusy(true)
     try {
-      await retranscribe(rec)
+      console.warn('retranscribe moved to MeetingPage')
     } catch (e) {
       showToast(`重新转写失败:${e instanceof Error ? e.message : String(e)}`, 'error')
     } finally {

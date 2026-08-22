@@ -1,10 +1,8 @@
 import { useEffect } from 'react'
 import { Sidebar } from './components/Sidebar'
-import { RecorderOverlay } from './components/RecorderOverlay'
 import { SearchModal } from './components/SearchModal'
 import { SettingsModal } from './components/SettingsModal'
 import { TrashView } from './components/TrashView'
-import { RecordingsView } from './components/RecordingsView'
 import { AiSelectionBar } from './components/AiSelectionBar'
 import { HarnessView } from './components/HarnessView'
 import MeetingPage from './components/MeetingPage'
@@ -12,7 +10,6 @@ import { ProjectView } from './components/ProjectView'
 import { useAppStore } from './stores/appStore'
 import { useUiStore } from './stores/uiStore'
 import { useRecordingsStore } from './stores/recordingsStore'
-import { useRecorderStore } from './stores/recorderStore'
 
 export default function App() {
   const view = useUiStore((s) => s.view)
@@ -51,11 +48,6 @@ export default function App() {
         e.preventDefault()
         useUiStore.getState().setSearchOpen(true)
       }
-      if (mod && e.shiftKey && e.key.toLowerCase() === 'r') {
-        e.preventDefault()
-        const phase = useRecorderStore.getState().phase
-        if (phase === 'idle') void useRecorderStore.getState().start()
-      }
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
@@ -67,8 +59,6 @@ export default function App() {
       <main className="main">
         {view === 'trash' ? (
           <TrashView />
-        ) : view === 'recordings' ? (
-          <RecordingsView />
         ) : view === 'harness' ? (
           <HarnessView />
         ) : loaded && currentId && currentIcon === 'project' ? (
@@ -80,7 +70,6 @@ export default function App() {
         )}
       </main>
 
-      <RecorderOverlay />
       <AiSelectionBar />
       <SearchModal />
       <SettingsModal />

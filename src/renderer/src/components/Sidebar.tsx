@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { useAppStore } from '../stores/appStore'
 import { useUiStore } from '../stores/uiStore'
-import { useRecorderStore } from '../stores/recorderStore'
 import { Icon } from './Icon'
 import { PageTree } from './PageTree'
 import { HarnessSidebar } from './HarnessSidebar'
@@ -18,7 +17,6 @@ export function Sidebar() {
   const theme = useUiStore((s) => s.theme)
   const modelStatus = useUiStore((s) => s.modelStatus)
   const pagesCount = useAppStore((s) => s.pages.length)
-  const recording = useRecorderStore((s) => s.phase === 'recording' || s.phase === 'saving')
   const [ctxMenu, setCtxMenu] = useState<{ x: number; y: number } | null>(null)
 
   const totalDownloaded = modelStatus?.files.reduce((acc, f) => acc + f.downloadedBytes, 0) ?? 0
@@ -66,8 +64,7 @@ export function Sidebar() {
         <button
           type="button"
           className="sidebar-btn primary"
-          disabled={recording}
-          onClick={() => void useAppStore.getState().createPage(null)}
+                    onClick={() => void useAppStore.getState().createPage(null)}
         >
           新建 Meeting
         </button>
