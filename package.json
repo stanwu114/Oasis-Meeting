@@ -1,0 +1,44 @@
+{
+  "name": "notion-oasis",
+  "productName": "Notion Oasis",
+  "version": "0.1.0",
+  "description": "本地优先的类 Notion 笔记应用,核心特性:完全离线的录音转写",
+  "main": "out/main/index.js",
+  "author": "stanwu",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "dev": "electron-vite dev",
+    "build": "electron-vite build",
+    "preview": "electron-vite preview",
+    "typecheck": "tsc --noEmit -p tsconfig.node.json && tsc --noEmit -p tsconfig.web.json",
+    "smoke:native": "electron scripts/native-smoke.cjs",
+    "postinstall": "electron-rebuild -f -w better-sqlite3",
+    "dist": "electron-vite build && electron-builder --mac"
+  },
+  "dependencies": {
+    "@blocknote/core": "^0.54.0",
+    "@blocknote/mantine": "^0.54.0",
+    "@blocknote/react": "^0.54.0",
+    "better-sqlite3": "^13.0.3",
+    "fix-webm-duration": "^1.0.6",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
+    "sherpa-onnx-node": "^1.13.6",
+    "wavesurfer.js": "^7.12.11",
+    "zustand": "^5.0.15"
+  },
+  "devDependencies": {
+    "@electron/rebuild": "^4.2.0",
+    "@types/better-sqlite3": "^9.6.0",
+    "@types/node": "^26.2.0",
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.4",
+    "@vitejs/plugin-react": "^5.2.0",
+    "electron": "^43.4.1",
+    "electron-builder": "^26.15.3",
+    "electron-vite": "^5.0.0",
+    "typescript": "^7.0.2",
+    "vite": "^7.3.6"
+  }
+}
