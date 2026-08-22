@@ -1962,7 +1962,7 @@ kbd {
   font-size: 28px;
   letter-spacing: -0.025em;
   line-height: 1;
-  color: var(--fg);
+  color: var(--accent);
 }
 
 .brand-logo {
@@ -1976,7 +1976,7 @@ kbd {
   font-family: 'BrandDisplay', Inter, -apple-system, sans-serif;
   font-weight: 900;
   font-size: 28px;
-  color: var(--accent);
+  color: var(--fg);
   margin-left: 7px;
   letter-spacing: -0.025em;
   line-height: 1;
@@ -1987,7 +1987,7 @@ kbd {
   font-weight: 900;
   font-size: 42px;
   letter-spacing: -0.025em;
-  color: var(--fg);
+  color: var(--accent);
   display: flex;
   align-items: baseline;
   gap: 8px;
@@ -1996,7 +1996,7 @@ kbd {
 .empty-wordmark .note {
   font-weight: 900;
   font-size: 42px;
-  color: var(--accent);
+  color: var(--fg);
 }
 
 /* 焦点可见性(键盘可达) */
