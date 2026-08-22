@@ -1892,12 +1892,11 @@ kbd {
 }
 
 .meeting-meta-row {
-  display: flex;
+  display: grid;
+  grid-template-columns: 96px 1fr;
   align-items: center;
-  gap: 16px;
-  padding: 11px 0;
+  padding: 10px 0;
   border-bottom: 1px dashed var(--border);
-  flex-wrap: nowrap;
 }
 
 .meeting-meta-row:last-child {
@@ -1905,27 +1904,13 @@ kbd {
 }
 
 .meeting-meta-label {
-  flex-shrink: 0;
-  width: 84px;
   font-size: 13px;
   font-weight: 600;
   color: var(--fg-muted);
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.meeting-meta-hint {
-  font-size: 10px;
-  font-weight: 500;
-  color: var(--accent);
-  background: var(--accent-soft);
-  border-radius: 4px;
-  padding: 1px 5px;
 }
 
 .meeting-meta-input {
-  flex: 1;
+  width: 100%;
   min-width: 0;
   white-space: nowrap;
   overflow: hidden;
@@ -1935,8 +1920,10 @@ kbd {
   background: transparent;
   color: var(--fg);
   font: inherit;
-  font-size: 14px;
-  padding: 2px 0;
+  font-size: 14.5px;
+  padding: 4px 0;
+  height: 34px;
+  box-sizing: border-box;
 }
 
 .meeting-meta-input::placeholder {
@@ -1948,10 +1935,9 @@ kbd {
   margin-bottom: -1.5px;
 }
 
-.meeting-meta-time {
-  font-size: 14px;
-  color: var(--fg);
+.meeting-meta-input[readonly] {
   font-variant-numeric: tabular-nums;
+  color: var(--fg-muted);
 }
 
 /* ============ 设计打磨层(暖纸墨体系) ============ */

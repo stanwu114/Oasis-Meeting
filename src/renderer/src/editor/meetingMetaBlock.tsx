@@ -14,11 +14,11 @@ interface MetaProps {
   participants: string
 }
 
-const FIELDS: { key: keyof MetaProps; label: string; placeholder: string; hint?: string }[] = [
-  { key: 'name', label: '会议名称', placeholder: '录音转写后由 AI 自动填写', hint: 'AI' },
-  { key: 'location', label: '会议地点', placeholder: '自动定位中…', hint: '定位' },
+const FIELDS: { key: keyof MetaProps; label: string; placeholder: string }[] = [
+  { key: 'name', label: '会议名称', placeholder: '录音转写后自动填写' },
+  { key: 'location', label: '会议地点', placeholder: '自动定位中…' },
   { key: 'topic', label: '会议主题', placeholder: '填写本次会议主题' },
-  { key: 'time', label: '会议时间', placeholder: '', hint: '北京时间' },
+  { key: 'time', label: '会议时间', placeholder: '' },
   { key: 'participants', label: '参会人员', placeholder: '填写参会人员,顿号分隔' }
 ]
 
@@ -62,20 +62,14 @@ function MeetingMetaView({ block, editor }: { block: { id: string; props: Record
     <div className="meeting-meta">
       {FIELDS.map((f) => (
         <div key={f.key} className="meeting-meta-row">
-          <span className="meeting-meta-label">
-            {f.label}
-            {f.hint ? <span className="meeting-meta-hint">{f.hint}</span> : null}
-          </span>
-          {f.key === 'time' ? (
-            <span className="meeting-meta-time">{values.time || '—'}</span>
-          ) : (
-            <input
-              className="meeting-meta-input"
-              value={values[f.key]}
-              placeholder={f.placeholder}
-              onChange={(e) => onChange(f.key, e.target.value)}
-            />
-          )}
+          <span className="meeting-meta-label">{f.label}</span>
+          <input
+            className="meeting-meta-input"
+            value={f.key === 'time' ? values.time || '—' : values[f.key]}
+            placeholder={f.placeholder}
+            readOnly={f.key === 'time'}
+            onChange={(e) => onChange(f.key, e.target.value)}
+          />
         </div>
       ))}
     </div>
