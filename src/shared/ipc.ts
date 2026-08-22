@@ -17,6 +17,7 @@ export const IPC = {
   recordingsGet: 'recordings:get',
   recordingsListByPage: 'recordings:list-by-page',
   recordingsListAll: 'recordings:list-all',
+  recordingsReadAudio: 'recordings:read-audio',
   recordingsUpdateBlock: 'recordings:update-block',
   recordingsTranscribe: 'recordings:transcribe',
 
@@ -147,6 +148,8 @@ export interface OasisApi {
     get(id: string): Promise<RecordingInfo | null>
     listByPage(pageId: string): Promise<RecordingInfo[]>
     listAll(): Promise<RecordingListEntry[]>
+    /** 读取录音文件字节(渲染进程转 blob: URL 播放,避开自定义协议的 CORS/类型问题) */
+    readAudio(id: string): Promise<ArrayBuffer | null>
     updateBlock(id: string, blockId: string | null): Promise<void>
     transcribe(id: string, pcm: Int16Array, sampleRate: number, language: string): Promise<void>
   }

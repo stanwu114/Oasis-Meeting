@@ -21,6 +21,7 @@ const api: OasisApi = {
     get: (id) => ipcRenderer.invoke(IPC.recordingsGet, id),
     listByPage: (pageId) => ipcRenderer.invoke(IPC.recordingsListByPage, pageId),
     listAll: () => ipcRenderer.invoke(IPC.recordingsListAll),
+    readAudio: (id) => ipcRenderer.invoke(IPC.recordingsReadAudio, id),
     updateBlock: (id, blockId) => ipcRenderer.invoke(IPC.recordingsUpdateBlock, id, blockId),
     transcribe: (id, pcm, sampleRate, language) =>
       ipcRenderer.invoke(IPC.recordingsTranscribe, id, pcm, sampleRate, language)

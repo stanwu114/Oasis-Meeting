@@ -4,7 +4,7 @@ import { insertRecordingBlock, getEditor } from '../editor/bridge'
 import { useAppStore } from '../stores/appStore'
 import { useUiStore } from '../stores/uiStore'
 import { useRecordingsStore } from '../stores/recordingsStore'
-import { mediaUrlFor, type RecordingInfo } from '../../../shared/ipc'
+import type { RecordingInfo } from '../../../shared/ipc'
 
 /**
  * 录音/导入音频 → 存盘 → 插入录音块 → 提交本地转写。
@@ -56,10 +56,9 @@ export async function finalizeRecording(input: {
 /** 从已存在的录音文件重新转写 */
 export async function retranscribe(rec: RecordingInfo): Promise<void> {
   const ui = useUiStore.getState()
-  const res = await fetch(mediaUrlFor(rec.fileName))
-  if (!res.ok) throw new Error('音频文件读取失败')
-  const blob = await res.blob()
-  const { pcm } = await decodeToPcm16kMono(blob)
+  const buf = await window.oasis.recordings.readAudio(rec.id)
+  if (!buf) throw new Error('音频文件缺失')
+  const { pcm } = await decodeToPcm16kMono(new Blob([buf], { type: rec.mimeType }))
   await window.oasis.recordings.transcribe(rec.id, pcm, 16000, ui.language)
 }
 

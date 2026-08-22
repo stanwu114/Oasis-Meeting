@@ -440,6 +440,11 @@ kbd {
   padding: 10px 14px;
 }
 
+.meeting-player-hint {
+  font-size: 13px;
+  color: var(--fg-faint);
+}
+
 .meeting-status-row {
   display: flex;
   align-items: center;

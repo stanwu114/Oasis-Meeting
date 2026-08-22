@@ -49,6 +49,13 @@ export function registerIpc(): void {
   handle(IPC.recordingsGet, (id: string) => db.getRecording(id))
   handle(IPC.recordingsListByPage, (pageId: string) => db.listRecordingsByPage(pageId))
   handle(IPC.recordingsListAll, () => db.listAllRecordings())
+  handle(IPC.recordingsReadAudio, async (id: string): Promise<ArrayBuffer | null> => {
+    const rec = db.getRecording(id)
+    if (!rec) return null
+    const bytes = await media.readAudioBytes(rec.fileName)
+    if (!bytes) return null
+    return bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength) as ArrayBuffer
+  })
   handle(IPC.recordingsUpdateBlock, (id: string, blockId: string | null) => db.setRecordingBlock(id, blockId))
   handle(IPC.recordingsTranscribe, (id: string, pcm: Int16Array, sampleRate: number, language: string) => {
     enqueueTranscription({ recordingId: id, pcm, sampleRate, language })

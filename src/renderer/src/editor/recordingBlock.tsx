@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { createReactBlockSpec } from '@blocknote/react'
 import { AudioPlayer } from './AudioPlayer'
 import { useRecordingsStore } from '../stores/recordingsStore'
@@ -45,8 +45,33 @@ function formatDate(iso: string): string {
 
 function RecordingBlockView({ block }: { block: { id: string; props: Record<string, string | number> } }) {
   const [busy, setBusy] = useState(false)
+  const [audioUrl, setAudioUrl] = useState<string | null>(null)
+  const [audioState, setAudioState] = useState<'loading' | 'ready' | 'missing'>('loading')
   const rec = useRecordingsStore((s) => s.byId[String(block.props.recordingId)])
   const showToast = useUiStore((s) => s.showToast)
+  const recId = rec?.id
+
+  /* 通过 IPC 读取音频字节,转 blob: URL 播放(同源,绕开自定义协议的种种限制) */
+  useEffect(() => {
+    if (!recId) return
+    let url: string | null = null
+    let cancelled = false
+    setAudioState('loading')
+    void window.oasis.recordings.readAudio(recId).then((buf) => {
+      if (cancelled) return
+      if (!buf) {
+        setAudioState('missing')
+        return
+      }
+      url = URL.createObjectURL(new Blob([buf], { type: rec?.mimeType || 'audio/webm' }))
+      setAudioUrl(url)
+      setAudioState('ready')
+    })
+    return () => {
+      cancelled = true
+      if (url) URL.revokeObjectURL(url)
+    }
+  }, [recId, rec?.mimeType])
 
   const transcript: string = rec?.transcript ?? String(block.props.transcript ?? '')
   const status: TranscribeStatus = rec?.status ?? (transcript ? 'done' : 'pending')
@@ -82,7 +107,13 @@ function RecordingBlockView({ block }: { block: { id: string; props: Record<stri
       </div>
 
       <div className="meeting-player">
-        <AudioPlayer url={String(block.props.url)} />
+        {audioState === 'loading' ? (
+          <span className="meeting-player-hint">音频加载中…</span>
+        ) : audioState === 'missing' ? (
+          <span className="meeting-player-hint">音频文件缺失(文稿仍保留)</span>
+        ) : audioUrl ? (
+          <AudioPlayer url={audioUrl} />
+        ) : null}
       </div>
 
       <div className="meeting-status-row">
