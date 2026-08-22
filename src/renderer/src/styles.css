@@ -2689,7 +2689,7 @@ svg {
 .console-live {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 1px;
   flex: 1;
   min-width: 0;
 }
