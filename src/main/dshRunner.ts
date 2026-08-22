@@ -1,6 +1,6 @@
 import { app } from 'electron'
 import { spawn, type ChildProcess } from 'node:child_process'
-import { existsSync } from 'node:fs'
+import { accessSync, constants, existsSync } from 'node:fs'
 import { join } from 'node:path'
 
 /**
@@ -32,6 +32,28 @@ function dshBinPath(): string {
   return join(vendor, 'apps', 'cli', 'lib', 'bin.js')
 }
 
+/**
+ * dsh 必须用系统 Node 运行:Electron 内置 Node 解析不了 ~/.dsh profile 里
+ * 安装的第三方插件包(dshmarket 等)。GUI 应用的 PATH 通常不含 Homebrew,
+ * 因此显式探测常见位置。
+ */
+function resolveNodeBinary(): { cmd: string; env: NodeJS.ProcessEnv } {
+  const candidates: string[] = []
+  for (const dir of (process.env.PATH ?? '').split(':')) {
+    if (dir) candidates.push(join(dir, 'node'))
+  }
+  candidates.push('/opt/homebrew/bin/node', '/usr/local/bin/node', '/opt/local/bin/node')
+  for (const candidate of candidates) {
+    try {
+      accessSync(candidate, constants.X_OK)
+      return { cmd: candidate, env: {} }
+    } catch {
+      /* 下一个 */
+    }
+  }
+  return { cmd: process.execPath, env: { ELECTRON_RUN_AS_NODE: '1' } }
+}
+
 function setState(patch: Partial<DshState>): void {
   state = { ...state, ...patch }
   for (const fn of listeners) fn(state)
@@ -61,8 +83,13 @@ export async function startDsh(): Promise<DshState> {
     setState({ status: 'starting', url: null, error: null })
 
     return new Promise<DshState>((resolve) => {
-      const childProc = spawn(process.execPath, [dshBinPath(), '--profile', 'web', '--port', '0', '--host', '127.0.0.1'], {
-        env: { ...process.env, ELECTRON_RUN_AS_NODE: '1', DSH_HOME: process.env.DSH_HOME ?? join(process.env.HOME ?? '', '.dsh') },
+      const node = resolveNodeBinary()
+      const childProc = spawn(node.cmd, [dshBinPath(), '--profile', 'web', '--port', '0', '--host', '127.0.0.1'], {
+        env: {
+          ...process.env,
+          ...node.env,
+          DSH_HOME: process.env.DSH_HOME ?? join(process.env.HOME ?? '', '.dsh')
+        },
         stdio: ['ignore', 'pipe', 'pipe'],
         cwd: join(dshBinPath(), '..', '..', '..', '..')
       })
