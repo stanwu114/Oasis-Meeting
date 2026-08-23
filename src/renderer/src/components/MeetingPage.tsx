@@ -40,9 +40,9 @@ type Tab = 'notes' | 'transcript' | 'summary'
 type RecStatus = 'idle' | 'recording' | 'paused' | 'importing' | 'transcribing' | 'summarizing' | 'done' | 'error'
 
 const TAB_LABELS: { key: Tab; label: string }[] = [
-  { key: 'notes', label: '会议笔记' },
+  { key: 'summary', label: 'AI 会议纪要' },
   { key: 'transcript', label: '录音转写稿' },
-  { key: 'summary', label: 'AI 会议纪要' }
+  { key: 'notes', label: '会议笔记' }
 ]
 
 const META_FIELDS: { key: keyof MetaData; label: string; placeholder: string }[] = [
