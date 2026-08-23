@@ -6,7 +6,6 @@ import fixWebmDuration from 'fix-webm-duration'
 import WaveSurfer from 'wavesurfer.js'
 import { useAppStore } from '../stores/appStore'
 import { useUiStore } from '../stores/uiStore'
-import { beijingStamp } from '../../../shared/ipc'
 
 /**
  * Meeting 页面:纯表单结构(无 BlockNote)
@@ -208,7 +207,6 @@ export default function MeetingPage({ pageId }: { pageId: string }) {
   const wsPlayRef = useRef<WaveSurfer | null>(null)
   const timerRef = useRef<number | null>(null)
   const saveTimer = useRef<number | null>(null)
-  const namedRef = useRef(false)
 
   /* 同步 ref(避免闭包捕获旧值) */
   consoleDataRef.current = consoleData
@@ -387,23 +385,6 @@ export default function MeetingPage({ pageId }: { pageId: string }) {
 
   /* ---------- AI 自动命名+主题 ----------
   useEffect(() => {
-    if (namedRef.current || meta.name || !consoleData.transcript) return
-    namedRef.current = true
-    void window.oasis.ai.meetingName(consoleData.transcript).then(({ name, topic }) => {
-      if (name) {
-        updateMeta({ name, topic: topic || meta.topic })
-        void useAppStore.getState().renamePage(pageId, `${name}会议@${meta.time || beijingStamp()}`)
-      }
-    }).catch(() => { namedRef.current = false })
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [consoleData.transcript, pageId])
-
-  /* ---------- 录音控制 ---------- */
-  const startTimer = (): void => {
-    timerRef.current = window.setInterval(() => {
-      if (recorderRef.current) setElapsed(recorderRef.current.elapsedMs)
-    }, 200)
-  }
   const stopTimer = (): void => {
     if (timerRef.current) { clearInterval(timerRef.current); timerRef.current = null }
   }
