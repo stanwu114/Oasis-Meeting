@@ -57,21 +57,34 @@ const emptyMeta: MetaData = { name: '', location: '', topic: '', time: '', parti
 const emptyConsole: ConsoleData = { notes: '', transcript: '', summary: '', status: 'idle', recordingId: '', durationMs: 0, activeTab: 'summary' }
 
 /* ---------- 会议信息卡 ---------- */
-function MetaCard({ data, onChange }: { data: MetaData; onChange: (patch: Partial<MetaData>) => void }): React.ReactNode {
+function MetaCard({
+  data,
+  onChange,
+  highlightQuery
+}: {
+  data: MetaData
+  onChange: (patch: Partial<MetaData>) => void
+  highlightQuery: string
+}): React.ReactNode {
+  const hq = highlightQuery.trim().toLowerCase()
   return (
     <div className="meeting-meta">
-      {META_FIELDS.map((f) => (
-        <div key={f.key} className="meeting-meta-row">
-          <span className="meeting-meta-label">{f.label}</span>
-          <input
-            className="meeting-meta-input"
-            value={data[f.key]}
-            placeholder={f.placeholder}
-            readOnly={f.key === 'time'}
-            onChange={(e) => onChange({ [f.key]: e.target.value })}
-          />
-        </div>
-      ))}
+      {META_FIELDS.map((f) => {
+        const value = data[f.key] || ''
+        const isMatch = !!hq && value.toLowerCase().includes(hq)
+        return (
+          <div key={f.key} className={`meeting-meta-row${isMatch ? ' field-hit' : ''}`}>
+            <span className="meeting-meta-label">{f.label}</span>
+            <input
+              className={`meeting-meta-input${isMatch ? ' field-highlight' : ''}`}
+              value={value}
+              placeholder={f.placeholder}
+              readOnly={f.key === 'time'}
+              onChange={(e) => onChange({ [f.key]: e.target.value })}
+            />
+          </div>
+        )
+      })}
     </div>
   )
 }
@@ -625,7 +638,7 @@ export default function MeetingPage({ pageId }: { pageId: string }) {
       </div>
 
       {/* 会议信息卡(不可删除) */}
-      <MetaCard data={meta} onChange={updateMeta} />
+      <MetaCard data={meta} onChange={updateMeta} highlightQuery={highlightQuery} />
 
       {/* 会议控制台(不可删除) */}
       <div className="meeting-console">

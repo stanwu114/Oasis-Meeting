@@ -2758,3 +2758,21 @@ svg {
 .project-add-btn:hover svg {
   color: var(--accent);
 }
+
+/* 会议卡字段搜索命中高亮 */
+.meeting-meta-row.field-hit {
+  background: rgba(255, 241, 118, 0.15);
+  border-radius: 6px;
+  padding-left: 6px;
+  padding-right: 6px;
+  margin-left: -6px;
+  margin-right: -6px;
+}
+
+.meeting-meta-input.field-highlight {
+  background: #fff176;
+  color: #333;
+  border-radius: 4px;
+  padding-left: 6px;
+  padding-right: 6px;
+}
