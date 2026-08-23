@@ -54,7 +54,7 @@ const META_FIELDS: { key: keyof MetaData; label: string; placeholder: string }[]
 ]
 
 const emptyMeta: MetaData = { name: '', location: '', topic: '', time: '', participants: '' }
-const emptyConsole: ConsoleData = { notes: '', transcript: '', summary: '', status: 'idle', recordingId: '', durationMs: 0, activeTab: 'notes' }
+const emptyConsole: ConsoleData = { notes: '', transcript: '', summary: '', status: 'idle', recordingId: '', durationMs: 0, activeTab: 'summary' }
 
 /* ---------- 会议信息卡 ---------- */
 function MetaCard({ data, onChange }: { data: MetaData; onChange: (patch: Partial<MetaData>) => void }): React.ReactNode {
@@ -191,7 +191,7 @@ export default function MeetingPage({ pageId }: { pageId: string }) {
   const [meta, setMeta] = useState<MetaData>(emptyMeta)
   const [consoleData, setConsoleData] = useState<ConsoleData>(emptyConsole)
   const [recStatus, setRecStatus] = useState<RecStatus>('idle')
-  const [activeTab, setActiveTab] = useState<Tab>('notes')
+  const [activeTab, setActiveTab] = useState<Tab>('summary')
   const [elapsed, setElapsed] = useState(0)
   const [errorMsg, setErrorMsg] = useState('')
   const [searchQuery, setSearchQuery] = useState('')
