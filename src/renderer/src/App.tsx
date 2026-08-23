@@ -97,7 +97,7 @@ function EmptyState(): React.ReactNode {
       <p>本地优先的会议记录空间 · 录音在本机转写,数据不出电脑</p>
       <div className="empty-actions">
         <button type="button" className="btn primary" onClick={() => void useAppStore.getState().createPage(null)}>
-          ＋ 新建 Meeting
+          新建 Meeting
         </button>
       </div>
     </div>

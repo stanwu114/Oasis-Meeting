@@ -2726,3 +2726,9 @@ svg {
   font-size: 14px;
   margin: 0;
 }
+
+/* 欢迎页按钮:适中大小 */
+.empty-actions .btn {
+  padding: 8px 20px;
+  font-size: 14px;
+}
