@@ -6,14 +6,11 @@ import type { SearchResult } from '../../../shared/ipc'
 /** 搜索结果页:在右侧主区域显示 */
 export function SearchResults({ results, query }: { results: SearchResult[]; query: string }): React.ReactNode {
   const openPage = (pageId: string): void => {
+    // 先设置高亮词,再打开页面(确保页面加载时能读到)
+    useUiStore.getState().setHighlightQuery(query)
     useUiStore.getState().setView('editor')
-    useUiStore.getState().setSearch('', []) // 清搜索状态
-    void useAppStore.getState().openPage(pageId).then(() => {
-      // 延迟设置高亮,等 MeetingPage 加载完数据
-      setTimeout(() => {
-        useUiStore.getState().setHighlightQuery(query)
-      }, 200)
-    })
+    useUiStore.getState().setSearch('', [])
+    void useAppStore.getState().openPage(pageId)
   }
 
   return (

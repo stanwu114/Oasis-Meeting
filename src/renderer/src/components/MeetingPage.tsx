@@ -369,7 +369,23 @@ export default function MeetingPage({ pageId }: { pageId: string }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pageId])
 
-  /* ---------- AI 自动命名+主题 ---------- */
+  /* 补漏:页面已加载但高亮词后到的情况 */
+  useEffect(() => {
+    if (!highlightQuery || !dataLoadedRef.current) return
+    const q = highlightQuery.toLowerCase()
+    const cd = consoleDataRef.current
+    if (cd.transcript?.toLowerCase().includes(q)) {
+      setActiveTab('transcript')
+      setSearchQuery(highlightQuery)
+    } else if (cd.summary?.toLowerCase().includes(q)) {
+      setActiveTab('summary')
+      setSearchQuery(highlightQuery)
+    } else if (cd.notes?.toLowerCase().includes(q)) {
+      setActiveTab('notes')
+    }
+  }, [highlightQuery])
+
+  /* ---------- AI 自动命名+主题 ----------
   useEffect(() => {
     if (namedRef.current || meta.name || !consoleData.transcript) return
     namedRef.current = true
