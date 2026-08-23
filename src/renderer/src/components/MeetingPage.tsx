@@ -288,16 +288,23 @@ export default function MeetingPage({ pageId }: { pageId: string }) {
         const hq = useUiStore.getState().highlightQuery
         if (hq) {
           const q = hq.toLowerCase()
-          if (content.console.transcript?.toLowerCase().includes(q)) {
+          // 检查所有内容(含 meta 字段)
+          const inTranscript = content.console.transcript?.toLowerCase().includes(q)
+          const inSummary = content.console.summary?.toLowerCase().includes(q)
+          const inNotes = content.console.notes?.toLowerCase().includes(q)
+          const inMeta = Object.values(content.meta || {}).some(
+            (v) => typeof v === 'string' && v.toLowerCase().includes(q)
+          )
+          if (inTranscript) {
             setActiveTab('transcript')
             setSearchQuery(hq)
-          } else if (content.console.summary?.toLowerCase().includes(q)) {
+          } else if (inSummary) {
             setActiveTab('summary')
             setSearchQuery(hq)
-          } else if (content.console.notes?.toLowerCase().includes(q)) {
+          } else if (inNotes) {
             setActiveTab('notes')
           }
-          useUiStore.getState().setHighlightQuery('')
+          // 不清除 highlightQuery,让它持续用于高亮(切页或新搜索时由 SearchResults 清除)
         }
       }
     })
@@ -383,6 +390,14 @@ export default function MeetingPage({ pageId }: { pageId: string }) {
       setActiveTab('notes')
     }
   }, [highlightQuery])
+
+  /* 切页时清除高亮 */
+  useEffect(() => {
+    return () => {
+      useUiStore.getState().setHighlightQuery('')
+      setSearchQuery('')
+    }
+  }, [pageId])
 
   /* ---------- AI 自动命名+主题 ----------
   useEffect(() => {
