@@ -43,6 +43,9 @@ export function registerIpc(): void {
   handle(IPC.pagesSetIcon, (id: string, icon: string | null) => db.setIcon(id, icon))
   handle(IPC.pagesMove, (id: string, parentId: string | null, index: number) => db.movePage(id, parentId, index))
   handle(IPC.pagesUpdateContent, (id: string, content: BlockDoc) => db.updateContent(id, content))
+  handle(IPC.pagesUpdateConsole, (id: string, fields: { transcript?: string; summary?: string; notes?: string }) => {
+    db.updateConsoleFields(id, fields)
+  })
   handle(IPC.pagesTrash, (id: string) => db.trashPage(id))
   handle(IPC.pagesRestore, (id: string) => db.restorePage(id))
   handle(IPC.pagesDeletePermanent, async (id: string) => {

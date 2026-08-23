@@ -101,6 +101,14 @@ function migrate(): void {
     db.exec(`ALTER TABLE ai_conversations ADD COLUMN kind TEXT NOT NULL DEFAULT 'chat';`)
     db.pragma('user_version = 4')
   }
+  if (version < 5) {
+    db.exec(`
+      ALTER TABLE pages ADD COLUMN transcript TEXT DEFAULT '';
+      ALTER TABLE pages ADD COLUMN summary TEXT DEFAULT '';
+      ALTER TABLE pages ADD COLUMN notes TEXT DEFAULT '';
+    `)
+    db.pragma('user_version = 5')
+  }
 }
 
 /* ---------- 行映射 ---------- */
@@ -116,6 +124,9 @@ interface PageRow {
   created_at: string
   updated_at: string
   deleted_at: string | null
+  transcript?: string
+  summary?: string
+  notes?: string
   child_count?: number
 }
 
@@ -133,7 +144,15 @@ function toSummary(r: PageRow): PageSummary {
 }
 
 function toDetail(r: PageRow): PageDetail {
-  return { ...toSummary(r), content: r.content ? (JSON.parse(r.content) as BlockDoc) : null }
+  const content = r.content ? (JSON.parse(r.content) as Record<string, unknown>) : null
+  // 合并独立列到 console 数据(v5 迁移后 transcript/summary/notes 存独立列)
+  if (content && typeof content === 'object' && 'console' in content) {
+    const consoleData = content.console as Record<string, unknown>
+    if (r.transcript) consoleData.transcript = r.transcript
+    if (r.summary) consoleData.summary = r.summary
+    if (r.notes) consoleData.notes = r.notes
+  }
+  return { ...toSummary(r), content: content as unknown as BlockDoc }
 }
 
 interface RecRow {
@@ -388,6 +407,21 @@ export function listAllRecordings(): RecordingListEntry[] {
   }))
 }
 
+export function updateConsoleFields(
+  id: string,
+  fields: { transcript?: string; summary?: string; notes?: string }
+): void {
+  const sets: string[] = []
+  const vals: unknown[] = []
+  if (fields.transcript !== undefined) { sets.push('transcript = ?'); vals.push(fields.transcript) }
+  if (fields.summary !== undefined) { sets.push('summary = ?'); vals.push(fields.summary) }
+  if (fields.notes !== undefined) { sets.push('notes = ?'); vals.push(fields.notes) }
+  if (sets.length === 0) return
+  sets.push(`updated_at = strftime('%Y-%m-%dT%H:%M:%fZ','now')`)
+  vals.push(id)
+  db.prepare(`UPDATE pages SET ${sets.join(', ')} WHERE id = ?`).run(...vals)
+}
+
 export function setRecordingBlock(id: string, blockId: string | null): void {
   db.prepare(`UPDATE recordings SET block_id = ? WHERE id = ?`).run(blockId, id)
 }
@@ -411,6 +445,11 @@ export function setSummaryText(id: string, summary: string): void {
 }
 
 /* ---------- 设置 ---------- */
+
+export function getAllRecordingFileNames(): string[] {
+  const rows = db.prepare(`SELECT file_name FROM recordings`).all() as { file_name: string }[]
+  return rows.map((r) => r.file_name)
+}
 
 export function getSetting(key: string): string | undefined {
   const row = db.prepare(`SELECT value FROM settings WHERE key = ?`).get(key) as { value: string } | undefined

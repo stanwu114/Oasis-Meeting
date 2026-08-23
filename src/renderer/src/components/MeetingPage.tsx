@@ -209,12 +209,23 @@ export default function MeetingPage({ pageId }: { pageId: string }) {
   const namedRef = useRef(false)
 
   /* ---------- 数据持久化 ---------- */
+  /* meta 数据防抖保存(名称/地点/主题/参会人 — 高频输入) */
   const saveData = (m: MetaData, c: ConsoleData): void => {
-    if (!dataLoadedRef.current) return // 数据未加载完不保存,防止空数据覆盖
+    if (!dataLoadedRef.current) return
     if (saveTimer.current) clearTimeout(saveTimer.current)
     saveTimer.current = window.setTimeout(() => {
-      void window.oasis.pages.updateContent(pageId, { meta: m, console: c } as never)
+      // console 的大字段(transcript/summary/notes)已拆独立列,JSON 里只存状态
+      void window.oasis.pages.updateContent(pageId, {
+        meta: m,
+        console: { status: c.status, recordingId: c.recordingId, durationMs: c.durationMs, activeTab: c.activeTab }
+      } as never)
     }, 600)
+  }
+
+  /* 关键数据立即保存(转写稿/纪要/笔记 — 不走防抖) */
+  const saveConsoleNow = (fields: { transcript?: string; summary?: string; notes?: string }): void => {
+    if (!dataLoadedRef.current) return
+    void window.oasis.pages.updateConsole(pageId, fields)
   }
 
   const updateMeta = (patch: Partial<MetaData>): void => {
@@ -228,6 +239,13 @@ export default function MeetingPage({ pageId }: { pageId: string }) {
   const updateConsole = (patch: Partial<ConsoleData>): void => {
     setConsoleData((prev) => {
       const next = { ...prev, ...patch }
+      // 大字段立即保存
+      const immediate: { transcript?: string; summary?: string; notes?: string } = {}
+      if (patch.transcript !== undefined) immediate.transcript = patch.transcript
+      if (patch.summary !== undefined) immediate.summary = patch.summary
+      if (patch.notes !== undefined) immediate.notes = patch.notes
+      if (Object.keys(immediate).length > 0) saveConsoleNow(immediate)
+      // 状态字段防抖保存
       saveData(meta, next)
       return next
     })
@@ -244,6 +262,18 @@ export default function MeetingPage({ pageId }: { pageId: string }) {
       if (content.console) {
         setConsoleData({ ...emptyConsole, ...content.console })
         setRecStatus((content.console.status as RecStatus) || 'idle')
+
+        // 校验录音文件是否存在
+        const recId = (content.console as Record<string, unknown>)?.recordingId as string
+        if (recId) {
+          void window.oasis.recordings.readAudio(recId).then((buf) => {
+            if (!buf) {
+              // 文件丢失,清除回放引用但保留文稿
+              setConsoleData((prev) => ({ ...prev, recordingId: '' }))
+              setRecStatus((prev) => (prev === 'done' ? 'idle' : prev))
+            }
+          })
+        }
 
         // 搜索高亮:检查哪个标签页包含搜索词,自动切换过去
         const hq = useUiStore.getState().highlightQuery

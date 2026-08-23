@@ -6,6 +6,8 @@ import { registerIpc } from './ipc'
 import { onModelStatus } from './modelManager'
 import { broadcastModelStatus, broadcastHarnessState } from './events'
 import { onHarnessState, stopHarness } from './dshRunner'
+import { runDailyBackup, cleanOrphanMedia } from './backup'
+import { getAllRecordingFileNames } from './db'
 
 // 单实例
 const gotLock = app.requestSingleInstanceLock()
@@ -119,6 +121,11 @@ app.whenReady().then(() => {
   registerIpc()
   onModelStatus(broadcastModelStatus)
   onHarnessState(broadcastHarnessState)
+
+  // 每日备份 + 孤儿文件清理(异步,不阻塞启动)
+  void runDailyBackup()
+  void cleanOrphanMedia(getAllRecordingFileNames)
+
   setupMenu()
   createWindow()
 

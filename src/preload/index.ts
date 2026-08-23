@@ -11,6 +11,7 @@ const api: OasisApi = {
     setIcon: (id, icon) => ipcRenderer.invoke(IPC.pagesSetIcon, id, icon),
     move: (id, parentId, index) => ipcRenderer.invoke(IPC.pagesMove, id, parentId, index),
     updateContent: (id, content) => ipcRenderer.invoke(IPC.pagesUpdateContent, id, content),
+    updateConsole: (id, fields) => ipcRenderer.invoke(IPC.pagesUpdateConsole, id, fields),
     trash: (id) => ipcRenderer.invoke(IPC.pagesTrash, id),
     restore: (id) => ipcRenderer.invoke(IPC.pagesRestore, id),
     deletePermanent: (id) => ipcRenderer.invoke(IPC.pagesDeletePermanent, id),

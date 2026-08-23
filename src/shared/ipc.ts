@@ -8,6 +8,7 @@ export const IPC = {
   pagesSetIcon: 'pages:set-icon',
   pagesMove: 'pages:move',
   pagesUpdateContent: 'pages:update-content',
+  pagesUpdateConsole: 'pages:update-console',
   pagesTrash: 'pages:trash',
   pagesRestore: 'pages:restore',
   pagesDeletePermanent: 'pages:delete-permanent',
@@ -179,6 +180,8 @@ export interface OasisApi {
     setIcon(id: string, icon: string | null): Promise<void>
     move(id: string, parentId: string | null, index: number): Promise<void>
     updateContent(id: string, content: BlockDoc): Promise<void>
+    /** 独立更新 console 字段(立即写入,无防抖) */
+    updateConsole(id: string, fields: { transcript?: string; summary?: string; notes?: string }): Promise<void>
     trash(id: string): Promise<void>
     restore(id: string): Promise<void>
     deletePermanent(id: string): Promise<void>
