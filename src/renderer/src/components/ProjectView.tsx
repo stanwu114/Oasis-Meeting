@@ -32,8 +32,8 @@ export function ProjectView({ pageId }: { pageId: string }) {
       </div>
 
       <div className="project-actions">
-        <button type="button" className="btn primary" onClick={createMeeting}>
-          新建 Meeting
+        <button type="button" className="project-add-btn" onClick={createMeeting}>
+          <Icon name="plus" size={13} /> 新建 Meeting
         </button>
       </div>
 

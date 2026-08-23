@@ -2733,3 +2733,28 @@ svg {
   padding: 8px 20px;
   font-size: 14px;
 }
+
+/* Project 详情页的新建按钮:低调的文字链接风格 */
+.project-add-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px;
+  border-radius: 7px;
+  font-size: 13px;
+  color: var(--fg-muted);
+  transition: background 0.12s, color 0.12s;
+}
+
+.project-add-btn:hover {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+.project-add-btn svg {
+  color: var(--fg-faint);
+}
+
+.project-add-btn:hover svg {
+  color: var(--accent);
+}
