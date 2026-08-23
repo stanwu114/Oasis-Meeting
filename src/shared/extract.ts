@@ -19,6 +19,23 @@ function inlineText(content: unknown): string {
 }
 
 export function extractDocText(doc: unknown): string {
+  // 新格式:纯 JSON 对象 { meta: {...}, console: {...} }
+  if (doc && typeof doc === 'object' && !Array.isArray(doc)) {
+    const d = doc as {
+      meta?: { name?: string; topic?: string; participants?: string }
+      console?: { notes?: string; transcript?: string; summary?: string }
+    }
+    const parts: string[] = []
+    if (d.meta?.name) parts.push(d.meta.name)
+    if (d.meta?.topic) parts.push(d.meta.topic)
+    if (d.meta?.participants) parts.push(d.meta.participants)
+    if (d.console?.notes) parts.push(d.console.notes)
+    if (d.console?.transcript) parts.push(d.console.transcript)
+    if (d.console?.summary) parts.push(d.console.summary)
+    return parts.filter(Boolean).join('\n')
+  }
+
+  // 旧格式:BlockNote 文档数组
   if (!Array.isArray(doc)) return ''
   const parts: string[] = []
   const walk = (blocks: AnyBlock[]) => {
