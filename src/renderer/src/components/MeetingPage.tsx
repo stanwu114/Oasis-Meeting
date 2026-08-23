@@ -280,10 +280,11 @@ export default function MeetingPage({ pageId }: { pageId: string }) {
             setSearchQuery(hq)
           } else if (content.console.summary?.toLowerCase().includes(q)) {
             setActiveTab('summary')
+            setSearchQuery(hq)
           } else if (content.console.notes?.toLowerCase().includes(q)) {
             setActiveTab('notes')
           }
-          useUiStore.getState().setHighlightQuery('') // 用完清空
+          useUiStore.getState().setHighlightQuery('')
         }
       }
     })
@@ -539,13 +540,15 @@ export default function MeetingPage({ pageId }: { pageId: string }) {
     return consoleData.transcript.split(/\n{2,}/)
       .map((p) => {
         const m = /^\[(\d{1,2}:\d{2}(?::\d{2})?)\]\s*/.exec(p)
+        const text = m ? p.slice(m[0].length) : p
         return {
           stamp: m ? m[1] : '',
-          text: m ? p.slice(m[0].length) : p,
-          highlight: !!q && (m ? p.slice(m[0].length) : p).toLowerCase().includes(q)
+          text,
+          highlight: !!q && text.toLowerCase().includes(q)
         }
       })
-      .filter((item) => !q || item.highlight)
+      // 有搜索词时仍然显示全部行(不过滤),只是高亮命中的;用户可以手动在搜索栏过滤
+      .filter((item) => !q || item.highlight || true)
   })()
 
   /* 标题 */

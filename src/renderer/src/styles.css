@@ -2511,10 +2511,10 @@ svg {
 
 /* 搜索高亮 */
 .console-highlight {
-  background: var(--accent-soft);
-  color: var(--accent);
-  border-radius: 3px;
-  padding: 0 2px;
+  background: #fff176;
+  color: inherit;
+  border-radius: 2px;
+  padding: 0 1px;
 }
 
 /* AI 纪要:分区标题 */
