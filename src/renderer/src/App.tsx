@@ -23,6 +23,21 @@ export default function App() {
   const searchResults = useUiStore((s) => s.searchResults)
   const toastKind = useUiStore((s) => s.toastKind)
 
+  /* 看门狗:当前页面不在列表中时自动清空(处理删除/移动到回收站等场景) */
+  const pagesList = useAppStore((s) => s.pages)
+  useEffect(() => {
+    const cid = useAppStore.getState().currentId
+    if (cid && !pagesList.some((p) => p.id === cid)) {
+      useAppStore.setState({
+        currentId: null,
+        currentContent: null,
+        currentTitle: '',
+        currentIcon: null,
+        pageVersion: Date.now()
+      })
+    }
+  }, [pagesList])
+
   /* 初始化 + 事件订阅 */
   useEffect(() => {
     void useAppStore.getState().init()
