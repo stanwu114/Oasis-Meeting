@@ -32,7 +32,7 @@ export interface ChatMessage {
   content: string
 }
 
-export async function chat(messages: ChatMessage[], opts?: { temperature?: number; maxTokens?: number }): Promise<string> {
+export async function chat(messages: ChatMessage[], opts?: { temperature?: number; maxTokens?: number; timeoutMs?: number }): Promise<string> {
   const key = readKey()
   if (!key) throw new Error('未找到 DeepSeek API Key(读取 ~/.dsh/.credentials.yaml 失败)')
   const res = await fetch(API_URL, {
@@ -44,7 +44,7 @@ export async function chat(messages: ChatMessage[], opts?: { temperature?: numbe
       max_tokens: opts?.maxTokens ?? 1400,
       messages
     }),
-    signal: AbortSignal.timeout(60_000)
+    signal: AbortSignal.timeout(opts?.timeoutMs ?? 120_000)
   })
   if (!res.ok) {
     const body = await res.text().catch(() => '')

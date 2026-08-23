@@ -79,9 +79,9 @@ async function processQueue(): Promise<void> {
         const summary = await chat(
           [
             { role: 'system', content: SYSTEM_PROMPT },
-            { role: 'user', content: rec.transcript.slice(0, 24_000) }
+            { role: 'user', content: rec.transcript }
           ],
-          { temperature: 0.3 }
+          { temperature: 0.3, maxTokens: 4000 }
         )
         setSummaryText(id, summary)
       } catch (e) {
