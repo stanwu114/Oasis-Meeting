@@ -342,12 +342,31 @@ export function searchPages(q: string): SearchResult[] {
   const term = `%${q.replace(/([%_\\])/g, '\\$1')}%`
   const rows = db
     .prepare(
-      `SELECT id, title, icon, body_text FROM pages
-       WHERE deleted_at IS NULL AND (title LIKE ? ESCAPE '\\' COLLATE NOCASE OR body_text LIKE ? ESCAPE '\\')
+      `SELECT DISTINCT id, title, icon, body_text,
+              COALESCE(transcript, '') as col_transcript,
+              COALESCE(summary, '') as col_summary,
+              COALESCE(notes, '') as col_notes
+       FROM pages
+       WHERE deleted_at IS NULL AND (
+         title LIKE ? ESCAPE '\\' COLLATE NOCASE
+         OR body_text LIKE ? ESCAPE '\\'
+         OR COALESCE(transcript, '') LIKE ? ESCAPE '\\'
+         OR COALESCE(summary, '') LIKE ? ESCAPE '\\'
+         OR COALESCE(notes, '') LIKE ? ESCAPE '\\'
+         OR COALESCE(content, '') LIKE ? ESCAPE '\\'
+       )
        ORDER BY updated_at DESC LIMIT 50`
     )
-    .all(term, term) as { id: string; title: string; icon: string | null; body_text: string }[]
-  return rows.map((r) => ({ pageId: r.id, title: r.title, icon: r.icon, snippet: makeSnippet(r.body_text, q) }))
+    .all(term, term, term, term, term, term) as {
+      id: string; title: string; icon: string | null; body_text: string;
+      col_transcript: string; col_summary: string; col_notes: string
+    }[]
+  return rows.map((r) => {
+    // 用所有文本源拼出完整的搜索文本(保证 snippet 能找到)
+    const fullText = [r.body_text, r.col_transcript, r.col_summary, r.col_notes]
+      .filter(Boolean).join('\n')
+    return { pageId: r.id, title: r.title, icon: r.icon, snippet: makeSnippet(fullText, q) }
+  })
 }
 
 /* ---------- 录音 ---------- */

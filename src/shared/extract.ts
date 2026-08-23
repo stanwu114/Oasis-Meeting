@@ -22,12 +22,14 @@ export function extractDocText(doc: unknown): string {
   // 新格式:纯 JSON 对象 { meta: {...}, console: {...} }
   if (doc && typeof doc === 'object' && !Array.isArray(doc)) {
     const d = doc as {
-      meta?: { name?: string; topic?: string; participants?: string }
+      meta?: { name?: string; topic?: string; participants?: string; location?: string; time?: string }
       console?: { notes?: string; transcript?: string; summary?: string }
     }
     const parts: string[] = []
     if (d.meta?.name) parts.push(d.meta.name)
+    if (d.meta?.location) parts.push(d.meta.location)
     if (d.meta?.topic) parts.push(d.meta.topic)
+    if (d.meta?.time) parts.push(d.meta.time)
     if (d.meta?.participants) parts.push(d.meta.participants)
     if (d.console?.notes) parts.push(d.console.notes)
     if (d.console?.transcript) parts.push(d.console.transcript)
