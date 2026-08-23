@@ -202,6 +202,7 @@ export default function MeetingPage({ pageId }: { pageId: string }) {
   const highlightQuery = useUiStore((s) => s.highlightQuery)
 
   const recorderRef = useRef<MicRecorder | null>(null)
+  const dataLoadedRef = useRef(false)
   const wsPlayRef = useRef<WaveSurfer | null>(null)
   const timerRef = useRef<number | null>(null)
   const saveTimer = useRef<number | null>(null)
@@ -209,6 +210,7 @@ export default function MeetingPage({ pageId }: { pageId: string }) {
 
   /* ---------- 数据持久化 ---------- */
   const saveData = (m: MetaData, c: ConsoleData): void => {
+    if (!dataLoadedRef.current) return // 数据未加载完不保存,防止空数据覆盖
     if (saveTimer.current) clearTimeout(saveTimer.current)
     saveTimer.current = window.setTimeout(() => {
       void window.oasis.pages.updateContent(pageId, { meta: m, console: c } as never)
@@ -233,7 +235,9 @@ export default function MeetingPage({ pageId }: { pageId: string }) {
 
   /* ---------- 加载页面数据 ---------- */
   useEffect(() => {
+    dataLoadedRef.current = false // 切页时重置
     void window.oasis.pages.get(pageId).then((page) => {
+      dataLoadedRef.current = true // 数据已加载,允许保存
       if (!page?.content) return
       const content = page.content as unknown as PageData
       if (content.meta) setMeta({ ...emptyMeta, ...content.meta })
