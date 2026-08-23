@@ -1,16 +1,13 @@
 import { useEffect } from 'react'
 import { Sidebar } from './components/Sidebar'
-import { SearchModal } from './components/SearchModal'
 import { SettingsModal } from './components/SettingsModal'
 import { TrashView } from './components/TrashView'
-import { AiSelectionBar } from './components/AiSelectionBar'
 import { SearchResults } from './components/SearchResults'
 import { HarnessView } from './components/HarnessView'
 import MeetingPage from './components/MeetingPage'
 import { ProjectView } from './components/ProjectView'
 import { useAppStore } from './stores/appStore'
 import { useUiStore } from './stores/uiStore'
-import { useRecordingsStore } from './stores/recordingsStore'
 
 export default function App() {
   const view = useUiStore((s) => s.view)
@@ -43,9 +40,6 @@ export default function App() {
     void useAppStore.getState().init()
     void useUiStore.getState().initModel()
 
-    const offRec = window.oasis.on.recordingsChanged((rec) => {
-      useRecordingsStore.getState().upsert(rec)
-    })
     const offModel = window.oasis.on.modelProgress((m) => {
       useUiStore.getState().setModelStatus(m)
     })
@@ -53,7 +47,6 @@ export default function App() {
       if (action === 'new-page') void useAppStore.getState().createPage(null)
     })
     return () => {
-      offRec()
       offModel()
       offAction()
     }
@@ -91,8 +84,6 @@ export default function App() {
         )}
       </main>
 
-      <AiSelectionBar />
-      <SearchModal />
       <SettingsModal />
       {toast ? <div className={`toast ${toastKind === 'error' ? 'error' : ''}`}>{toast}</div> : null}
     </div>

@@ -17,9 +17,6 @@
     "dist": "electron-vite build && electron-builder --mac"
   },
   "dependencies": {
-    "@blocknote/core": "^0.54.0",
-    "@blocknote/mantine": "^0.54.0",
-    "@blocknote/react": "^0.54.0",
     "better-sqlite3": "^13.0.3",
     "docx": "^9.7.1",
     "fix-webm-duration": "^1.0.6",

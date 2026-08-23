@@ -123,11 +123,6 @@ kbd {
 }
 
 /* 编辑器正文排印:稍大字号 + 舒适行高 */
-.bn-editor {
-  font-size: 15.5px;
-  line-height: 1.75;
-}
-
 /* ============ 划词 AI 工具条 ============ */
 .ai-sel {
   position: fixed;
@@ -304,10 +299,6 @@ kbd {
   align-items: center;
   color: var(--fg);
   padding: 4px 10px 6px;
-}
-
-.brand-mark {
-  font-size: 14px;
 }
 
 .sidebar-actions {
@@ -574,28 +565,6 @@ kbd {
 }
 
 /* 空文档快捷入口 */
-.empty-doc-hints {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 18px;
-  flex-wrap: wrap;
-}
-
-.hint-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  padding: 8px 15px;
-  border-radius: 9px;
-  border: 1px solid var(--border);
-  background: var(--bg-subtle);
-  color: var(--fg);
-  font-size: 13.5px;
-  font-weight: 500;
-  transition: border-color 0.12s, box-shadow 0.12s;
-}
-
 .hint-chip:hover {
   border-color: var(--border-strong);
   box-shadow: var(--shadow-sm);
@@ -612,29 +581,7 @@ kbd {
   cursor: default;
 }
 
-.hint-text {
-  font-size: 12.5px;
-  color: var(--fg-faint);
-}
-
 /* 页面内录音悬浮按钮 */
-.record-fab {
-  position: fixed;
-  right: 34px;
-  bottom: 34px;
-  width: 52px;
-  height: 52px;
-  border-radius: 50%;
-  background: var(--accent);
-  color: var(--on-accent);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: var(--shadow-lg);
-  z-index: 60;
-  transition: filter 0.15s;
-}
-
 .record-fab:hover {
   filter: brightness(1.1);
 }
@@ -660,61 +607,9 @@ kbd {
 }
 
 /* ============ 会议记录块(录音) ============ */
-.meeting-block {
-  margin: 14px 0;
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  background: var(--bg-subtle);
-  padding: 16px 18px;
-  box-shadow: var(--shadow-sm);
-}
-
-.meeting-head {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 12px;
-}
-
-.meeting-icon {
-  font-size: 15px;
-}
-
-.meeting-title {
-  font-weight: 600;
-  font-size: 14px;
-}
-
-.meeting-date {
-  color: var(--fg-faint);
-  font-size: 12.5px;
-}
-
-.meeting-duration {
-  color: var(--fg-faint);
-  font-size: 12.5px;
-  font-variant-numeric: tabular-nums;
-  margin-left: auto;
-}
-
-.meeting-player {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 9px;
-  padding: 10px 14px;
-}
-
 .meeting-player-hint {
   font-size: 13px;
   color: var(--fg-faint);
-}
-
-.meeting-status-row {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin: 12px 2px 4px;
-  flex-wrap: wrap;
 }
 
 .meeting-status {
@@ -768,13 +663,6 @@ kbd {
 }
 
 /* AI 总结区 */
-.meeting-summary {
-  margin-top: 12px;
-  background: var(--accent-soft);
-  border-radius: 9px;
-  padding: 12px 14px;
-}
-
 .meeting-summary-head {
   display: flex;
   align-items: center;
@@ -843,38 +731,6 @@ kbd {
   padding-top: 12px;
 }
 
-.meeting-transcript-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  font-size: 11.5px;
-  font-weight: 600;
-  letter-spacing: 0.5px;
-  color: var(--fg-faint);
-  margin-bottom: 8px;
-  text-transform: uppercase;
-}
-
-.meeting-line {
-  display: flex;
-  gap: 10px;
-  margin: 0 0 10px;
-  font-size: 13.5px;
-  line-height: 1.75;
-  align-items: baseline;
-}
-
-.meeting-stamp {
-  flex-shrink: 0;
-  font-size: 11px;
-  font-variant-numeric: tabular-nums;
-  color: var(--fg-faint);
-  background: var(--bg-active);
-  border-radius: 5px;
-  padding: 1px 6px;
-  transform: translateY(-1px);
-}
-
 .meeting-transcript-empty {
   color: var(--fg-faint);
   font-size: 13px;
@@ -925,77 +781,14 @@ kbd {
 }
 
 /* ============ 播放器 ============ */
-.audio-player {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  min-width: 0;
-}
-
-.audio-play-btn {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background: var(--accent);
-  color: var(--on-accent);
-  font-size: 11px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  transition: filter 0.12s;
-}
-
 .audio-play-btn:hover {
   filter: brightness(1.1);
 }
 
-.audio-wave {
-  flex: 1;
-  min-width: 0;
-}
-
-.audio-time {
-  font-size: 11.5px;
-  color: var(--fg-faint);
-  font-variant-numeric: tabular-nums;
-  flex-shrink: 0;
-}
-
 /* ============ 录音 HUD(顶部悬浮胶囊) ============ */
-.hud-center {
-  position: fixed;
-  top: 52px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 100;
-}
-
-.hud-pill {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  background: var(--card);
-  border: 1px solid var(--border-strong);
-  border-radius: 999px;
-  box-shadow: var(--shadow-lg);
-  padding: 10px 12px 10px 18px;
-  backdrop-filter: blur(20px);
-}
-
 .hud-pill.error {
   padding: 10px 12px 10px 18px;
   max-width: 620px;
-}
-
-.hud-dot {
-  width: 9px;
-  height: 9px;
-  border-radius: 50%;
-  background: var(--danger);
-  animation: pulse 1.2s ease-in-out infinite;
-  flex-shrink: 0;
 }
 
 @keyframes pulse {
@@ -1010,30 +803,11 @@ kbd {
   }
 }
 
-.hud-timer {
-  font-size: 17px;
-  font-weight: 600;
-  font-variant-numeric: tabular-nums;
-  letter-spacing: 0.5px;
-}
-
-.hud-canvas {
-  width: 170px;
-  height: 30px;
-  display: block;
-}
-
 .hud-divider {
   width: 1px;
   height: 20px;
   background: var(--border-strong);
   flex-shrink: 0;
-}
-
-.hud-hint {
-  font-size: 13.5px;
-  color: var(--fg-muted);
-  padding-right: 6px;
 }
 
 .hud-error-text {
@@ -1043,16 +817,6 @@ kbd {
   overflow: hidden;
   text-overflow: ellipsis;
   max-width: 340px;
-}
-
-.hud-btn {
-  padding: 6px 13px;
-  border-radius: 999px;
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--fg);
-  background: var(--bg-active);
-  transition: filter 0.12s, background 0.12s;
 }
 
 .hud-btn:hover {
@@ -1483,29 +1247,6 @@ kbd {
 }
 
 /* ============ AI 面板 ============ */
-.ai-panel {
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-}
-
-.ai-toolbar {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 10px 18px;
-  border-bottom: 1px solid var(--border);
-  -webkit-app-region: no-drag;
-}
-
-.ai-status-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--fg-faint);
-  flex-shrink: 0;
-}
-
 .ai-status-dot.s-ready {
   background: var(--ok);
   box-shadow: 0 0 0 3px var(--ok-soft);
@@ -1518,18 +1259,6 @@ kbd {
 
 .ai-status-dot.s-error {
   background: var(--danger);
-}
-
-.ai-status-label {
-  font-size: 13px;
-  font-weight: 500;
-  margin-right: auto;
-}
-
-.ai-webview {
-  flex: 1;
-  border: none;
-  background: var(--bg);
 }
 
 .ai-placeholder {
@@ -1557,12 +1286,6 @@ kbd {
   font-size: 13.5px;
   line-height: 1.8;
   margin: 0 0 8px;
-}
-
-.ai-error {
-  color: var(--danger);
-  max-width: 520px;
-  word-break: break-all;
 }
 
 .ai-spin {
@@ -1727,10 +1450,6 @@ kbd {
   align-items: center;
   justify-content: center;
   gap: 8px;
-}
-
-.empty-logo {
-  font-size: 46px;
 }
 
 .empty-state h1 {
@@ -1988,13 +1707,6 @@ kbd {
   color: var(--accent);
 }
 
-.brand-logo {
-  height: 30px;
-  width: auto;
-  display: block;
-  border-radius: 4px;
-}
-
 .brand-sub {
   font-family: 'BrandDisplay', Inter, -apple-system, sans-serif;
   font-weight: 900;
@@ -2052,14 +1764,6 @@ svg {
 /* 主按钮文字颜色跟随主题令牌 */
 .btn.primary,
 .sidebar-btn.record,
-.chat-send,
-.audio-play-btn,
-.hud-btn.stop,
-.record-fab,
-.chat-tab.on {
-  color: var(--on-accent);
-}
-
 /* 标题排印 */
 .page-title {
   font-size: 38px;
@@ -2151,12 +1855,6 @@ svg {
 /* 录音块头部图标 */
 .meeting-block-icon,
 .recording-row-icon,
-.chat-welcome-icon,
-.harness-placeholder .ai-placeholder-icon,
-.empty-logo {
-  color: var(--accent);
-}
-
 /* 计时/数字统一等宽 */
 .meeting-duration,
 .audio-time,
