@@ -147,7 +147,9 @@ export const useAppStore = create<AppState>((set, get) => ({
 
   trashPage: async (id) => {
     await api.pages.trash(id)
-    if (get().currentId === id) set({ currentId: null, currentContent: null, currentTitle: '' })
+    if (get().currentId === id) {
+      set({ currentId: null, currentContent: null, currentTitle: '', currentIcon: null })
+    }
     await get().refresh()
     // 删除后回到欢迎页
   },
