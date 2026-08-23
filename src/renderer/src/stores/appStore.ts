@@ -9,6 +9,7 @@ interface AppState {
   currentIcon: string | null
   currentContent: BlockDoc | null
   loaded: boolean
+  pageVersion: number
   expanded: Record<string, boolean>
 
   init(): Promise<void>
@@ -70,6 +71,7 @@ export const useAppStore = create<AppState>((set, get) => ({
   currentIcon: null,
   currentContent: null,
   loaded: false,
+  pageVersion: 0,
   expanded: {},
 
   init: async () => {
@@ -148,7 +150,9 @@ export const useAppStore = create<AppState>((set, get) => ({
   trashPage: async (id) => {
     await api.pages.trash(id)
     if (get().currentId === id) {
-      set({ currentId: null, currentContent: null, currentTitle: '', currentIcon: null })
+      set((s) => ({ currentId: null, currentContent: null, currentTitle: '', currentIcon: null, pageVersion: s.pageVersion + 1 }))
+    } else {
+      set((s) => ({ pageVersion: s.pageVersion + 1 }))
     }
     await get().refresh()
     // 删除后回到欢迎页

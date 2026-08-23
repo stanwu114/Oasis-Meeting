@@ -17,6 +17,7 @@ export default function App() {
   const currentId = useAppStore((s) => s.currentId)
   const currentIcon = useAppStore((s) => s.currentIcon)
   const loaded = useAppStore((s) => s.loaded)
+  const pageVersion = useAppStore((s) => s.pageVersion)
   const toast = useUiStore((s) => s.toast)
   const searchQuery = useUiStore((s) => s.searchQuery)
   const searchResults = useUiStore((s) => s.searchResults)
@@ -67,9 +68,9 @@ export default function App() {
         ) : searchQuery ? (
           <SearchResults results={searchResults} query={searchQuery} />
         ) : loaded && currentId && currentIcon === 'project' ? (
-          <ProjectView key={currentId} pageId={currentId} />
+          <ProjectView key={`${currentId}-${pageVersion}`} pageId={currentId} />
         ) : loaded && currentId ? (
-          <MeetingPage key={currentId} pageId={currentId} />
+          <MeetingPage key={`${currentId}-${pageVersion}`} pageId={currentId} />
         ) : (
           <EmptyState />
         )}
