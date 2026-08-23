@@ -203,15 +203,28 @@ export default function MeetingPage({ pageId }: { pageId: string }) {
 
   const recorderRef = useRef<MicRecorder | null>(null)
   const dataLoadedRef = useRef(false)
+  const consoleDataRef = useRef<ConsoleData>(emptyConsole)
+  const metaRef = useRef<MetaData>(emptyMeta)
   const wsPlayRef = useRef<WaveSurfer | null>(null)
   const timerRef = useRef<number | null>(null)
   const saveTimer = useRef<number | null>(null)
   const namedRef = useRef(false)
 
+  /* 同步 ref(避免闭包捕获旧值) */
+  consoleDataRef.current = consoleData
+  metaRef.current = meta
+
   /* ---------- 数据持久化 ---------- */
   /* 防抖保存:完整数据(含转写稿/纪要/笔记)都存入 JSON,独立列同步写 */
   const saveData = (m: MetaData, c: ConsoleData): void => {
     if (!dataLoadedRef.current) return
+    // 安全检查:不允许用空的 console 覆盖有录音/转写/纪要的数据
+    const prev = consoleDataRef.current
+    if (!c.transcript && prev.transcript) c.transcript = prev.transcript
+    if (!c.summary && prev.summary) c.summary = prev.summary
+    if (!c.notes && prev.notes) c.notes = prev.notes
+    if (!c.recordingId && prev.recordingId) c.recordingId = prev.recordingId
+    if (!c.status || c.status === 'idle') if (prev.status && prev.status !== 'idle') c.status = prev.status
     if (saveTimer.current) clearTimeout(saveTimer.current)
     saveTimer.current = window.setTimeout(() => {
       void window.oasis.pages.updateContent(pageId, { meta: m, console: c } as never)
@@ -227,7 +240,8 @@ export default function MeetingPage({ pageId }: { pageId: string }) {
   const updateMeta = (patch: Partial<MetaData>): void => {
     setMeta((prev) => {
       const next = { ...prev, ...patch }
-      saveData(next, consoleData)
+      metaRef.current = next
+      saveData(next, consoleDataRef.current)
       return next
     })
   }
