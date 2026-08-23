@@ -2260,13 +2260,14 @@ svg {
 }
 
 .project-icon {
+  font-size: 20px;
   color: var(--accent);
 }
 
 .project-title {
-  font-size: 32px;
+  font-size: 24px;
   font-weight: 700;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.015em;
   margin: 0;
   flex: 1;
 }
