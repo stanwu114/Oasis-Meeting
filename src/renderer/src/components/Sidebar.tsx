@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { useAppStore } from '../stores/appStore'
 import { useUiStore } from '../stores/uiStore'
 import { Icon } from './Icon'
@@ -18,16 +18,24 @@ export function Sidebar() {
   const modelStatus = useUiStore((s) => s.modelStatus)
   const pagesCount = useAppStore((s) => s.pages.length)
   const [ctxMenu, setCtxMenu] = useState<{ x: number; y: number } | null>(null)
-  const searchQuery = useUiStore((s) => s.searchQuery)
+  const [searchInput, setSearchInput] = useState('')
+  const composingRef = useRef(false)
+  const searchTimerRef = useRef<number | null>(null)
 
-  const onSearch = (q: string): void => {
-    if (q.trim().length < 2) {
-      useUiStore.getState().setSearch('', [])
-      return
-    }
-    void window.oasis.search.query(q.trim()).then((results) => {
-      useUiStore.getState().setSearch(q, results)
-    })
+  const onSearchInput = (value: string): void => {
+    setSearchInput(value)
+    // IME 组词中不触发搜索
+    if (composingRef.current) return
+    if (searchTimerRef.current) clearTimeout(searchTimerRef.current)
+    searchTimerRef.current = window.setTimeout(() => {
+      if (value.trim().length < 2) {
+        useUiStore.getState().setSearch('', [])
+        return
+      }
+      void window.oasis.search.query(value.trim()).then((results) => {
+        useUiStore.getState().setSearch(value, results)
+      })
+    }, 300)
   }
 
   const totalDownloaded = modelStatus?.files.reduce((acc, f) => acc + f.downloadedBytes, 0) ?? 0
@@ -89,14 +97,19 @@ export function Sidebar() {
             className="sidebar-search-input"
             type="text"
             placeholder="搜索会议内容…"
-            value={searchQuery}
-            onChange={(e) => onSearch(e.target.value)}
+            value={searchInput}
+            onChange={(e) => onSearchInput(e.target.value)}
+            onCompositionStart={() => { composingRef.current = true }}
+            onCompositionEnd={(e) => {
+              composingRef.current = false
+              onSearchInput((e.target as HTMLInputElement).value)
+            }}
           />
-          {searchQuery ? (
+          {searchInput ? (
             <button
               type="button"
               className="sidebar-search-clear"
-              onClick={() => { useUiStore.getState().setSearch('', []); }}
+              onClick={() => { setSearchInput(''); useUiStore.getState().setSearch('', []); }}
             >
               <Icon name="close" size={12} />
             </button>
