@@ -127,6 +127,8 @@ export function PageTree() {
                   className="danger"
                   onClick={() => {
                     setMenuId(null)
+                    // 立即同步清空当前页面状态,不等异步 trashPage
+                    useAppStore.setState({ currentId: null, currentContent: null, currentTitle: '', currentIcon: null, pageVersion: Date.now() })
                     void useAppStore.getState().trashPage(page.id)
                   }}
                 >
