@@ -15,9 +15,11 @@ interface UiState {
   toastKind: 'info' | 'error'
   searchQuery: string
   searchResults: SearchResult[]
+  highlightQuery: string
 
   setView(v: View): void
   setSearch(q: string, results: SearchResult[]): void
+  setHighlightQuery(q: string): void
   setSearchOpen(open: boolean): void
   setSettingsOpen(open: boolean): void
   toggleTheme(): void
@@ -51,9 +53,11 @@ export const useUiStore = create<UiState>((set, get) => ({
   toastKind: 'info',
   searchQuery: '',
   searchResults: [],
+  highlightQuery: '',
 
   setView: (v) => set({ view: v }),
   setSearch: (q: string, results: SearchResult[]) => set({ searchQuery: q, searchResults: results }),
+  setHighlightQuery: (q: string) => set({ highlightQuery: q }),
 
   setSearchOpen: (open) => set({ searchOpen: open }),
   setSettingsOpen: (open) => set({ settingsOpen: open }),

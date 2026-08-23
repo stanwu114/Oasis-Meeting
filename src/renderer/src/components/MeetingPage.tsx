@@ -199,6 +199,7 @@ export default function MeetingPage({ pageId }: { pageId: string }) {
   const [activeStamp, setActiveStamp] = useState('')
   const [summaryEditing, setSummaryEditing] = useState(false)
   const [summaryDraft, setSummaryDraft] = useState('')
+  const highlightQuery = useUiStore((s) => s.highlightQuery)
 
   const recorderRef = useRef<MicRecorder | null>(null)
   const wsPlayRef = useRef<WaveSurfer | null>(null)
@@ -239,6 +240,21 @@ export default function MeetingPage({ pageId }: { pageId: string }) {
       if (content.console) {
         setConsoleData({ ...emptyConsole, ...content.console })
         setRecStatus((content.console.status as RecStatus) || 'idle')
+
+        // 搜索高亮:检查哪个标签页包含搜索词,自动切换过去
+        const hq = useUiStore.getState().highlightQuery
+        if (hq) {
+          const q = hq.toLowerCase()
+          if (content.console.transcript?.toLowerCase().includes(q)) {
+            setActiveTab('transcript')
+            setSearchQuery(hq)
+          } else if (content.console.summary?.toLowerCase().includes(q)) {
+            setActiveTab('summary')
+          } else if (content.console.notes?.toLowerCase().includes(q)) {
+            setActiveTab('notes')
+          }
+          useUiStore.getState().setHighlightQuery('') // 用完清空
+        }
       }
     })
   }, [pageId])
@@ -711,11 +727,30 @@ export default function MeetingPage({ pageId }: { pageId: string }) {
                     consoleData.summary.split('\n').map((line, i) => {
                       const t = line.trim()
                       if (!t) return null
+                      // 高亮搜索词
+                      const hl = (text: string): React.ReactNode => {
+                        const hq = highlightQuery || searchQuery
+                        if (!hq || !hq.trim()) return text
+                        try {
+                          const regex = new RegExp(`(${hq.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi')
+                          const parts = text.split(regex)
+                          if (parts.length <= 1) return text
+                          return parts.map((part, j) =>
+                            regex.test(part) ? (
+                              <mark key={j} className="console-highlight">{part}</mark>
+                            ) : (
+                              <span key={j}>{part}</span>
+                            )
+                          )
+                        } catch {
+                          return text
+                        }
+                      }
                       if (t.startsWith('## ')) {
                         return (
                           <div key={i} className="console-heading-section">
                             <span className="console-heading-bar" />
-                            <span className="console-heading">{t.slice(3)}</span>
+                            <span className="console-heading">{hl(t.slice(3))}</span>
                           </div>
                         )
                       }
@@ -723,11 +758,11 @@ export default function MeetingPage({ pageId }: { pageId: string }) {
                         return (
                           <div key={i} className="console-bullet">
                             <span className="console-dot" />
-                            <span>{t.replace(/^[-*]\s/, '')}</span>
+                            <span>{hl(t.replace(/^[-*]\s/, ''))}</span>
                           </div>
                         )
                       }
-                      return <p key={i} className="console-para">{t}</p>
+                      return <p key={i} className="console-para">{hl(t)}</p>
                     })
                   ) : busy ? (
                     <div className="console-loading">

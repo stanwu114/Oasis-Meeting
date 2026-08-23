@@ -7,7 +7,13 @@ import type { SearchResult } from '../../../shared/ipc'
 export function SearchResults({ results, query }: { results: SearchResult[]; query: string }): React.ReactNode {
   const openPage = (pageId: string): void => {
     useUiStore.getState().setView('editor')
-    void useAppStore.getState().openPage(pageId)
+    useUiStore.getState().setSearch('', []) // 清搜索状态
+    void useAppStore.getState().openPage(pageId).then(() => {
+      // 延迟设置高亮,等 MeetingPage 加载完数据
+      setTimeout(() => {
+        useUiStore.getState().setHighlightQuery(query)
+      }, 200)
+    })
   }
 
   return (
