@@ -300,7 +300,7 @@ export default function MeetingPage({ pageId }: { pageId: string }) {
       // 回退:IP 粗定位
       const loc = await window.oasis.system.getCityLocation()
       if (cancelled || !loc) return
-      const place = [loc.country, loc.regionName || loc.region, loc.city].filter((x, i, a) => x && a.indexOf(x) === i).join(' ')
+      const place = [loc.country, loc.region, loc.city].filter((x, i, a) => x && a.indexOf(x) === i).join(' ')
       updateMeta({ location: place })
     })()
 
