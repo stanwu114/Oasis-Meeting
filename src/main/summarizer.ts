@@ -81,7 +81,7 @@ async function processQueue(): Promise<void> {
             { role: 'system', content: SYSTEM_PROMPT },
             { role: 'user', content: rec.transcript }
           ],
-          { temperature: 0.3, maxTokens: 4000 }
+          { temperature: 0.3, maxTokens: 128_000 }
         )
         setSummaryText(id, summary)
       } catch (e) {
