@@ -220,7 +220,6 @@ export default function MeetingPage({ pageId }: { pageId: string }) {
   const wsPlayRef = useRef<WaveSurfer | null>(null)
   const timerRef = useRef<number | null>(null)
   const saveTimer = useRef<number | null>(null)
-  const namedRef = useRef(false)
 
   /* 同步 ref(避免闭包捕获旧值) */
   consoleDataRef.current = consoleData
@@ -305,9 +304,6 @@ export default function MeetingPage({ pageId }: { pageId: string }) {
           const inTranscript = content.console.transcript?.toLowerCase().includes(q)
           const inSummary = content.console.summary?.toLowerCase().includes(q)
           const inNotes = content.console.notes?.toLowerCase().includes(q)
-          const inMeta = Object.values(content.meta || {}).some(
-            (v) => typeof v === 'string' && v.toLowerCase().includes(q)
-          )
           if (inTranscript) {
             setActiveTab('transcript')
             setSearchQuery(hq)
