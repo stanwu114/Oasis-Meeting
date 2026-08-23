@@ -51,9 +51,6 @@ export function ProjectView({ pageId }: { pageId: string }) {
           <div className="project-empty">
             <Icon name="calendar" size={32} />
             <p>这个 Project 还没有 Meeting</p>
-            <button type="button" className="btn ghost" onClick={createMeeting}>
-              新建第一个 Meeting
-            </button>
           </div>
         ) : null}
       </div>
