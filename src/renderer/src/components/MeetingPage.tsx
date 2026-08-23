@@ -197,6 +197,8 @@ export default function MeetingPage({ pageId }: { pageId: string }) {
   const [errorMsg, setErrorMsg] = useState('')
   const [searchQuery, setSearchQuery] = useState('')
   const [activeStamp, setActiveStamp] = useState('')
+  const [summaryEditing, setSummaryEditing] = useState(false)
+  const [summaryDraft, setSummaryDraft] = useState('')
 
   const recorderRef = useRef<MicRecorder | null>(null)
   const wsPlayRef = useRef<WaveSurfer | null>(null)
@@ -665,39 +667,80 @@ export default function MeetingPage({ pageId }: { pageId: string }) {
           ) : null}
 
           {activeTab === 'summary' ? (
-            <div className="console-text summary-body">
-              {consoleData.summary ? (
-                consoleData.summary.split('\n').map((line, i) => {
-                  const t = line.trim()
-                  if (!t) return null
-                  if (t.startsWith('## ')) {
-                    return (
-                      <div key={i} className="console-heading-section">
-                        <span className="console-heading-bar" />
-                        <span className="console-heading">{t.slice(3)}</span>
-                      </div>
-                    )
-                  }
-                  if (/^[-*]\s/.test(t)) {
-                    return (
-                      <div key={i} className="console-bullet">
-                        <span className="console-dot" />
-                        <span>{t.replace(/^[-*]\s/, '')}</span>
-                      </div>
-                    )
-                  }
-                  return <p key={i} className="console-para">{t}</p>
-                })
-              ) : busy ? (
-                <div className="console-loading">
-                  <div className="shimmer-line" style={{ width: '70%' }} />
-                  <div className="shimmer-line" style={{ width: '85%' }} />
-                  <div className="shimmer-line" style={{ width: '50%' }} />
+            <>
+              {consoleData.summary && !summaryEditing ? (
+                <div className="summary-toolbar">
+                  <button
+                    type="button"
+                    className="btn ghost small"
+                    onClick={() => {
+                      setSummaryDraft(consoleData.summary)
+                      setSummaryEditing(true)
+                    }}
+                  >
+                    编辑纪要
+                  </button>
                 </div>
+              ) : null}
+              {summaryEditing ? (
+                <>
+                  <div className="summary-toolbar">
+                    <button
+                      type="button"
+                      className="btn primary small"
+                      onClick={() => {
+                        setSummaryEditing(false)
+                        updateConsole({ summary: summaryDraft })
+                      }}
+                    >
+                      完成
+                    </button>
+                  </div>
+                  <textarea
+                    className="console-notes summary-edit"
+                    value={summaryDraft}
+                    onChange={(e) => setSummaryDraft(e.target.value)}
+                    rows={Math.max(8, summaryDraft.split('\n').length + 1)}
+                    placeholder="编辑会议纪要内容…"
+                    autoFocus
+                  />
+                </>
               ) : (
-                <span className="console-empty">录音完成后 AI 会议纪要会显示在这里</span>
+                <div className="console-text summary-body">
+                  {consoleData.summary ? (
+                    consoleData.summary.split('\n').map((line, i) => {
+                      const t = line.trim()
+                      if (!t) return null
+                      if (t.startsWith('## ')) {
+                        return (
+                          <div key={i} className="console-heading-section">
+                            <span className="console-heading-bar" />
+                            <span className="console-heading">{t.slice(3)}</span>
+                          </div>
+                        )
+                      }
+                      if (/^[-*]\s/.test(t)) {
+                        return (
+                          <div key={i} className="console-bullet">
+                            <span className="console-dot" />
+                            <span>{t.replace(/^[-*]\s/, '')}</span>
+                          </div>
+                        )
+                      }
+                      return <p key={i} className="console-para">{t}</p>
+                    })
+                  ) : busy ? (
+                    <div className="console-loading">
+                      <div className="shimmer-line" style={{ width: '70%' }} />
+                      <div className="shimmer-line" style={{ width: '85%' }} />
+                      <div className="shimmer-line" style={{ width: '50%' }} />
+                    </div>
+                  ) : (
+                    <span className="console-empty">录音完成后 AI 会议纪要会显示在这里</span>
+                  )}
+                </div>
               )}
-            </div>
+            </>
           ) : null}
         </div>
       </div>

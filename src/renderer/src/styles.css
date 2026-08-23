@@ -2868,3 +2868,19 @@ svg {
   justify-content: flex-end;
   margin: -4px 0 8px;
 }
+
+/* AI 纪要:编辑模式 */
+.summary-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 10px;
+}
+
+.console-notes.summary-edit {
+  min-height: 200px;
+  font-size: 14px;
+  line-height: 1.8;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  padding: 14px 16px;
+}
