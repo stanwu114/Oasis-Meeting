@@ -4,6 +4,7 @@ import { SearchModal } from './components/SearchModal'
 import { SettingsModal } from './components/SettingsModal'
 import { TrashView } from './components/TrashView'
 import { AiSelectionBar } from './components/AiSelectionBar'
+import { SearchResults } from './components/SearchResults'
 import { HarnessView } from './components/HarnessView'
 import MeetingPage from './components/MeetingPage'
 import { ProjectView } from './components/ProjectView'
@@ -17,6 +18,8 @@ export default function App() {
   const currentIcon = useAppStore((s) => s.currentIcon)
   const loaded = useAppStore((s) => s.loaded)
   const toast = useUiStore((s) => s.toast)
+  const searchQuery = useUiStore((s) => s.searchQuery)
+  const searchResults = useUiStore((s) => s.searchResults)
   const toastKind = useUiStore((s) => s.toastKind)
 
   /* 初始化 + 事件订阅 */
@@ -61,6 +64,8 @@ export default function App() {
           <TrashView />
         ) : view === 'harness' ? (
           <HarnessView />
+        ) : searchQuery ? (
+          <SearchResults results={searchResults} query={searchQuery} />
         ) : loaded && currentId && currentIcon === 'project' ? (
           <ProjectView key={currentId} pageId={currentId} />
         ) : loaded && currentId ? (

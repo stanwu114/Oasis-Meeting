@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import type { ModelStatus } from '../../../shared/ipc'
+import type { ModelStatus, SearchResult } from '../../../shared/ipc'
 
 export type Theme = 'light' | 'dark'
 export type View = 'editor' | 'harness' | 'trash'
@@ -13,8 +13,11 @@ interface UiState {
   modelStatus: ModelStatus | null
   toast: string | null
   toastKind: 'info' | 'error'
+  searchQuery: string
+  searchResults: SearchResult[]
 
   setView(v: View): void
+  setSearch(q: string, results: SearchResult[]): void
   setSearchOpen(open: boolean): void
   setSettingsOpen(open: boolean): void
   toggleTheme(): void
@@ -46,8 +49,12 @@ export const useUiStore = create<UiState>((set, get) => ({
   modelStatus: null,
   toast: null,
   toastKind: 'info',
+  searchQuery: '',
+  searchResults: [],
 
   setView: (v) => set({ view: v }),
+  setSearch: (q: string, results: SearchResult[]) => set({ searchQuery: q, searchResults: results }),
+
   setSearchOpen: (open) => set({ searchOpen: open }),
   setSettingsOpen: (open) => set({ settingsOpen: open }),
 

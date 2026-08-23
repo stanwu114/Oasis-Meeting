@@ -2884,3 +2884,147 @@ svg {
   border-radius: 9px;
   padding: 14px 16px;
 }
+
+/* 侧栏搜索框 */
+.sidebar-search {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 10px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg-subtle);
+  margin-bottom: 8px;
+}
+
+.sidebar-search svg {
+  color: var(--fg-faint);
+  flex-shrink: 0;
+}
+
+.sidebar-search-input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: var(--fg);
+  font: inherit;
+  font-size: 13px;
+}
+
+.sidebar-search-input::placeholder {
+  color: var(--fg-faint);
+}
+
+.sidebar-search-clear {
+  color: var(--fg-faint);
+  padding: 2px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.sidebar-search-clear:hover {
+  background: var(--bg-hover);
+  color: var(--fg);
+}
+
+/* 搜索结果页 */
+.search-results-view {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 72px 52px 20vh;
+  animation: contentIn 0.22s ease-out;
+}
+
+.search-results-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 24px;
+}
+
+.search-results-head svg {
+  color: var(--fg-faint);
+}
+
+.search-results-title {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.search-results-count {
+  font-size: 14px;
+  color: var(--fg-faint);
+}
+
+.search-results-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.search-result-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 18px;
+  border: 1px solid var(--border);
+  border-radius: 11px;
+  background: var(--bg-subtle);
+  text-align: left;
+  transition: border-color 0.12s, box-shadow 0.12s;
+}
+
+.search-result-item:hover {
+  border-color: var(--border-strong);
+  box-shadow: var(--shadow-sm);
+}
+
+.search-result-item svg {
+  color: var(--fg-faint);
+  margin-top: 2px;
+}
+
+.search-result-item:hover svg {
+  color: var(--accent);
+}
+
+.search-result-body {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.search-result-title {
+  font-size: 14.5px;
+  font-weight: 600;
+}
+
+.search-result-snippet {
+  font-size: 13px;
+  color: var(--fg-faint);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.search-results-empty {
+  text-align: center;
+  color: var(--fg-faint);
+  padding: 60px 0;
+}
+
+.search-results-empty svg {
+  margin-bottom: 10px;
+}
+
+.search-results-empty p {
+  font-size: 14px;
+  margin: 0;
+}

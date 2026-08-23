@@ -18,6 +18,17 @@ export function Sidebar() {
   const modelStatus = useUiStore((s) => s.modelStatus)
   const pagesCount = useAppStore((s) => s.pages.length)
   const [ctxMenu, setCtxMenu] = useState<{ x: number; y: number } | null>(null)
+  const searchQuery = useUiStore((s) => s.searchQuery)
+
+  const onSearch = (q: string): void => {
+    if (q.trim().length < 2) {
+      useUiStore.getState().setSearch('', [])
+      return
+    }
+    void window.oasis.search.query(q.trim()).then((results) => {
+      useUiStore.getState().setSearch(q, results)
+    })
+  }
 
   const totalDownloaded = modelStatus?.files.reduce((acc, f) => acc + f.downloadedBytes, 0) ?? 0
   const btn = (active: boolean): string => `sidebar-btn${active ? ' active' : ''}`
@@ -40,7 +51,7 @@ export function Sidebar() {
       <div className="mode-switch">
         <button
           type="button"
-          className={`mode-btn${view !== 'harness' ? ' on' : ''}`}
+          className={`mode-btn${(view as string) !== 'harness' ? ' on' : ''}`}
           onClick={() => {
             useUiStore.getState().setView('editor')
             const id = useAppStore.getState().currentId
@@ -58,7 +69,7 @@ export function Sidebar() {
         </button>
       </div>
 
-      {view !== 'harness' ? (
+      {(view as string) !== 'harness' ? (
         <>
       <div className="sidebar-actions">
         <button
@@ -69,6 +80,29 @@ export function Sidebar() {
           新建 Meeting
         </button>
       </div>
+
+      {/* 搜索框 */}
+      {(view as string) !== 'harness' ? (
+        <div className="sidebar-search">
+          <Icon name="search" size={14} />
+          <input
+            className="sidebar-search-input"
+            type="text"
+            placeholder="搜索会议内容…"
+            value={searchQuery}
+            onChange={(e) => onSearch(e.target.value)}
+          />
+          {searchQuery ? (
+            <button
+              type="button"
+              className="sidebar-search-clear"
+              onClick={() => { useUiStore.getState().setSearch('', []); }}
+            >
+              <Icon name="close" size={12} />
+            </button>
+          ) : null}
+        </div>
+      ) : null}
 
       <div
         className="sidebar-pages"
