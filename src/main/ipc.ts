@@ -173,7 +173,7 @@ export function registerIpc(): void {
       const res = await fetch('http://ip-api.com/json/?lang=zh-CN', { signal: AbortSignal.timeout(5000) })
       if (!res.ok) return null
       const data = (await res.json()) as { city?: string; regionName?: string; country?: string }
-      if (!data.city && !data.region) return null
+      if (!data.city && !data.regionName) return null
       return { city: data.city ?? '', region: data.regionName ?? '', country: data.country ?? '' }
     } catch {
       return null
