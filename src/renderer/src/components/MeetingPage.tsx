@@ -319,9 +319,11 @@ export default function MeetingPage({ pageId }: { pageId: string }) {
     })
   }, [pageId])
 
-  /* ---------- 自动定位:macOS CoreLocation(系统定位) + 反向地理编码 ---------- */
+  /* ---------- 自动定位:macOS CoreLocation(系统定位) + 反向地理编码 ----------
+   * 只在页面数据加载完 且 地点为空 时才定位,已有地点(包括录音后)永不覆盖 */
   useEffect(() => {
     if (meta.location) return
+    if (!dataLoadedRef.current) return // 等页面数据加载完再判断(防止空默认值误触发)
     let cancelled = false
 
     // 1. 用系统定位获取经纬度(触发 macOS 定位权限弹窗)
@@ -382,7 +384,7 @@ export default function MeetingPage({ pageId }: { pageId: string }) {
 
     return () => { cancelled = true }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pageId])
+  }, [pageId, meta.location, dataLoadedRef.current])
 
   /* 补漏:页面已加载但高亮词后到的情况 */
   useEffect(() => {
