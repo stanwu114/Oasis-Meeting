@@ -6,7 +6,6 @@ import fixWebmDuration from 'fix-webm-duration'
 import WaveSurfer from 'wavesurfer.js'
 import { useAppStore } from '../stores/appStore'
 import { useUiStore } from '../stores/uiStore'
-import { beijingStamp } from '../../../shared/ipc'
 
 /**
  * Meeting 页面:纯表单结构(无 BlockNote)
