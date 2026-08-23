@@ -264,7 +264,7 @@ export default function MeetingPage({ pageId }: { pageId: string }) {
         setRecStatus((content.console.status as RecStatus) || 'idle')
 
         // 校验录音文件是否存在
-        const recId = (content.console as Record<string, unknown>)?.recordingId as string
+        const recId = (content.console as unknown as Record<string, unknown>)?.recordingId as string
         if (recId) {
           void window.oasis.recordings.readAudio(recId).then((buf) => {
             if (!buf) {
