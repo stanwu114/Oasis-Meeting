@@ -40,19 +40,6 @@ export const IPC = {
   aiEditorAction: 'ai:editor-action',
   aiSummarizePage: 'ai:summarize-page',
 
-  aiPlanDraft: 'ai:plan-draft',
-  aiPlanRevise: 'ai:plan-revise',
-  aiPlanChat: 'ai:plan-chat',
-  aiActionRefine: 'ai:action-refine',
-
-  actionsList: 'actions:list',
-  actionsCreate: 'actions:create',
-  actionsUpdate: 'actions:update',
-  actionsTrash: 'actions:trash',
-  actionsRestore: 'actions:restore',
-  actionsDeletePermanent: 'actions:delete-permanent',
-  actionsTrashList: 'actions:trash-list',
-
   llmConfigGet: 'llm:config-get',
   llmConfigSet: 'llm:config-set',
   llmTest: 'llm:test',
@@ -64,11 +51,7 @@ export const IPC = {
   engineCheck: 'engine:check',
 
   evtRecordingsChanged: 'evt:recordings-changed',
-  evtModelProgress: 'evt:model-progress',
-  evtAgentDelta: 'evt:agent-delta',
-  evtAgentDone: 'evt:agent-done',
-  evtAgentError: 'evt:agent-error',
-  evtAgentReset: 'evt:agent-reset'
+  evtModelProgress: 'evt:model-progress'
 } as const
 
 export interface PageSummary {

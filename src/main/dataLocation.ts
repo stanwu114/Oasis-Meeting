@@ -28,7 +28,6 @@ export function applyDataLocation(): void {
     const info = JSON.parse(readFileSync(p, 'utf8')) as { path: string }
     if (info.path && info.path !== defaultUserData() && existsSync(info.path)) {
       app.setPath('userData', info.path)
-      console.log(`[data-location] userData 重定向到: ${info.path}`)
     }
   } catch (e) {
     console.error('[data-location] 读取指针失败:', e)

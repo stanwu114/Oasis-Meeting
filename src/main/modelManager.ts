@@ -2,7 +2,7 @@ import { app } from 'electron'
 import { createWriteStream } from 'node:fs'
 import { rename, rm } from 'node:fs/promises'
 import { join } from 'node:path'
-import { IPC, type ModelFileProgress, type ModelStatus } from '../shared/ipc'
+import type { ModelFileProgress, ModelStatus } from '../shared/ipc'
 
 /**
  * SenseVoice Small(zh/en/ja/ko/yue)模型,来自 sherpa-onnx 官方发布。
@@ -152,6 +152,3 @@ export async function ensureModelDownloaded(): Promise<ModelStatus> {
   await downloadPromise
   return state
 }
-
-export const MODEL_FILES = FILES
-export const EVT_MODEL_PROGRESS = IPC.evtModelProgress

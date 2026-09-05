@@ -103,7 +103,7 @@ function sendAction(action: string): void {
   win?.webContents.send('app:action', action)
 }
 
-app.whenReady().then(() => {
+app.whenReady().then(async () => {
   // 允许渲染进程使用系统定位(Geolocation API)
   const { session } = require('electron')
   session.defaultSession.setPermissionRequestHandler((_wc: Electron.WebContents, permission: string, callback: (allowed: boolean) => void) => {
@@ -114,20 +114,15 @@ app.whenReady().then(() => {
     }
   })
 
+  /* 自定义数据位置(必须在 initDb 之前,让 userData 指向正确路径) */
+  const { applyDataLocation } = await import('./dataLocation')
+  applyDataLocation()
+
   initDb()
   initMedia()
   registerMediaProtocol()
   registerIpc()
   onModelStatus(broadcastModelStatus)
-
-  /* 启动时检查转写引擎:未下载则日志提醒(侧栏已有下载入口) */
-  void import('./modelManager').then(({ getModelStatus }) => {
-    void getModelStatus().then((s: { downloaded: boolean; downloading: boolean }) => {
-      if (!s.downloaded && !s.downloading) {
-        console.log('[startup] 转写引擎未下载,侧栏将显示下载提示')
-      }
-    })
-  })
 
   // 每日备份 + 孤儿文件清理(异步,不阻塞启动)
   void runDailyBackup()
