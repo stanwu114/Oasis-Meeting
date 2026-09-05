@@ -9,6 +9,7 @@ export const IPC = {
   pagesMove: 'pages:move',
   pagesUpdateContent: 'pages:update-content',
   pagesUpdateConsole: 'pages:update-console',
+  pagesMergeConsole: 'pages:merge-console',
   pagesTrash: 'pages:trash',
   pagesRestore: 'pages:restore',
   pagesDeletePermanent: 'pages:delete-permanent',
@@ -39,22 +40,35 @@ export const IPC = {
   aiEditorAction: 'ai:editor-action',
   aiSummarizePage: 'ai:summarize-page',
 
-  harnessStart: 'harness:start',
-  harnessStop: 'harness:stop',
-  harnessStatus: 'harness:status',
-  harnessGetSettings: 'harness:get-settings',
-  harnessSetSettings: 'harness:set-settings',
-  harnessSessions: 'harness:sessions',
-  harnessApiKeyGet: 'harness:apikey-get',
-  harnessApiKeySet: 'harness:apikey-set',
-  harnessSkillsList: 'harness:skills-list',
-  harnessSkillsDelete: 'harness:skills-delete',
-  harnessSkillsInstall: 'harness:skills-install',
-  harnessSkillsReveal: 'harness:skills-reveal',
+  aiPlanDraft: 'ai:plan-draft',
+  aiPlanRevise: 'ai:plan-revise',
+  aiPlanChat: 'ai:plan-chat',
+  aiActionRefine: 'ai:action-refine',
+
+  actionsList: 'actions:list',
+  actionsCreate: 'actions:create',
+  actionsUpdate: 'actions:update',
+  actionsTrash: 'actions:trash',
+  actionsRestore: 'actions:restore',
+  actionsDeletePermanent: 'actions:delete-permanent',
+  actionsTrashList: 'actions:trash-list',
+
+  llmConfigGet: 'llm:config-get',
+  llmConfigSet: 'llm:config-set',
+  llmTest: 'llm:test',
+
+  dataGetLocation: 'data:get-location',
+  dataChooseLocation: 'data:choose-location',
+  dataMigrateLocation: 'data:migrate-location',
+  dataResetLocation: 'data:reset-location',
+  engineCheck: 'engine:check',
 
   evtRecordingsChanged: 'evt:recordings-changed',
   evtModelProgress: 'evt:model-progress',
-  evtHarnessState: 'evt:harness-state'
+  evtAgentDelta: 'evt:agent-delta',
+  evtAgentDone: 'evt:agent-done',
+  evtAgentError: 'evt:agent-error',
+  evtAgentReset: 'evt:agent-reset'
 } as const
 
 export interface PageSummary {
@@ -133,6 +147,17 @@ export interface SearchResult {
   snippet: string
 }
 
+export interface DataLocationInfo {
+  current: string
+  isDefault: boolean
+  totalBytes: number
+}
+
+export interface EngineCheckResult {
+  ok: boolean
+  message: string
+}
+
 export interface ImportedAudio {
   fileName: string
   mimeType: string
@@ -182,6 +207,8 @@ export interface OasisApi {
     updateContent(id: string, content: BlockDoc): Promise<void>
     /** 独立更新 console 字段(立即写入,无防抖) */
     updateConsole(id: string, fields: { transcript?: string; summary?: string; notes?: string }): Promise<void>
+    /** 深合并 console 字段(全局录音流水线在页面未打开时落库用) */
+    mergeConsole(id: string, patch: Record<string, unknown>): Promise<void>
     trash(id: string): Promise<void>
     restore(id: string): Promise<void>
     deletePermanent(id: string): Promise<void>
@@ -202,6 +229,15 @@ export interface OasisApi {
   models: {
     status(): Promise<ModelStatus>
     ensure(): Promise<ModelStatus>
+  }
+  data: {
+    getLocation(): Promise<DataLocationInfo>
+    chooseLocation(): Promise<{ path: string | null }>
+    migrateLocation(path: string): Promise<{ ok: boolean; message?: string }>
+    resetLocation(): Promise<{ ok: boolean; message?: string }>
+  }
+  engine: {
+    check(): Promise<EngineCheckResult>
   }
   search: {
     query(q: string): Promise<SearchResult[]>
@@ -234,63 +270,25 @@ export interface OasisApi {
       participants: string
       summary: string
     }): Promise<string | null>
-  }
-  harness: {
-    start(): Promise<HarnessState>
-    stop(): Promise<void>
-    status(): Promise<HarnessState>
-    getSettings(): Promise<HarnessSettings | null>
-    setSettings(patch: { model?: string; reasoningEffort?: string }): Promise<HarnessSettings>
-    /** 历史会话(读 ~/.dsh 会话存储) */
-    sessions(): Promise<HarnessSession[]>
-    getApiKey(): Promise<HarnessApiKeyState>
-    setApiKey(key: string | null): Promise<HarnessApiKeyState>
-    listSkills(): Promise<HarnessSkill[]>
-    deleteSkill(id: string): Promise<void>
-    installSkillFromDir(): Promise<{ name: string } | null>
-    revealSkillsDir(): Promise<void>
+    }
+  llm: {
+    getConfig(): Promise<LlmConfigState>
+    setConfig(patch: { apiKey?: string; baseUrl?: string; model?: string }): Promise<LlmConfigState>
+    test(): Promise<{ ok: boolean; message: string }>
   }
   on: {
     recordingsChanged(cb: (r: RecordingInfo) => void): () => void
     modelProgress(cb: (m: ModelStatus) => void): () => void
-    harnessStateChanged(cb: (s: HarnessState) => void): () => void
     appAction(cb: (action: string) => void): () => void
   }
 }
 
-/** Harness(dsh web)运行状态 */
-export interface HarnessState {
-  status: 'unavailable' | 'stopped' | 'starting' | 'ready' | 'error'
-  url: string | null
-  error: string | null
-}
-
-/** Harness 设置(~/.dsh/settings.yaml 的 agent-default-model) */
-export interface HarnessSettings {
-  provider: string
-  model: string
-  reasoningEffort: string
-}
-
-/** dsh 历史会话条目 */
-export interface HarnessSession {
-  id: string
-  title: string
-  timeMs: number
-  workspace: string
-}
-
-/** 已安装的 dsh 技能 */
-export interface HarnessSkill {
-  id: string
-  name: string
-  description: string
-}
-
-/** API Key 状态(不回传完整密钥) */
-export interface HarnessApiKeyState {
+/** AI 大模型接口配置状态(不回传完整密钥) */
+export interface LlmConfigState {
   hasKey: boolean
   masked: string | null
+  baseUrl: string
+  model: string
 }
 
 export interface ExportMeetingData {

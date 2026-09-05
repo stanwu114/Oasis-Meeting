@@ -12,6 +12,7 @@ const api: OasisApi = {
     move: (id, parentId, index) => ipcRenderer.invoke(IPC.pagesMove, id, parentId, index),
     updateContent: (id, content) => ipcRenderer.invoke(IPC.pagesUpdateContent, id, content),
     updateConsole: (id, fields) => ipcRenderer.invoke(IPC.pagesUpdateConsole, id, fields),
+    mergeConsole: (id, patch) => ipcRenderer.invoke(IPC.pagesMergeConsole, id, patch),
     trash: (id) => ipcRenderer.invoke(IPC.pagesTrash, id),
     restore: (id) => ipcRenderer.invoke(IPC.pagesRestore, id),
     deletePermanent: (id) => ipcRenderer.invoke(IPC.pagesDeletePermanent, id),
@@ -32,6 +33,15 @@ const api: OasisApi = {
     status: () => ipcRenderer.invoke(IPC.modelsStatus),
     ensure: () => ipcRenderer.invoke(IPC.modelsEnsure)
   },
+  data: {
+    getLocation: () => ipcRenderer.invoke(IPC.dataGetLocation),
+    chooseLocation: () => ipcRenderer.invoke(IPC.dataChooseLocation),
+    migrateLocation: (path) => ipcRenderer.invoke(IPC.dataMigrateLocation, path),
+    resetLocation: () => ipcRenderer.invoke(IPC.dataResetLocation)
+  },
+  engine: {
+    check: () => ipcRenderer.invoke(IPC.engineCheck)
+  },
   search: {
     query: (q) => ipcRenderer.invoke(IPC.searchQuery, q)
   },
@@ -45,26 +55,16 @@ const api: OasisApi = {
     editorAction: (action, text, question) => ipcRenderer.invoke(IPC.aiEditorAction, action, text, question),
     summarizePage: (pageId) => ipcRenderer.invoke(IPC.aiSummarizePage, pageId),
     meetingName: (transcript) => ipcRenderer.invoke(IPC.aiMeetingName, transcript),
-    exportMeeting: (data) => ipcRenderer.invoke(IPC.meetingExport, data)
+    exportMeeting: (data) => ipcRenderer.invoke(IPC.meetingExport, data),
   },
-  harness: {
-    start: () => ipcRenderer.invoke(IPC.harnessStart),
-    stop: () => ipcRenderer.invoke(IPC.harnessStop),
-    status: () => ipcRenderer.invoke(IPC.harnessStatus),
-    getSettings: () => ipcRenderer.invoke(IPC.harnessGetSettings),
-    setSettings: (patch) => ipcRenderer.invoke(IPC.harnessSetSettings, patch),
-    sessions: () => ipcRenderer.invoke(IPC.harnessSessions),
-    getApiKey: () => ipcRenderer.invoke(IPC.harnessApiKeyGet),
-    setApiKey: (key) => ipcRenderer.invoke(IPC.harnessApiKeySet, key),
-    listSkills: () => ipcRenderer.invoke(IPC.harnessSkillsList),
-    deleteSkill: (id) => ipcRenderer.invoke(IPC.harnessSkillsDelete, id),
-    installSkillFromDir: () => ipcRenderer.invoke(IPC.harnessSkillsInstall),
-    revealSkillsDir: () => ipcRenderer.invoke(IPC.harnessSkillsReveal)
+  llm: {
+    getConfig: () => ipcRenderer.invoke(IPC.llmConfigGet),
+    setConfig: (patch) => ipcRenderer.invoke(IPC.llmConfigSet, patch),
+    test: () => ipcRenderer.invoke(IPC.llmTest)
   },
   on: {
     recordingsChanged: (cb) => subscribe(IPC.evtRecordingsChanged, cb),
     modelProgress: (cb) => subscribe(IPC.evtModelProgress, cb),
-    harnessStateChanged: (cb) => subscribe(IPC.evtHarnessState, cb),
     appAction: (cb) => subscribe('app:action', cb)
   }
 }

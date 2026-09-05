@@ -31,7 +31,7 @@ function welcomeDoc(): BlockDoc {
     {
       type: 'heading',
       props: { level: 2 },
-      content: [{ type: 'text', text: '欢迎使用 Notion Oasis', styles: {} }],
+      content: [{ type: 'text', text: '欢迎使用 Oasis Meeting', styles: {} }],
       children: []
     },
     {

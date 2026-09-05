@@ -55,12 +55,24 @@ export function extractDocText(doc: unknown): string {
   return parts.join('\n')
 }
 
-/** 从搜索命中位置生成上下文片段 */
+/** 从搜索命中位置生成上下文片段(取所有命中,拼接展示) */
 export function makeSnippet(text: string, q: string, radius = 40): string {
   if (!text) return ''
-  const idx = text.toLowerCase().indexOf(q.toLowerCase())
-  if (idx < 0) return text.slice(0, radius * 2)
-  const start = Math.max(0, idx - radius)
-  const end = Math.min(text.length, idx + q.length + radius)
-  return (start > 0 ? '…' : '') + text.slice(start, end).replace(/\n/g, ' ') + (end < text.length ? '…' : '')
+  const lower = text.toLowerCase()
+  const needle = q.toLowerCase()
+  const positions: number[] = []
+  let idx = lower.indexOf(needle)
+  while (idx >= 0 && positions.length < 5) {
+    positions.push(idx)
+    idx = lower.indexOf(needle, idx + needle.length)
+  }
+  if (positions.length === 0) return text.slice(0, radius * 2).replace(/\n/g, ' ')
+  const parts: string[] = []
+  for (const pos of positions) {
+    const start = Math.max(0, pos - radius)
+    const end = Math.min(text.length, pos + q.length + radius)
+    const frag = text.slice(start, end).replace(/\n/g, ' ')
+    parts.push((start > 0 ? '…' : '') + frag + (end < text.length ? '…' : ''))
+  }
+  return parts.join(' | ')
 }

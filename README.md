@@ -1,6 +1,6 @@
-# Notion Oasis
+# Oasis Meeting
 
-本地优先的类 Notion 笔记应用,核心特性:**录音完全在本地离线转写**(中/英/日/韩/粤)。除首次下载语音模型外不联网,所有数据(笔记、录音、模型)只存在你的电脑上。
+本地优先的会议记录应用,核心特性:**录音完全在本地离线转写**(中/英/日/韩/粤)。除首次下载语音模型外不联网,所有数据(笔记、录音、模型)只存在你的电脑上。
 
 ## 功能
 
@@ -52,7 +52,7 @@ npx electron scripts/transcribe-e2e.cjs   # 端到端转写测试(下载模型�
 ## 数据位置
 
 ```
-~/Library/Application Support/Notion Oasis/
+~/Library/Application Support/Oasis Meeting/
 ├── oasis.db          # SQLite(页面、录音元数据)
 ├── media/            # 录音与导入的音频文件
 └── models/sensevoice # 语音识别模型

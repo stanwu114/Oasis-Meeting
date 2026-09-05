@@ -2,12 +2,11 @@ import { create } from 'zustand'
 import type { ModelStatus, SearchResult } from '../../../shared/ipc'
 
 export type Theme = 'light' | 'dark'
-export type View = 'editor' | 'harness' | 'trash'
+export type View = 'editor' | 'trash' | 'settings'
 
 interface UiState {
   view: View
   searchOpen: boolean
-  settingsOpen: boolean
   theme: Theme
   language: string
   modelStatus: ModelStatus | null
@@ -21,7 +20,6 @@ interface UiState {
   setSearch(q: string, results: SearchResult[]): void
   setHighlightQuery(q: string): void
   setSearchOpen(open: boolean): void
-  setSettingsOpen(open: boolean): void
   toggleTheme(): void
   setLanguage(lang: string): void
   setModelStatus(m: ModelStatus): void
@@ -45,7 +43,6 @@ function initialTheme(): Theme {
 export const useUiStore = create<UiState>((set, get) => ({
   view: 'editor',
   searchOpen: false,
-  settingsOpen: false,
   theme: initialTheme(),
   language: localStorage.getItem('oasis.language') ?? 'auto',
   modelStatus: null,
@@ -60,7 +57,6 @@ export const useUiStore = create<UiState>((set, get) => ({
   setHighlightQuery: (q: string) => set({ highlightQuery: q }),
 
   setSearchOpen: (open) => set({ searchOpen: open }),
-  setSettingsOpen: (open) => set({ settingsOpen: open }),
 
   toggleTheme: () => {
     const next: Theme = get().theme === 'dark' ? 'light' : 'dark'

@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" role="img" aria-labelledby="title desc">
-  <title id="title">Oasis app icon</title>
-  <desc id="desc">OASIS product icon for Oasis, using the approved shared Q symbol and an orange platform entry motif.</desc>
+  <title id="title">Oasis Vision app icon</title>
+  <desc id="desc">OASIS product icon for Oasis Vision, using the approved shared Q symbol and an orange centered camera for visual recognition and analysis motif.</desc>
   <defs>
     <linearGradient id="tile" x1="170" y1="86" x2="840" y2="930" gradientUnits="userSpaceOnUse">
       <stop offset="0" stop-color="#fffdf9"/>
@@ -32,5 +32,10 @@
   <g id="symbol" mask="url(#qCutout)">
     <ellipse cx="512" cy="514" rx="356" ry="361" fill="url(#qOrange)"/>
     <ellipse cx="512" cy="514" rx="356" ry="361" fill="url(#qHighlight)"/>
+  </g>
+  <g id="vision-camera" fill="none" stroke="#FF7A00" stroke-width="24" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M418 438 H474 L496 406 H554 L576 438 H614 C630 438 642 450 642 466 V586 C642 602 630 614 614 614 H418 C402 614 390 602 390 586 V466 C390 450 402 438 418 438 Z"/>
+    <circle cx="516" cy="528" r="54"/>
+    <circle cx="612" cy="478" r="10" fill="#FF7A00" stroke="none"/>
   </g>
 </svg>

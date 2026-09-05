@@ -98,7 +98,8 @@ const PATHS: Record<string, React.ReactNode> = {
       <path d="M12 21s-7-5.5-7-11a7 7 0 0 1 14 0c0 5.5-7 11-7 11z" />
       <circle cx="12" cy="10" r="2.5" />
     </>
-  )
+  ),
+  check: <path d="M4.5 12.5l5 5 10-11" />
 }
 
 export function Icon({ name, size = 16, className }: { name: keyof typeof PATHS | string; size?: number; className?: string }): React.ReactNode {

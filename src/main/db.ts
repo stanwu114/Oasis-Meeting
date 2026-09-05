@@ -109,6 +109,24 @@ function migrate(): void {
     `)
     db.pragma('user_version = 5')
   }
+  if (version < 6) {
+    db.exec(`
+      CREATE TABLE actions (
+        id TEXT PRIMARY KEY,
+        meeting_id TEXT,
+        title TEXT NOT NULL,
+        detail TEXT NOT NULL DEFAULT '',
+        status TEXT NOT NULL DEFAULT 'todo',
+        source TEXT NOT NULL DEFAULT 'manual',
+        created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ','now')),
+        updated_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ','now')),
+        completed_at TEXT,
+        deleted_at TEXT
+      );
+      CREATE INDEX idx_actions_meeting ON actions(meeting_id);
+    `)
+    db.pragma('user_version = 6')
+  }
 }
 
 /* ---------- 行映射 ---------- */
@@ -439,6 +457,30 @@ export function updateConsoleFields(
   sets.push(`updated_at = strftime('%Y-%m-%dT%H:%M:%fZ','now')`)
   vals.push(id)
   db.prepare(`UPDATE pages SET ${sets.join(', ')} WHERE id = ?`).run(...vals)
+}
+
+/** 深合并 console 字段进 content JSON(录音流水线在页面未打开时也能落库);大字段同步独立列 */
+export function mergeConsoleFields(id: string, patch: Record<string, unknown>): void {
+  const row = db.prepare(`SELECT content FROM pages WHERE id = ?`).get(id) as { content: string | null } | undefined
+  if (!row) return
+  let content: Record<string, unknown>
+  try {
+    content = row.content ? (JSON.parse(row.content) as Record<string, unknown>) : {}
+  } catch {
+    content = {}
+  }
+  const consoleData = (content.console ?? {}) as Record<string, unknown>
+  Object.assign(consoleData, patch)
+  content.console = consoleData
+  db.prepare(`UPDATE pages SET content = ?, updated_at = strftime('%Y-%m-%dT%H:%M:%fZ','now') WHERE id = ?`).run(
+    JSON.stringify(content),
+    id
+  )
+  const big: { transcript?: string; summary?: string; notes?: string } = {}
+  if (typeof patch.transcript === 'string') big.transcript = patch.transcript
+  if (typeof patch.summary === 'string') big.summary = patch.summary
+  if (typeof patch.notes === 'string') big.notes = patch.notes
+  if (Object.keys(big).length > 0) updateConsoleFields(id, big)
 }
 
 export function setRecordingBlock(id: string, blockId: string | null): void {

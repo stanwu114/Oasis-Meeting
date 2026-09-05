@@ -1,5 +1,5 @@
-appId: com.oasis.notion
-productName: Notion Oasis
+appId: com.oasis.meeting
+productName: Oasis Meeting
 directories:
   buildResources: build
   output: dist

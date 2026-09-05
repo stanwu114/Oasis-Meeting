@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" role="img" aria-labelledby="title desc">
-  <title id="title">Oasis app icon</title>
-  <desc id="desc">OASIS product icon for Oasis, using the approved shared Q symbol and an orange platform entry motif.</desc>
+  <title id="title">Oasis Experience app icon</title>
+  <desc id="desc">OASIS product icon for Oasis Experience, using the approved shared Q symbol and an orange clean solid hourglass silhouette motif.</desc>
   <defs>
     <linearGradient id="tile" x1="170" y1="86" x2="840" y2="930" gradientUnits="userSpaceOnUse">
       <stop offset="0" stop-color="#fffdf9"/>
@@ -32,5 +32,10 @@
   <g id="symbol" mask="url(#qCutout)">
     <ellipse cx="512" cy="514" rx="356" ry="361" fill="url(#qOrange)"/>
     <ellipse cx="512" cy="514" rx="356" ry="361" fill="url(#qHighlight)"/>
+  </g>
+  <g id="experience-hourglass-solid" fill="#FF7A00">
+    <rect x="430" y="394" width="164" height="34" rx="17"/>
+    <path d="M468 428 H556 C553 474 538 500 526 516 C520 524 520 536 526 544 C540 562 553 592 556 636 H468 C471 592 484 562 498 544 C504 536 504 524 498 516 C486 500 471 474 468 428 Z"/>
+    <rect x="430" y="636" width="164" height="34" rx="17"/>
   </g>
 </svg>

@@ -4,8 +4,7 @@ import { initDb, closeDb } from './db'
 import { initMedia, registerMediaProtocol, registerMediaScheme } from './media'
 import { registerIpc } from './ipc'
 import { onModelStatus } from './modelManager'
-import { broadcastModelStatus, broadcastHarnessState } from './events'
-import { onHarnessState, stopHarness } from './dshRunner'
+import { broadcastModelStatus } from './events'
 import { runDailyBackup, cleanOrphanMedia } from './backup'
 import { getAllRecordingFileNames } from './db'
 
@@ -120,7 +119,15 @@ app.whenReady().then(() => {
   registerMediaProtocol()
   registerIpc()
   onModelStatus(broadcastModelStatus)
-  onHarnessState(broadcastHarnessState)
+
+  /* 启动时检查转写引擎:未下载则日志提醒(侧栏已有下载入口) */
+  void import('./modelManager').then(({ getModelStatus }) => {
+    void getModelStatus().then((s: { downloaded: boolean; downloading: boolean }) => {
+      if (!s.downloaded && !s.downloading) {
+        console.log('[startup] 转写引擎未下载,侧栏将显示下载提示')
+      }
+    })
+  })
 
   // 每日备份 + 孤儿文件清理(异步,不阻塞启动)
   void runDailyBackup()
@@ -146,7 +153,7 @@ app.whenReady().then(() => {
         console.error(`[crash] webview 渲染崩溃 reason=${details.reason} code=${details.exitCode}`)
       })
       contents.on('console-message', (_e2, level, message) => {
-        if (level >= 2) console.error('[dsh-webview]', String(message).slice(0, 300))
+        if (level >= 2) console.error('[webview]', String(message).slice(0, 300))
       })
     })
   }
@@ -161,6 +168,5 @@ app.on('window-all-closed', () => {
 })
 
 app.on('before-quit', () => {
-  stopHarness()
   closeDb()
 })

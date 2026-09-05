@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 485 205" role="img" aria-labelledby="title desc">
+  <title id="title">OASIS logo lockup</title>
+  <desc id="desc">Approved gradient symbol, editable typed lowercase oasis wordmark, and editable typed tagline.</desc>
+  <defs>
+    <linearGradient id="qOrange" x1="26" y1="8" x2="114" y2="132" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ff8f2d"/>
+      <stop offset="0.42" stop-color="#ff7300"/>
+      <stop offset="1" stop-color="#e44600"/>
+    </linearGradient>
+    <radialGradient id="qHighlight" cx="48" cy="18" r="93" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.23"/>
+      <stop offset="0.5" stop-color="#ffffff" stop-opacity="0.06"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
+    </radialGradient>
+    <mask id="qCutout" maskUnits="userSpaceOnUse">
+      <rect width="485" height="205" fill="white"/>
+      <ellipse cx="78.0" cy="70.0" rx="39.6" ry="39.6" fill="black"/>
+      <path d="M98.4 99.0 C108.2 110.3 119.6 118.8 139.7 116.3" fill="none" stroke="black" stroke-width="7.3" stroke-linecap="round" stroke-linejoin="round"/>
+    </mask>
+  </defs>
+  <g id="symbol" mask="url(#qCutout)">
+    <ellipse cx="77.5" cy="70.5" rx="63.5" ry="64.5" fill="url(#qOrange)"/>
+    <ellipse cx="77.5" cy="70.5" rx="63.5" ry="64.5" fill="url(#qHighlight)"/>
+  </g>
+  <g id="wordmark" transform="translate(161.883 0) scale(1.019481 1)">
+    <text x="0" y="115" font-family="Avenir, Avenir Next, Helvetica Neue, Arial, sans-serif" font-size="138" font-weight="700" letter-spacing="0" text-rendering="geometricPrecision" fill="#333333">oasis</text>
+  </g>
+  <g id="tagline" transform="translate(250 0) scale(.866 1) translate(-250 0)">
+    <text x="250" y="189" text-anchor="middle" font-family="Avenir Next, Avenir, Helvetica Neue, Arial, sans-serif" font-size="31" font-weight="500" letter-spacing="0" fill="#777777">Your intelligent workspace.</text>
+  </g>
+</svg>

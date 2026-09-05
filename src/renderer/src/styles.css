@@ -1002,8 +1002,31 @@ kbd {
 }
 
 /* ============ 设置 ============ */
+.settings-view {
+  max-width: 780px;
+  margin: 0 auto;
+  padding: 64px 52px 20vh;
+}
+
+.settings-page-title {
+  font-size: 28px;
+  font-weight: 700;
+  margin: 0 0 6px;
+  letter-spacing: -0.5px;
+}
+
+.settings-page-sub {
+  color: var(--fg-muted);
+  font-size: 13.5px;
+  margin-bottom: 24px;
+}
+
 .settings-section {
-  padding: 12px 24px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--card);
+  padding: 16px 20px 18px;
+  margin-bottom: 16px;
 }
 
 .settings-section h3 {
@@ -1295,79 +1318,8 @@ kbd {
   border-width: 3px;
 }
 
-/* ============ 笔记/Harness 模式切换 ============ */
-.mode-switch {
-  display: flex;
-  gap: 3px;
-  background: var(--bg-active);
-  border-radius: 9px;
-  padding: 3px;
-  margin-bottom: 10px;
-}
-
-.mode-btn {
-  flex: 1;
-  padding: 6px 8px;
-  border-radius: 7px;
-  font-size: 12.5px;
-  font-weight: 500;
-  color: var(--fg-muted);
-  transition: background 0.15s, color 0.15s;
-}
-
-.mode-btn:hover {
-  color: var(--fg);
-}
-
-.mode-btn.on {
-  background: var(--bg);
-  color: var(--fg);
-  box-shadow: var(--shadow-sm);
-}
-
 .sidebar-pages-head .link-btn {
   font-size: 11.5px;
-}
-
-/* ============ Harness 主界面(纯 dsh,无附加工具栏) ============ */
-.harness-view {
-  height: 100vh;
-  display: flex;
-}
-
-.harness-webview {
-  flex: 1;
-  border: none;
-  background: var(--bg);
-}
-
-.harness-error {
-  font-size: 13px;
-  color: var(--danger);
-  max-width: 480px;
-  word-break: break-all;
-}
-
-.harness-placeholder {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  text-align: center;
-  padding: 24px;
-}
-
-.harness-placeholder h2 {
-  font-size: 20px;
-  margin: 0;
-}
-
-.harness-placeholder p {
-  color: var(--fg-muted);
-  font-size: 13.5px;
-  margin: 0 0 8px;
 }
 
 .ai-placeholder-icon {
@@ -1525,53 +1477,6 @@ kbd {
 /* 文本选区颜色与主题一致 */
 ::selection {
   background: var(--accent-soft);
-}
-
-/* Harness 会话列表(侧栏) */
-.harness-sessions {
-  display: flex;
-  flex-direction: column;
-  gap: 1px;
-}
-
-.harness-session {
-  display: block;
-  width: 100%;
-  text-align: left;
-  padding: 7px 10px;
-  border-radius: 7px;
-}
-
-.harness-session:hover {
-  background: var(--bg-hover);
-}
-
-.harness-session.active {
-  background: var(--accent-soft);
-}
-
-.harness-session-title {
-  display: block;
-  font-size: 13px;
-  color: var(--fg);
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-}
-
-.harness-session.active .harness-session-title {
-  color: var(--accent);
-  font-weight: 500;
-}
-
-.harness-session-meta {
-  display: block;
-  font-size: 11.5px;
-  color: var(--fg-faint);
-  margin-top: 2px;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
 }
 
 /* 设置面板:技能行与输入框 */
@@ -1762,8 +1667,10 @@ svg {
 }
 
 /* 主按钮文字颜色跟随主题令牌 */
-.btn.primary,
-.sidebar-btn.record,
+.btn.primary {
+  color: var(--on-accent);
+}
+
 /* 标题排印 */
 .page-title {
   font-size: 38px;
@@ -2575,6 +2482,14 @@ svg {
   margin-bottom: 10px;
 }
 
+/* AI 纪要:手动生成入口 */
+.summary-generate {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 6px 0 2px;
+}
+
 .console-notes.summary-edit {
   min-height: 200px;
   font-size: 14px;
@@ -2775,4 +2690,93 @@ svg {
   border-radius: 4px;
   padding-left: 6px;
   padding-right: 6px;
+}
+
+/* 全局录音指示器:录音/处理期间跨视图可见 */
+.rec-indicator {
+  display: flex;
+  align-items: stretch;
+  margin: 0 2px 8px;
+  border: 1px solid var(--danger);
+  border-radius: 9px;
+  overflow: hidden;
+  animation: popIn 0.18s ease-out;
+}
+
+.rec-indicator-main {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 10px;
+  text-align: left;
+  min-width: 0;
+}
+
+.rec-indicator-main:hover {
+  background: var(--bg-hover);
+}
+
+.rec-dot {
+  flex-shrink: 0;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--danger);
+  animation: recPulse 1.4s ease-in-out infinite;
+}
+
+@keyframes recPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.25; }
+}
+
+.rec-indicator-text {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--danger);
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.rec-indicator-text em {
+  font-style: normal;
+  font-weight: 400;
+  font-size: 11px;
+  color: var(--fg-faint);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rec-indicator-stop {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  padding: 0 10px;
+  color: #fff;
+  background: var(--danger);
+}
+
+.rec-indicator-stop:hover {
+  filter: brightness(1.1);
+}
+
+/* ---------- 笔记搜索高亮视图 ---------- */
+
+.console-notes-view {
+  flex: 1;
+  min-height: 200px;
+  padding: 14px 16px;
+  font-size: 14px;
+  line-height: 1.75;
+  color: var(--fg);
+  overflow-y: auto;
+  border-radius: 8px;
+  background: var(--card);
+}
+
+.notes-line {
+  min-height: 1.75em;
 }

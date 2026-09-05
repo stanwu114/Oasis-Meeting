@@ -1,9 +1,8 @@
 import { useEffect } from 'react'
 import { Sidebar } from './components/Sidebar'
-import { SettingsModal } from './components/SettingsModal'
+import { SettingsView } from './components/SettingsView'
 import { TrashView } from './components/TrashView'
 import { SearchResults } from './components/SearchResults'
-import { HarnessView } from './components/HarnessView'
 import MeetingPage from './components/MeetingPage'
 import { ProjectView } from './components/ProjectView'
 import { useAppStore } from './stores/appStore'
@@ -69,10 +68,10 @@ export default function App() {
     <div className="app">
       <Sidebar />
       <main className="main">
-        {view === 'trash' ? (
+        {view === 'settings' ? (
+          <SettingsView />
+        ) : view === 'trash' ? (
           <TrashView />
-        ) : view === 'harness' ? (
-          <HarnessView />
         ) : searchQuery ? (
           <SearchResults results={searchResults} query={searchQuery} />
         ) : loaded && currentId && currentIcon === 'project' ? (
@@ -84,7 +83,6 @@ export default function App() {
         )}
       </main>
 
-      <SettingsModal />
       {toast ? <div className={`toast ${toastKind === 'error' ? 'error' : ''}`}>{toast}</div> : null}
     </div>
   )

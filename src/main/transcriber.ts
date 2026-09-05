@@ -3,7 +3,6 @@ import sherpaOnnx from 'sherpa-onnx-node'
 import { getRecording, setRecordingStatus, setRecordingTranscript } from './db'
 import { ensureModelDownloaded, modelFile } from './modelManager'
 import { broadcastRecording } from './events'
-import { enqueueSummary } from './summarizer'
 import type { RecordingInfo } from '../shared/ipc'
 
 /* ---------- sherpa-onnx 引擎封装 ---------- */
@@ -221,8 +220,7 @@ async function processQueue(): Promise<void> {
         const text = recognizePcm(job.pcm, job.sampleRate, job.language)
         setRecordingTranscript(job.recordingId, text, job.language)
         emit(getRecording(job.recordingId))
-        // 转写完成 → 自动生成 AI 总结(队列异步,事件回流 UI)
-        enqueueSummary(job.recordingId)
+        // AI 纪要为独立功能,由用户在纪要页手动触发生成
       } catch (e) {
         setRecordingStatus(job.recordingId, 'error', e instanceof Error ? e.message : String(e))
         emit(getRecording(job.recordingId))

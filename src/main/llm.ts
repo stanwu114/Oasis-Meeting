@@ -1,31 +1,9 @@
-import { readFileSync } from 'node:fs'
-import { join } from 'node:path'
+import { getLlmConfig } from './llmSettings'
 
 /**
- * DeepSeek LLM 薄封装:AI 总结(录音纪要/页面摘要)与编辑器划词动作共用。
- * 密钥复用 ~/.dsh/.credentials.yaml 的 DEEPSEEK_API_KEY。
+ * LLM 直连薄封装(AgentScope 运行时的降级路径):AI 纪要、会议命名与编辑器动作共用。
+ * 接口配置(密钥/地址/模型)由设置面板管理,存应用自身数据库。
  */
-
-const API_URL = 'https://api.deepseek.com/chat/completions'
-const MODEL = 'deepseek-chat'
-
-let cachedKey: string | null | undefined
-
-export function hasDeepseekKey(): boolean {
-  return readKey() !== null
-}
-
-export function readKey(): string | null {
-  if (cachedKey !== undefined) return cachedKey
-  try {
-    const text = readFileSync(join(process.env.HOME ?? '', '.dsh', '.credentials.yaml'), 'utf8')
-    const m = /^\s*DEEPSEEK_API_KEY:\s*["']?([\w-]+)["']?\s*$/m.exec(text)
-    cachedKey = m ? m[1] : null
-  } catch {
-    cachedKey = null
-  }
-  return cachedKey
-}
 
 export interface ChatMessage {
   role: 'system' | 'user' | 'assistant'
@@ -33,13 +11,13 @@ export interface ChatMessage {
 }
 
 export async function chat(messages: ChatMessage[], opts?: { temperature?: number; maxTokens?: number; timeoutMs?: number }): Promise<string> {
-  const key = readKey()
-  if (!key) throw new Error('未找到 DeepSeek API Key(读取 ~/.dsh/.credentials.yaml 失败)')
-  const res = await fetch(API_URL, {
+  const cfg = getLlmConfig()
+  if (!cfg.apiKey) throw new Error('未配置 API Key,请到「设置 → AI 大模型接口」填写')
+  const res = await fetch(`${cfg.baseUrl}/chat/completions`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${key}` },
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${cfg.apiKey}` },
     body: JSON.stringify({
-      model: MODEL,
+      model: cfg.model,
       temperature: opts?.temperature ?? 0.4,
       max_tokens: opts?.maxTokens ?? 1400,
       messages
@@ -48,11 +26,11 @@ export async function chat(messages: ChatMessage[], opts?: { temperature?: numbe
   })
   if (!res.ok) {
     const body = await res.text().catch(() => '')
-    throw new Error(`DeepSeek API ${res.status}:${body.slice(0, 160) || res.statusText}`)
+    throw new Error(`大模型接口 ${res.status}:${body.slice(0, 160) || res.statusText}`)
   }
   const data = (await res.json()) as { choices?: { message?: { content?: string } }[] }
   const text = data.choices?.[0]?.message?.content?.trim()
-  if (!text) throw new Error('DeepSeek 返回为空')
+  if (!text) throw new Error('大模型接口返回为空')
   return text
 }
 
@@ -82,7 +60,6 @@ export async function runEditorAction(action: EditorAction, text: string, questi
   ])
 }
 
-/** 依据录音转写生成会议名称与主题 */
 export async function meetingName(transcript: string): Promise<{ name: string; topic: string }> {
   const raw = await chat(
     [
@@ -112,3 +89,4 @@ export async function meetingName(transcript: string): Promise<{ name: string; t
   topic = topic.replace(/^["「]|["」]$/g, '').slice(0, 40)
   return { name, topic }
 }
+

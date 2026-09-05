@@ -1,11 +1,12 @@
 import { useEffect, useRef, useState } from 'react'
 import { Icon } from './Icon'
-import { formatDuration, decodeToPcm16kMono } from '../audio/pcm'
-import { MicRecorder } from '../audio/MicRecorder'
-import fixWebmDuration from 'fix-webm-duration'
+import { formatDuration } from '../audio/pcm'
+import { beijingStamp } from '../../../shared/ipc'
+import type { MicRecorder } from '../audio/MicRecorder'
 import WaveSurfer from 'wavesurfer.js'
 import { useAppStore } from '../stores/appStore'
 import { useUiStore } from '../stores/uiStore'
+import { useRecordingStore } from '../stores/recordingStore'
 
 /**
  * Meeting 页面:纯表单结构(无 BlockNote)
@@ -205,7 +206,6 @@ export default function MeetingPage({ pageId }: { pageId: string }) {
   const [consoleData, setConsoleData] = useState<ConsoleData>(emptyConsole)
   const [recStatus, setRecStatus] = useState<RecStatus>('idle')
   const [activeTab, setActiveTab] = useState<Tab>('summary')
-  const [elapsed, setElapsed] = useState(0)
   const [errorMsg, setErrorMsg] = useState('')
   const [searchQuery, setSearchQuery] = useState('')
   const [activeStamp, setActiveStamp] = useState('')
@@ -213,12 +213,11 @@ export default function MeetingPage({ pageId }: { pageId: string }) {
   const [summaryDraft, setSummaryDraft] = useState('')
   const highlightQuery = useUiStore((s) => s.highlightQuery)
 
-  const recorderRef = useRef<MicRecorder | null>(null)
   const dataLoadedRef = useRef(false)
+  const namedRef = useRef(false)
   const consoleDataRef = useRef<ConsoleData>(emptyConsole)
   const metaRef = useRef<MetaData>(emptyMeta)
   const wsPlayRef = useRef<WaveSurfer | null>(null)
-  const timerRef = useRef<number | null>(null)
   const saveTimer = useRef<number | null>(null)
 
   /* 同步 ref(避免闭包捕获旧值) */
@@ -229,16 +228,27 @@ export default function MeetingPage({ pageId }: { pageId: string }) {
   /* 防抖保存:完整数据(含转写稿/纪要/笔记)都存入 JSON,独立列同步写 */
   const saveData = (m: MetaData, c: ConsoleData): void => {
     if (!dataLoadedRef.current) return
-    // 安全检查:不允许用空的 console 覆盖有录音/转写/纪要的数据
+    /* 隔离突变:构造保存副本,不 mutate 传入的 c(它同时是 React 新 state) */
+    const toSave: ConsoleData = { ...c }
+    /* 只保护流水线产出字段(后台录音管线写入,UI 不应覆盖);
+       notes/summary 是用户可编辑字段,主动清空是合法操作,不做回填 */
     const prev = consoleDataRef.current
-    if (!c.transcript && prev.transcript) c.transcript = prev.transcript
-    if (!c.summary && prev.summary) c.summary = prev.summary
-    if (!c.notes && prev.notes) c.notes = prev.notes
-    if (!c.recordingId && prev.recordingId) c.recordingId = prev.recordingId
-    if (!c.status || c.status === 'idle') if (prev.status && prev.status !== 'idle') c.status = prev.status
+    if (!toSave.recordingId && prev.recordingId) toSave.recordingId = prev.recordingId
+    if (!toSave.durationMs && prev.durationMs) toSave.durationMs = prev.durationMs
+    if (!toSave.transcript && prev.transcript) toSave.transcript = prev.transcript
+    if (!toSave.status || toSave.status === 'idle') if (prev.status && prev.status !== 'idle') toSave.status = prev.status
     if (saveTimer.current) clearTimeout(saveTimer.current)
     saveTimer.current = window.setTimeout(() => {
-      void window.oasis.pages.updateContent(pageId, { meta: m, console: c } as never)
+      void window.oasis.pages.get(pageId).then((fresh) => {
+        const fc = (fresh?.content as unknown as { console?: Partial<ConsoleData> } | null)?.console
+        if (fc) {
+          if (!toSave.transcript && fc.transcript) toSave.transcript = fc.transcript
+          if (!toSave.recordingId && fc.recordingId) toSave.recordingId = fc.recordingId
+          if (!toSave.durationMs && fc.durationMs) toSave.durationMs = fc.durationMs
+          if (fc.status === 'done') toSave.status = 'done'
+        }
+        void window.oasis.pages.updateContent(pageId, { meta: m, console: toSave } as never)
+      })
     }, 600)
   }
 
@@ -255,6 +265,16 @@ export default function MeetingPage({ pageId }: { pageId: string }) {
       saveData(next, consoleDataRef.current)
       return next
     })
+    // 会议名称改动 → 同步页面标题(侧边栏/页面顶端随之更新)
+    const name = patch.name?.trim()
+    if (name) {
+      const oldTitle = useAppStore.getState().currentTitle
+      const at = oldTitle.indexOf('@')
+      const suffix = at > 0 ? oldTitle.slice(at) : `@${metaRef.current.time || beijingStamp()}`
+      const base = name.endsWith('会议') ? name : `${name}会议`
+      const newTitle = `${base}${suffix}`
+      if (newTitle !== oldTitle) void useAppStore.getState().renamePage(pageId, newTitle)
+    }
   }
 
   const updateConsole = (patch: Partial<ConsoleData>): void => {
@@ -282,7 +302,13 @@ export default function MeetingPage({ pageId }: { pageId: string }) {
       if (content.meta) setMeta({ ...emptyMeta, ...content.meta })
       if (content.console) {
         setConsoleData({ ...emptyConsole, ...content.console })
-        setRecStatus((content.console.status as RecStatus) || 'idle')
+        // 全局录音/处理正进行且属于本页时,以全局状态为准(库里的旧 status 不能覆盖)
+        const gs = useRecordingStore.getState()
+        if (gs.pageId === pageId && gs.phase && gs.phase !== 'done' && gs.phase !== 'error') {
+          setRecStatus(gs.phase as RecStatus)
+        } else {
+          setRecStatus((content.console.status as RecStatus) || 'idle')
+        }
 
         // 校验录音文件是否存在
         const recId = (content.console as unknown as Record<string, unknown>)?.recordingId as string
@@ -410,39 +436,53 @@ export default function MeetingPage({ pageId }: { pageId: string }) {
     }
   }, [pageId])
 
-  /* ---------- AI 自动命名+主题 ----------
+  /* ---------- AI 自动命名+主题 ---------- */
   useEffect(() => {
     if (namedRef.current || meta.name || !consoleData.transcript) return
     namedRef.current = true
     void window.oasis.ai.meetingName(consoleData.transcript).then(({ name, topic }) => {
       if (name) {
         updateMeta({ name, topic: topic || meta.topic })
-        void useAppStore.getState().renamePage(pageId, `${name}会议@${meta.time || beijingStamp()}`)
       }
     }).catch(() => { namedRef.current = false })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [consoleData.transcript, pageId])
 
-  /* ---------- 录音控制 ---------- */
-  const startTimer = (): void => {
-    timerRef.current = window.setInterval(() => {
-      if (recorderRef.current) setElapsed(recorderRef.current.elapsedMs)
-    }, 200)
-  }
-  const stopTimer = (): void => {
-    if (timerRef.current) { clearInterval(timerRef.current); timerRef.current = null }
-  }
+  /* ---------- 录音控制:全局管理器(切页不中断) ---------- */
+  const recPhase = useRecordingStore((st) => st.phase)
+  const recPageId = useRecordingStore((st) => st.pageId)
+  const recElapsed = useRecordingStore((st) => st.elapsedMs)
+  const recError = useRecordingStore((st) => st.errorMsg)
+  const mineRecording = recPageId === pageId
+  const elapsed = mineRecording ? recElapsed : 0
+
+  /* 全局流水线状态 → 本页 UI;完成/失败时重载本页数据 */
+  useEffect(() => {
+    if (!mineRecording) return
+    if (recPhase === 'recording' || recPhase === 'paused' || recPhase === 'importing' || recPhase === 'transcribing' || recPhase === 'summarizing') {
+      setRecStatus(recPhase)
+      return
+    }
+    if (recPhase === 'done') {
+      setRecStatus('done')
+      void window.oasis.pages.get(pageId).then((page) => {
+        const content = page?.content as unknown as { console?: Partial<ConsoleData> } | null
+        if (content?.console) setConsoleData({ ...emptyConsole, ...content.console })
+        setActiveTab('summary')
+        useUiStore.getState().showToast('录音处理完成,AI 纪要已生成')
+      })
+    }
+    if (recPhase === 'error') {
+      setRecStatus('error')
+      setErrorMsg(recError || '录音处理失败')
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [recPhase, mineRecording, recError])
 
   const startRec = async (): Promise<void> => {
     try {
-      const granted = await window.oasis.system.askMicPermission()
-      if (!granted) throw new Error('麦克风权限被拒绝')
-      const rec = new MicRecorder()
-      await rec.start()
-      recorderRef.current = rec
-      setRecStatus('recording')
-      setElapsed(0)
-      startTimer()
+      const pageTitle = metaRef.current.name || useAppStore.getState().currentTitle || '会议'
+      await useRecordingStore.getState().start(pageId, pageTitle)
     } catch (e) {
       setErrorMsg(e instanceof Error ? e.message : String(e))
       setRecStatus('error')
@@ -450,17 +490,7 @@ export default function MeetingPage({ pageId }: { pageId: string }) {
   }
 
   const togglePause = (): void => {
-    const rec = recorderRef.current
-    if (!rec) return
-    if (recStatus === 'recording') {
-      rec.pause()
-      setRecStatus('paused')
-      stopTimer()
-    } else if (recStatus === 'paused') {
-      rec.resume()
-      setRecStatus('recording')
-      startTimer()
-    }
+    useRecordingStore.getState().togglePause()
   }
 
   const summarizeViaIpc = async (recordingId: string): Promise<string> => {
@@ -473,71 +503,33 @@ export default function MeetingPage({ pageId }: { pageId: string }) {
     })
   }
 
-  const processAudio = async (pcm: Int16Array, recInfo: { id: string }): Promise<void> => {
-    setRecStatus('transcribing')
-    updateConsole({ status: 'transcribing', recordingId: recInfo.id })
-    const lang = localStorage.getItem('oasis.language') || 'auto'
-    const transcript = await new Promise<string>((resolve) => {
-      const unsub = window.oasis.on.recordingsChanged((r) => {
-        if (r.id === recInfo.id && r.status === 'done') { unsub(); resolve(r.transcript || '') }
-        if (r.id === recInfo.id && r.status === 'error') { unsub(); resolve('') }
-      })
-      void window.oasis.recordings.transcribe(recInfo.id, pcm, 16000, lang)
-      setTimeout(() => { unsub(); resolve('') }, 90_000)
-    })
-    if (transcript) {
-      updateConsole({ transcript, status: 'summarizing' })
-      setRecStatus('summarizing')
-      const summary = await summarizeViaIpc(recInfo.id)
+  /* 手动重新生成纪要(有转写稿时) */
+  const generateSummary = async (): Promise<void> => {
+    const rid = consoleDataRef.current.recordingId
+    if (!rid) return
+    setRecStatus('summarizing')
+    updateConsole({ status: 'summarizing' })
+    const summary = await summarizeViaIpc(rid)
+    if (summary) {
       updateConsole({ summary, status: 'done' })
-      setRecStatus('done')
-      setActiveTab('summary')
     } else {
-      updateConsole({ status: 'error' })
-      setRecStatus('error')
-      setErrorMsg('转写结果为空(录音太短或引擎出错)')
+      updateConsole({ status: 'done' })
+      setErrorMsg('AI 纪要生成失败,请检查「设置 → AI 总结模型配置」')
     }
+    setRecStatus('done')
   }
 
   const stopRec = async (): Promise<void> => {
-    const rec = recorderRef.current
-    if (!rec) return
-    stopTimer()
-    try {
-      const { blob, durationMs } = await rec.stop()
-      recorderRef.current = null
-      let fixed = blob
-      if (blob.type.includes('webm') && durationMs > 0) {
-        try { fixed = await fixWebmDuration(blob, durationMs) } catch { /* ignore */ }
-      }
-      const { pcm } = await decodeToPcm16kMono(fixed)
-      const buffer = await fixed.arrayBuffer()
-      const recInfo = await window.oasis.recordings.save({
-        pageId, mimeType: fixed.type || 'audio/webm', durationMs, buffer
-      })
-      updateConsole({ durationMs })
-      await processAudio(pcm, recInfo)
-    } catch (e) {
-      recorderRef.current?.cancel()
-      recorderRef.current = null
-      setErrorMsg(e instanceof Error ? e.message : String(e))
-      setRecStatus('error')
-    }
+    await useRecordingStore.getState().stop()
   }
 
   const importAudio = async (): Promise<void> => {
-    setRecStatus('importing')
     try {
       const imported = await window.oasis.system.importAudioFile()
-      if (!imported) { setRecStatus('idle'); return }
-      setRecStatus('transcribing')
+      if (!imported) return
       const blob = new Blob([imported.buffer], { type: imported.mimeType })
-      const { pcm, durationMs } = await decodeToPcm16kMono(blob)
-      const recInfo = await window.oasis.recordings.save({
-        pageId, mimeType: imported.mimeType, durationMs, buffer: imported.buffer
-      })
-      updateConsole({ durationMs })
-      await processAudio(pcm, recInfo)
+      const pageTitle = metaRef.current.name || useAppStore.getState().currentTitle || '会议'
+      await useRecordingStore.getState().importBlob(pageId, pageTitle, blob)
     } catch (e) {
       setErrorMsg(e instanceof Error ? e.message : String(e))
       setRecStatus('error')
@@ -575,13 +567,7 @@ export default function MeetingPage({ pageId }: { pageId: string }) {
     ws.play()
   }
 
-  /* ---------- 清理 ---------- */
-  useEffect(() => {
-    return () => {
-      stopTimer()
-      recorderRef.current?.cancel()
-    }
-  }, [])
+
 
   /* ---------- 渲染 ---------- */
   const isRecording = recStatus === 'recording' || recStatus === 'paused'
@@ -686,7 +672,7 @@ export default function MeetingPage({ pageId }: { pageId: string }) {
           {isRecording ? (
             <div className="console-live">
               <span className="console-timer">{formatDuration(elapsed)}</span>
-              <WaveCanvas recorder={recorderRef.current} active={recStatus === 'recording'} />
+              <WaveCanvas recorder={mineRecording && (recPhase === 'recording' || recPhase === 'paused') ? useRecordingStore.getState().getRecorder() : null} active={recStatus === 'recording'} />
             </div>
           ) : null}
         </div>
@@ -709,13 +695,32 @@ export default function MeetingPage({ pageId }: { pageId: string }) {
                   <div key={i} className="line-num">{i + 1}.</div>
                 ))}
               </div>
-              <textarea
-                className="console-notes numbered"
-                value={consoleData.notes}
-                onChange={(e) => updateConsole({ notes: e.target.value })}
-                placeholder="点击此处开始记录…"
-                rows={Math.max(4, consoleData.notes.split('\n').length + 1)}
-              />
+              {searchQuery.trim() && consoleData.notes ? (
+                /* 搜索模式下:只读高亮视图 */
+                <div className="console-notes-view">
+                  {consoleData.notes.split('\n').map((line, i) => (
+                    <div key={i} className="notes-line">
+                      {(() => {
+                        const q = searchQuery.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+                        const parts = line.split(new RegExp(`(${q})`, 'gi'))
+                        return parts.map((part, j) =>
+                          part.toLowerCase() === searchQuery.toLowerCase()
+                            ? <mark key={j} className="console-highlight">{part}</mark>
+                            : <span key={j}>{part || '\u00A0'}</span>
+                        )
+                      })()}
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <textarea
+                  className="console-notes numbered"
+                  value={consoleData.notes}
+                  onChange={(e) => updateConsole({ notes: e.target.value })}
+                  placeholder="点击此处开始记录…"
+                  rows={Math.max(4, consoleData.notes.split('\n').length + 1)}
+                />
+              )}
             </div>
           ) : null}
 
@@ -744,17 +749,20 @@ export default function MeetingPage({ pageId }: { pageId: string }) {
                           {stamp}
                         </button>
                       ) : null}
-                      <span
-                        className="console-para-text"
-                        dangerouslySetInnerHTML={{
-                          __html: searchQuery.trim()
-                            ? text.replace(
-                                new RegExp(`(${searchQuery.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi'),
-                                '<mark class="console-highlight">$1</mark>'
+                      <span className="console-para-text">
+                        {searchQuery.trim()
+                          ? (() => {
+                              const escaped = searchQuery.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+                              const parts = text.split(new RegExp(`(${escaped})`, 'gi'))
+                              return parts.map((part, j) =>
+                                part.toLowerCase() === searchQuery.toLowerCase()
+                                  ? <mark key={j} className="console-highlight">{part}</mark>
+                                  : <span key={j}>{part}</span>
                               )
-                            : text
-                        }}
-                      />
+                            })()
+                          : text
+                        }
+                      </span>
                     </div>
                   ))
                 ) : busy ? (
@@ -858,8 +866,15 @@ export default function MeetingPage({ pageId }: { pageId: string }) {
                       <div className="shimmer-line" style={{ width: '85%' }} />
                       <div className="shimmer-line" style={{ width: '50%' }} />
                     </div>
+                  ) : consoleData.transcript ? (
+                    <div className="summary-generate">
+                      <button type="button" className="btn primary small" onClick={() => void generateSummary()}>
+                        生成 AI 纪要
+                      </button>
+                      <span className="console-empty">基于转写文稿生成,模型在「设置 → AI 总结模型配置」中管理</span>
+                    </div>
                   ) : (
-                    <span className="console-empty">录音完成后 AI 会议纪要会显示在这里</span>
+                    <span className="console-empty">先完成录音转写,再在这里生成 AI 纪要</span>
                   )}
                 </div>
               )}

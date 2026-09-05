@@ -7,9 +7,10 @@ import { IPC, type ModelFileProgress, type ModelStatus } from '../shared/ipc'
 /**
  * SenseVoice Small(zh/en/ja/ko/yue)模型,来自 sherpa-onnx 官方发布。
  * int8 量化版约 237MB,识别速度远超实时,CPU 即可流畅运行。
+ * 下载源走 hf-mirror.com(国内镜像,直连无需代理)。
  */
 const HF_BASE =
-  'https://huggingface.co/csukuangfj/sherpa-onnx-sense-voice-zh-en-ja-ko-yue-2024-07-17/resolve/main'
+  'https://hf-mirror.com/csukuangfj/sherpa-onnx-sense-voice-zh-en-ja-ko-yue-2024-07-17/resolve/main'
 
 const FILES: { name: string; url: string; minBytes: number }[] = [
   { name: 'model.int8.onnx', url: `${HF_BASE}/model.int8.onnx`, minBytes: 200 * 1024 * 1024 },

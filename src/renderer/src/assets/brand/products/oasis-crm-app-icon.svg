@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" role="img" aria-labelledby="title desc">
-  <title id="title">Oasis app icon</title>
-  <desc id="desc">OASIS product icon for Oasis, using the approved shared Q symbol and an orange platform entry motif.</desc>
+  <title id="title">Oasis CRM app icon</title>
+  <desc id="desc">OASIS product icon for Oasis CRM, using the approved shared Q symbol and an orange customer nodes motif.</desc>
   <defs>
     <linearGradient id="tile" x1="170" y1="86" x2="840" y2="930" gradientUnits="userSpaceOnUse">
       <stop offset="0" stop-color="#fffdf9"/>
@@ -32,5 +32,14 @@
   <g id="symbol" mask="url(#qCutout)">
     <ellipse cx="512" cy="514" rx="356" ry="361" fill="url(#qOrange)"/>
     <ellipse cx="512" cy="514" rx="356" ry="361" fill="url(#qHighlight)"/>
+  </g>
+  <g id="crm-nodes" fill="#FF7A00">
+    <circle cx="512" cy="438" r="32"/>
+    <circle cx="430" cy="584" r="28"/>
+    <circle cx="594" cy="584" r="28"/>
+  </g>
+  <g id="crm-links" fill="none" stroke="#FF7A00" stroke-width="24" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M500 466 L444 556"/>
+    <path d="M524 466 L580 556"/>
   </g>
 </svg>

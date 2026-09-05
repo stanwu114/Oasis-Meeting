@@ -7,18 +7,8 @@ import { getModelStatus, ensureModelDownloaded } from './modelManager'
 import { enqueueTranscription } from './transcriber'
 import { enqueueSummary } from './summarizer'
 import { chat, runEditorAction, meetingName } from './llm'
-import { startHarness, stopHarness, getHarnessState } from './dshRunner'
-import {
-  getHarnessSettings,
-  setHarnessSettings,
-  getHarnessApiKey,
-  setHarnessApiKey,
-  listHarnessSkills,
-  deleteHarnessSkill,
-  installHarnessSkillFromDir,
-  harnessSkillsDir
-} from './harnessSettings'
-import { listHarnessSessions } from './dshHistory'
+import { getLlmConfigState, setLlmConfig, testLlmConnection } from './llmSettings'
+import { getDataLocation, chooseDataLocation, migrateDataLocation, resetDataLocation } from './dataLocation'
 import { extractDocText } from '../shared/extract'
 import { exportMeetingToWord } from './exportMeeting'
 
@@ -43,6 +33,9 @@ export function registerIpc(): void {
   handle(IPC.pagesSetIcon, (id: string, icon: string | null) => db.setIcon(id, icon))
   handle(IPC.pagesMove, (id: string, parentId: string | null, index: number) => db.movePage(id, parentId, index))
   handle(IPC.pagesUpdateContent, (id: string, content: BlockDoc) => db.updateContent(id, content))
+  handle(IPC.pagesMergeConsole, (id: string, patch: Record<string, unknown>) => {
+    db.mergeConsoleFields(id, patch)
+  })
   handle(IPC.pagesUpdateConsole, (id: string, fields: { transcript?: string; summary?: string; notes?: string }) => {
     db.updateConsoleFields(id, fields)
   })
@@ -125,32 +118,31 @@ export function registerIpc(): void {
     )
   })
 
-  /* ---------- Harness(dsh) ---------- */
-  handle(IPC.harnessStart, () => startHarness())
-  handle(IPC.harnessStop, () => {
-    stopHarness()
+  /* ---------- AI 大模型接口 ---------- */
+  handle(IPC.llmConfigGet, () => getLlmConfigState())
+  handle(IPC.llmConfigSet, (patch: { apiKey?: string; baseUrl?: string; model?: string }) => {
+    setLlmConfig(patch)
+    return getLlmConfigState()
   })
-  handle(IPC.harnessStatus, () => getHarnessState())
-  handle(IPC.harnessGetSettings, () => getHarnessSettings())
-  handle(IPC.harnessSetSettings, (patch: { model?: string; reasoningEffort?: string }) => setHarnessSettings(patch))
-  handle(IPC.harnessSessions, () => listHarnessSessions())
-  handle(IPC.harnessApiKeyGet, () => getHarnessApiKey())
-  handle(IPC.harnessApiKeySet, (key: string | null) => setHarnessApiKey(key))
-  handle(IPC.harnessSkillsList, () => listHarnessSkills())
-  handle(IPC.harnessSkillsDelete, (id: string) => {
-    void deleteHarnessSkill(id)
-  })
-  handle(IPC.harnessSkillsInstall, async (): Promise<{ name: string } | null> => {
-    const { canceled, filePaths } = await dialog.showOpenDialog({
-      title: '选择技能文件夹(需含 SKILL.md)',
-      properties: ['openDirectory']
-    })
-    if (canceled || filePaths.length === 0) return null
-    const name = await installHarnessSkillFromDir(filePaths[0])
-    return { name }
-  })
-  handle(IPC.harnessSkillsReveal, () => {
-    void shell.openPath(harnessSkillsDir())
+  handle(IPC.llmTest, () => testLlmConnection())
+
+  /* 数据位置管理 */
+  handle(IPC.dataGetLocation, () => getDataLocation())
+  handle(IPC.dataChooseLocation, () => chooseDataLocation())
+  handle(IPC.dataMigrateLocation, (path: string) => migrateDataLocation(path, () => undefined))
+  handle(IPC.dataResetLocation, () => resetDataLocation())
+
+  /* 转写引擎检测 */
+  handle(IPC.engineCheck, async () => {
+    try {
+      const { engineAvailable } = await import('./transcriber')
+      const ok = await engineAvailable()
+      return ok
+        ? { ok: true, message: '引擎正常,模型可加载' }
+        : { ok: false, message: '引擎无法加载模型,请重新下载' }
+    } catch (e) {
+      return { ok: false, message: `检测失败: ${e instanceof Error ? e.message : String(e)}` }
+    }
   })
 
   /* ---------- 搜索 ---------- */
@@ -158,7 +150,7 @@ export function registerIpc(): void {
 
   /* ---------- 系统 ---------- */
   handle(IPC.systemAskMic, async () => {
-    const appName = app.isPackaged ? 'Notion Oasis' : 'Electron'
+    const appName = app.isPackaged ? 'Oasis Meeting' : 'Electron'
     if (process.platform !== 'darwin') return { granted: true, appName }
     try {
       const granted = await systemPreferences.askForMediaAccess('microphone')
