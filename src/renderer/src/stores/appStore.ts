@@ -81,7 +81,7 @@ export const useAppStore = create<AppState>((set, get) => ({
       const pages = await api.pages.list()
       if (pages.length === 0) {
         // 首次运行:创建欢迎页
-        const detail = await api.pages.create(null, '欢迎使用 Oasis NoteBook')
+        const detail = await api.pages.create(null, '欢迎使用 Oasis Meeting')
         await api.pages.updateContent(detail.id, welcomeDoc())
         set({ pages: await api.pages.list(), loaded: true })
         return
